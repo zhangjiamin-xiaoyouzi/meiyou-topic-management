@@ -1,0 +1,13 @@
+node_modules/
+.DS_Store
+*.log
+*.swp
+.vscode-server/
+.env
+.env.local
+dist/
+build/
+*.lock
+pnpm-lock.yaml
+yarn.lock
+package-lock.json
