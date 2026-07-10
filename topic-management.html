@@ -21,14 +21,14 @@
 /* ===== 本地演示模式 ===== */
 (function () {
   var LOCAL_MAP = {
-    '/topic/subject_list':             '话题管理.html',
-    '/topic/edit_subject?is_new=1':    '添加热议话题.html',
-    '/topic/edit_subject?act_type=ad': '添加热议话题_广告.html'
+    '/topic/subject_list':             'topic-management.html',
+    '/topic/edit_subject?is_new=1':    'add-hot-topic.html',
+    '/topic/edit_subject?act_type=ad': 'add-hot-topic-ads.html'
   };
 
   function isLocalFile(u) {
     if (!u) return false;
-    return ['话题管理.html', '添加热议话题.html', '编辑话题.html', '添加热议话题_广告.html']
+    return ['topic-management.html', 'add-hot-topic.html', 'edit-topic.html', 'add-hot-topic-ads.html']
       .some(function (p) { return u.indexOf(p) >= 0; });
   }
 

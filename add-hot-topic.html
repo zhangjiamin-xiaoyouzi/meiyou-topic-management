@@ -1,0 +1,1068 @@
+<!DOCTYPE html><html><head>
+<meta http-equiv="X-UA-Compatible" content="IE=9,Chrome=1">
+<meta http-equiv="X-UA-Compatible" content="IE=9">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="shortcut icon" href="https://sc.seeyouyima.com/image/favicon.ico" type="image/x-icon">
+<link href="https://admin.seeyouyima.com/front/css/bootstrap/bootstrap.min.css" rel="stylesheet">
+<link href="https://admin.seeyouyima.com/front/css/common.css" rel="stylesheet">
+<link href="https://admin.seeyouyima.com/front/css/add_base.css" rel="stylesheet">
+<title>美柚后台管理系统 - 运营系统</title>
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+  <script src="http://cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+  <script src="http://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"></script>
+
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/jquery-1.7.2.min.js"></script>
+
+<script id="__local_mock__">
+(function(){
+  var LOCAL=['topic-management.html','add-hot-topic.html','edit-topic.html','add-hot-topic-ads.html'];
+  function isLocal(u){return u&&LOCAL.some(function(p){return u.indexOf(p)>=0;})}
+  function showTip(){if(document.getElementById('__tip__'))return;var d=document.createElement('div');d.id='__tip__';d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border:1px solid #e8e8ed;border-radius:8px;padding:18px 40px;box-shadow:0 8px 24px rgba(0,0,0,.18);z-index:999999;font-size:15px;color:#666;text-align:center;pointer-events:none';d.textContent='暂无功能';document.body.appendChild(d);setTimeout(function(){var e=document.getElementById('__tip__');if(e)e.remove();},1500);}
+  function resolveHref(h){var m={'／topic/subject_list':'topic-management.html'};for(var k in m){if(h.indexOf(k)>=0)return m[k];}if(h.indexOf('/topic/subject_list')>=0)return'topic-management.html';if(h.indexOf('/topic/edit_subject?is_new=1')>=0)return'add-hot-topic.html';if(h.indexOf('/topic/edit_subject?act_type=ad')>=0)return'add-hot-topic-ads.html';if(h.indexOf('edit_subject?id=')>=0){var qs=h.split('?')[1]||'';return'edit-topic.html'+(qs?'?'+qs:'');}return null;}
+  window.open=function(url){if(!url){showTip();return;}if(isLocal(url)){location.href=url;return;}var l=resolveHref(url);if(l){location.href=l;return;}showTip();};
+  function hookJQ(){if(window.jQuery){var _d=function(){var d={done:function(){return d;},fail:function(f){try{f({});}catch(e){}return d;},always:function(f){try{f();}catch(e){}return d;},then:function(a,b){return d.done(a).fail(b||function(){});} };return d;};jQuery.ajax=jQuery.get=jQuery.post=function(){return _d();};jQuery.fn.load=function(){return this;};}else{setTimeout(hookJQ,30);}}
+  hookJQ();
+  function onReady(){setTimeout(function(){try{document.querySelectorAll('.aui_dialog').forEach(function(el){var b=el.querySelector('.aui_close');if(b)b.click();});}catch(e){}},500);document.addEventListener('click',function(e){var el=e.target;while(el&&el.tagName!=='A')el=el.parentElement;if(!el)return;var href=el.getAttribute('href')||'';if(!href||href==='#'||href.indexOf('javascript:')===0)return;if(isLocal(href))return;e.preventDefault();e.stopPropagation();var l=resolveHref(href);if(l){location.href=l;return;}showTip();},true);document.addEventListener('submit',function(e){e.preventDefault();e.stopPropagation();showTip();},true);}
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',onReady);}else{onReady();}
+})();
+</script>
+
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/index.js"></script>
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/bootstrap-datetimepicker.min.js"></script>
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/bootstrap-datetimepicker.zh-CN.js"></script>
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/artDialog/jquery.artDialog.js"></script>
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/WdatePicker.js"></script>
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/jquery.multiselect.js"></script>
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/jquery.base64.js"></script>
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/tips.js"></script>
+
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/zh-cn.js"></script>
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/common.js"></script>
+
+    <!-- layui组件 -->
+<script src="https://admin.seeyouyima.com/front/layui/layui.js" charset="utf-8"></script>
+<script>
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();
+
+	//iframe自适应
+	$("#tab_frame").load(function(){
+		 
+		 $(this).height($('body',window.frames["tab_frame"].document).height() + 50);
+	});
+	
+	if(top != self)
+	{
+		$('#tab_frame',window.parent.document).height($(this).height());
+	}
+	
+		
+	$('#sort_box a').click(function(){
+		
+		//没有排序默认点击ASC
+		if($(this).attr('sort_type') == 'none')
+		{
+			$(this).attr('class','sort_desc');
+			$(this).attr('sort_type','desc');
+			$('#_sort_type').html('<input type="hidden" name="sort_col" value="'+$(this).attr('sort_col')+'"/><input type="hidden" name="sort_type" value="'+$(this).attr('sort_type')+'"/>');
+			$('#fom').submit();
+		}
+		else if($(this).attr('sort_type') == 'asc')
+		{
+			$(this).attr('class','sort_desc');
+			$(this).attr('sort_type','desc');
+			$('#_sort_type').html('<input type="hidden" name="sort_col" value="'+$(this).attr('sort_col')+'"/><input type="hidden" name="sort_type" value="'+$(this).attr('sort_type')+'"/>');
+			$('#fom').submit();
+		}
+		else if($(this).attr('sort_type') == 'desc')
+		{
+			$(this).attr('class','sort_asc');
+			$(this).attr('sort_type','asc');
+			$('#_sort_type').html('<input type="hidden" name="sort_col" value="'+$(this).attr('sort_col')+'"/><input type="hidden" name="sort_type" value="'+$(this).attr('sort_type')+'"/>');
+			$('#fom').submit();
+		}
+	});
+
+});
+</script>
+
+<style id="__req_tip_style2__">
+.req-anno-btn{display:inline-block;background:#e67e00;color:#fff;border:none;border-radius:3px;padding:1px 7px;font-size:11px;line-height:18px;cursor:pointer;margin-right:8px;vertical-align:middle;font-weight:600;opacity:.9}
+.req-anno-btn:hover{background:#cf6c00;opacity:1}
+.req-anno-box{display:none}
+#__req_modal__ *{box-sizing:border-box}
+</style>
+<script>
+function toggleReqAnno(btn){
+  var box=btn.parentElement.querySelector('.req-anno-box');
+  if(!box)return;
+  if(document.getElementById('__req_modal__'))return;
+  var ov=document.createElement('div');
+  ov.id='__req_modal__';
+  ov.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);z-index:999998;display:flex;align-items:center;justify-content:center';
+  var card=document.createElement('div');
+  card.style.cssText='background:#fff;border-radius:8px;padding:24px 28px 20px;max-width:420px;width:92%;box-shadow:0 8px 32px rgba(0,0,0,.22);position:relative;border-top:4px solid #e67e00';
+  var cls=document.createElement('button');
+  cls.innerHTML='&times;';
+  cls.style.cssText='position:absolute;top:10px;right:14px;background:none;border:none;font-size:22px;line-height:1;cursor:pointer;color:#aaa;padding:0';
+  cls.onclick=function(){ov.remove();};
+  var ttl=document.createElement('div');
+  ttl.style.cssText='font-size:13px;font-weight:700;color:#e67e00;margin-bottom:12px;letter-spacing:.5px';
+  ttl.textContent='📋 需求说明';
+  var body=document.createElement('div');
+  body.style.cssText='font-size:12px;color:#5a4000;line-height:1.9;white-space:pre-line;background:#fffbe6;padding:12px 14px;border-radius:6px;border-left:3px solid #e67e00;max-height:60vh;overflow-y:auto';
+  body.textContent=box.textContent.trim();
+  card.appendChild(cls);card.appendChild(ttl);card.appendChild(body);
+  ov.appendChild(card);
+  ov.onclick=function(e){if(e.target===ov)ov.remove();};
+  document.body.appendChild(ov);
+}
+</script>
+</head>
+<body><div class="" style="display: none; position: absolute;"><div class="aui_outer"><table class="aui_border"><tbody><tr><td class="aui_nw"></td><td class="aui_n"></td><td class="aui_ne"></td></tr><tr><td class="aui_w"></td><td class="aui_c"><div class="aui_inner"><table class="aui_dialog"><tbody><tr><td colspan="2" class="aui_header"><div class="aui_titleBar"><div class="aui_title" style="cursor: move; display: block;"></div><a class="aui_close" href="javascript:/*artDialog*/;" style="display: block;">×</a></div></td></tr><tr><td class="aui_icon" style="display: none;"><div class="aui_iconBg" style="background: none;"></div></td><td class="aui_main" style="width: auto; height: auto;"><div class="aui_content" style="padding: 20px 25px;"></div></td></tr><tr><td colspan="2" class="aui_footer"><div class="aui_buttons" style="display: none;"></div></td></tr></tbody></table></div></td><td class="aui_e"></td></tr><tr><td class="aui_sw"></td><td class="aui_s"></td><td class="aui_se" style="cursor: se-resize;"></td></tr></tbody></table></div></div>
+		<div id="top" class="tops"><div class="top_menu">
+	<nav class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <a class="navbar-brand" href="/">运营系统</a>
+          </div>
+          <div id="navbar" class="navbar-collapse collapse">
+		   <ul class="nav navbar-nav navbar-nav-top">
+
+		                                                                                                                                            <li><a href="http://admin.seeyouyima.com/topic/topic_list">帖子管理</a></li>
+                                                                                            <li><a href="http://admin.seeyouyima.com/topic/review_list">评论管理</a></li>
+                                                                                            <li><a href="http://admin.seeyouyima.com/circle/circle_list">圈子管理</a></li>
+                                                                                            <li class="active"><a href="http://admin.seeyouyima.com/topic/subject_list">话题管理</a></li>
+                                                                                            <li><a href="http://admin.seeyouyima.com/circle_main/circle_main_list">圈主管理</a></li>
+                                                                                            <li><a href="http://admin.seeyouyima.com/qa_star/audit_page">问答之星</a></li>
+                                                                                            <li><a href="http://admin.seeyouyima.com/warm_star/warm_star_list">潜在暖评之星列表</a></li>
+                                                                                            <li><a href="http://admin.seeyouyima.com/topic/topic_new_user_list">用户管理</a></li>
+                                                                                            <li><a href="http://admin.seeyouyima.com/complaint/topic_listview">审核管理</a></li>
+                                                                                                                                                                                                                                                                                            <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"> 更多 <span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <li><a href="http://admin.seeyouyima.com/config_manage/aliyun_image_config">配置管理</a></li>
+                                                                                                                                <li><a href="http://admin.seeyouyima.com/circle/home_recommend_circle">她她圈首页配置</a></li>
+                                                                                                                                <li><a href="http://admin.seeyouyima.com/ttq_contribute/task_user_page">贡献榜任务管理</a></li>
+                                                                                                                                <li><a href="http://admin.seeyouyima.com/systemlog/forum_master_log">统计管理</a></li>
+                                                                                                                                <li><a href="http://admin.seeyouyima.com/warm_star/warm_star_list">潜在暖评之星</a></li>
+                                                                                    </ul>
+                    </li>
+                		    
+           </ul>
+
+
+            <ul class="nav navbar-nav navbar-right">
+            <li id="hasmsg" class="topinfo" style="display:none" onclick="this.style.display=&quot;none&quot;;location.href=&quot;/topic/fakeuser_message&quot;;"><img src="../front/img/email.png" class="topinfo-img"></li>
+            <li class="navbar-nav-login"><a href="#">张家敏</a></li>
+              <li class="dropdown">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> 系统操作 <span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+	                             				  <li><a href="http://auth.seeyouyima.com/index"><span class="glyphicon glyphicon-plus"></span> 选择系统</a></li>
+				  <li><a href="http://auth.seeyouyima.com/login/change_password"><span class="glyphicon glyphicon-repeat"></span> 修改密码</a></li>
+                                  <li><a href="http://auth.seeyouyima.com/login/logout"><span class="glyphicon glyphicon-log-out"></span> 退出登录</a></li>
+                </ul>
+              </li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div><!--/.container-fluid -->
+      </nav>
+</div>
+
+</div>
+		<div id="desc" class="warp">
+		<div id="left" class="warpleft" style="background:#f8f8f8;z-index:1;"><div id="bars" class="bars">
+	<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+	<ul class="nav nav-list nav-left-list">
+			<li><a href="http://admin.seeyouyima.com/topic/subject_list">热议话题列表</a></li>
+			<li><a href="http://admin.seeyouyima.com/subject_rss/subject_rss_list">热议话题关联管理</a></li>
+			<li><a href="http://admin.seeyouyima.com/subject_category/subject_category_list">话题推荐列表管理</a></li>
+			<li><a href="http://admin.seeyouyima.com/subject/subject_experience_subtitle_list">经验锦囊小标题</a></li>
+		</ul>
+	</div>
+</div></div>
+		<div id="right" class="warpright">
+		<link rel="stylesheet" type="text/css" href="https://admin.seeyouyima.com/front/css/chosen/chosen.min.css?v=34">
+<link rel="stylesheet" type="text/css" href="https://admin.seeyouyima.com/front/css/validation.css">
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/jquery.validate.js"></script>
+<link href="https://admin.seeyouyima.com/front/css/bootstrap/bootstrap-multiselect.css" rel="stylesheet">
+<link rel="stylesheet" href="https://admin.seeyouyima.com/front/js/select2/css/select2.min.css">
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/bootstrap-multiselect.js"></script>
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/meitu/xiuxiu.js"></script>
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/meitu/meitu.action.js"></script>
+<style>
+    #content_preview img{
+        max-width: 200px;
+    }
+    span.required {
+        color: red;
+    }
+</style>
+<div>
+
+    <h4 class="page-header page-header-title pdbtm0">
+        <p>话题管理 &gt; 添加热议话题</p>
+    </h4>
+    <form role="form" class="form-inline form" method="post" id="form">
+        <table class="table hover-table table-bordered">
+            <tbody><tr>
+                <th style="width:160px;">卡片模式</th>
+                <td>
+                                            <label><input type="radio" value="0" name="card_mode" checked="checked"> 关闭</label>&nbsp;&nbsp;&nbsp;
+                        <label><input type="radio" value="1" name="card_mode"> 排行模式</label>&nbsp;&nbsp;&nbsp;
+                        <label><input type="radio" value="5" name="card_mode"> 经验锦囊</label>&nbsp;&nbsp;&nbsp;
+                                    </td>
+            </tr>
+            <tr id="tr_user_role" style="display: none;">
+                <th style="width:160px;"><span class="required">*</span>用户属性</th>
+                <td>
+                    <label><input type="radio" value="1" name="user_role"> 普通用户</label>&nbsp;&nbsp;&nbsp;
+                    <label><input type="radio" value="2" name="user_role"> 达人</label>&nbsp;&nbsp;&nbsp;
+                </td>
+            </tr>
+            <tr id="mode_tr" style="">
+                <th style="min-width: 100px;"><span class="required">*</span>身份:</th>
+                                <td>
+                    <label class="ml10">
+                        <input type="checkbox" class="all-mode" value="-1"> 通用
+                    </label>
+                                            <label>
+                            <input name="modes[]" class="node-mode" type="checkbox" value="4" data-name="未成年" warning:="" in_array()="" expects="" parameter="" 2="" to="" be="" array,="" null="" given="" in="" data="" www="" admin.seeyouyima.com="" views="" subject="" edit_subject_default.php="" on="" line="" 61="" style="margin-left: 10px;">
+                            未成年                        </label>
+                                            <label>
+                            <input name="modes[]" class="node-mode" type="checkbox" value="0" data-name="经期" warning:="" in_array()="" expects="" parameter="" 2="" to="" be="" array,="" null="" given="" in="" data="" www="" admin.seeyouyima.com="" views="" subject="" edit_subject_default.php="" on="" line="" 61="" style="margin-left: 10px;">
+                            经期                        </label>
+                                            <label>
+                            <input name="modes[]" class="node-mode" type="checkbox" value="1" data-name="怀孕" warning:="" in_array()="" expects="" parameter="" 2="" to="" be="" array,="" null="" given="" in="" data="" www="" admin.seeyouyima.com="" views="" subject="" edit_subject_default.php="" on="" line="" 61="" style="margin-left: 10px;">
+                            怀孕                        </label>
+                                            <label>
+                            <input name="modes[]" class="node-mode" type="checkbox" value="2" data-name="备孕" warning:="" in_array()="" expects="" parameter="" 2="" to="" be="" array,="" null="" given="" in="" data="" www="" admin.seeyouyima.com="" views="" subject="" edit_subject_default.php="" on="" line="" 61="" style="margin-left: 10px;">
+                            备孕                        </label>
+                                            <label>
+                            <input name="modes[]" class="node-mode" type="checkbox" value="3" data-name="辣妈" warning:="" in_array()="" expects="" parameter="" 2="" to="" be="" array,="" null="" given="" in="" data="" www="" admin.seeyouyima.com="" views="" subject="" edit_subject_default.php="" on="" line="" 61="" style="margin-left: 10px;">
+                            辣妈                        </label>
+                                    </td>
+            </tr>
+            <tr>
+                <th><span class="required">*</span>名称:</th>
+                <td>
+                    <div class="talk-tit">
+                        <input type="text" name="name" class="form-control required text w300" value="" limit="60" id="title"> &nbsp;&nbsp;<span style="color: red;">不超出15个字（2个英文或数字算一个字）</span>
+                </div>
+                </td>
+            </tr>
+            <tr>
+                <th>副标题:</th>
+                <td>
+                    <div class="talk-tit">
+                        <input type="text" name="sub_title" class="form-control required text w300" value="" limit="60" id="sub_title"> &nbsp;&nbsp;
+                        <span style="color: red;">请不要超过 15 个字(2个英文算一个字)</span>
+                    </div>
+                </td>
+            </tr>
+            <tr id="tr_tpl_ids" style="display: none;">
+                <th>关联经验模板:</th>
+                <td>
+                    <select name="tpl_ids[]" id="tpl_ids" class="form-control select2_tpl w500 select2-hidden-accessible" multiple="" style="width: 130px;" tabindex="-1" aria-hidden="true">
+                                                                    </select><span class="select2 select2-container select2-container--default" dir="ltr" style="width: 130px;"><span class="selection"><span class="select2-selection select2-selection--multiple" role="combobox" aria-haspopup="true" aria-expanded="false" tabindex="-1"><ul class="select2-selection__rendered"><li class="select2-search select2-search--inline"><input class="select2-search__field" type="search" tabindex="0" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="textbox" aria-autocomplete="list" placeholder="请选择" style="width: 128px;"></li></ul></span></span><span class="dropdown-wrapper" aria-hidden="true"></span></span>
+                </td>
+            </tr>
+            <tr>
+                <th>分类:</th>
+                <td>
+                    <select name="category_ids[]" id="category_ids" class="form-control select2 w500 select2-hidden-accessible" multiple="" tabindex="-1" aria-hidden="true">
+                                                    <option value="31">
+                                互助                            </option>
+                                                    <option value="30">
+                                求助                            </option>
+                                                    <option value="29">
+                                经期热点                            </option>
+                                                    <option value="28">
+                                备孕热点                            </option>
+                                                    <option value="27">
+                                孕期热点                            </option>
+                                                    <option value="26">
+                                辣妈热点                            </option>
+                                                    <option value="25">
+                                投票话题                            </option>
+                                                    <option value="24">
+                                视频话题                            </option>
+                                                    <option value="22">
+                                热议话题                            </option>
+                                                    <option value="21">
+                                热点                            </option>
+                                                    <option value="20">
+                                母婴最热                            </option>
+                                                    <option value="17">
+                                备孕最热                            </option>
+                                                    <option value="16">
+                                最热                            </option>
+                                                    <option value="15">
+                                孕产最热                            </option>
+                                                    <option value="13">
+                                健康                            </option>
+                                                    <option value="12">
+                                孕产                            </option>
+                                                    <option value="11">
+                                校园                            </option>
+                                                    <option value="10">
+                                母婴                            </option>
+                                                    <option value="9">
+                                生活                            </option>
+                                                    <option value="8">
+                                时尚                            </option>
+                                                    <option value="7">
+                                情感                            </option>
+                                            </select><span class="select2 select2-container select2-container--default" dir="ltr" style="width: 500px;"><span class="selection"><span class="select2-selection select2-selection--multiple" role="combobox" aria-haspopup="true" aria-expanded="false" tabindex="-1"><ul class="select2-selection__rendered"><li class="select2-search select2-search--inline"><input class="select2-search__field" type="search" tabindex="0" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="textbox" aria-autocomplete="list" placeholder="请选择分类" style="width: 498px;"></li></ul></span></span><span class="dropdown-wrapper" aria-hidden="true"></span></span>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <button type="button" class="req-anno-btn" onclick="toggleReqAnno(this)" style="display:block;margin-bottom:4px">需求说明</button>
+                    <span class="required">*</span>话题标签
+                    <div class="req-anno-box">【话题标签】必填，新增话题时须完整配置以下 4 个维度：
+
+话题特色
+· 特色：运营精选话题，推荐流中享有更高权重分发
+· 非特色：普通话题，按正常权重分发
+
+话题频率
+· 高频：每周推送 ≥3 次，适合持续热点话题
+· 低频：每周推送 ≤1 次，适合长尾或季节性话题
+
+话题周期
+· 长期：无明确下线时间，持续运营
+· 短期：有明确截止日期，到期后自动降权或下线
+
+是否官方
+· 官方：由美柚官方创建或经认证的品牌/活动话题
+· 非官方：用户自发创建或第三方话题</div>
+                </th>
+                <td>
+                    <div style="margin-bottom:6px">
+                        <label style="width:80px;display:inline-block;color:#555">话题特色：</label>
+                        <label><input type="radio" value="1" name="topic_feature"> 特色</label>&nbsp;&nbsp;&nbsp;
+                        <label><input type="radio" value="2" name="topic_feature"> 非特色</label>
+                    </div>
+                    <div style="margin-bottom:6px">
+                        <label style="width:80px;display:inline-block;color:#555">话题频率：</label>
+                        <label><input type="radio" value="1" name="topic_frequency"> 高频</label>&nbsp;&nbsp;&nbsp;
+                        <label><input type="radio" value="2" name="topic_frequency"> 低频</label>
+                    </div>
+                    <div style="margin-bottom:6px">
+                        <label style="width:80px;display:inline-block;color:#555">话题周期：</label>
+                        <label><input type="radio" value="1" name="topic_cycle"> 长期</label>&nbsp;&nbsp;&nbsp;
+                        <label><input type="radio" value="2" name="topic_cycle"> 短期</label>
+                    </div>
+                    <div>
+                        <label style="width:80px;display:inline-block;color:#555">是否官方：</label>
+                        <label><input type="radio" value="1" name="topic_official"> 官方</label>&nbsp;&nbsp;&nbsp;
+                        <label><input type="radio" value="2" name="topic_official"> 非官方</label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th>简介:</th>
+                <td>
+                    <div class="talk-tit720" style="float: left;width: 520px;">
+                        <textarea class="form-control required texted w500" id="introduction" name="introduction"></textarea> <br>
+                        <span style="color: red;">请不要超过 120 个字(2个英文算一个字)</span>
+                    </div>
+                </td>
+            </tr>
+
+            <tr>
+                <th>icon:</th>
+                <td>
+                    <img id="icon_img1" src="https://admin.seeyouyima.com/front/img/default-180.png" class="toppic-add-img">
+                    <span style="color: red;"> 尺寸 : 300 X 300</span> <br>
+                    <input id="icon_input1" name="icon" value="" type="hidden">
+                    <div class="img-file-button">
+                        <button type="button" class="btn btn-danger m-left imgfile-img" data-index="1">选择图片</button>
+                        <button type="button" class="btn btn-sumbit m-left delete-img" data-index="1">删除图片</button>
+                    </div>
+                </td>
+            </tr>
+
+            <tr>
+                <th>是否展示banner</th>
+                <td>
+                    <label><input type="radio" value="0" name="banner_type" checked="checked"> 否</label>&nbsp;&nbsp;&nbsp;
+                    <label><input type="radio" value="1" name="banner_type"> 是</label>&nbsp;&nbsp;&nbsp;
+                </td>
+            </tr>
+
+            <tr class="banner_item" style="display:none;">
+                <th>banner小图</th>
+                <td>
+                    <img id="icon_img2" src="https://admin.seeyouyima.com/front/img/default-180.png" style="width: 180px;height: 180px;">
+                    <span style="color: red;"> 建议尺寸 : 300 X 300</span> <br>
+                    <input id="icon_input2" name="banner_icon" value="" type="hidden">
+                    <div class="img-file-button">
+                        <button type="button" class="btn btn-danger m-left imgfile-img" data-index="2">选择图片</button>
+                        <button type="button" class="btn btn-sumbit m-left delete-img" data-index="2">删除图片</button>
+                    </div>
+                </td>
+            </tr>
+
+            <tr class="banner_item" style="display:none;">
+                <th><span style="color: red">*</span>banner主标题:</th>
+                <td>
+                    <div class="talk-tit">
+                        <input type="text" name="banner_main_title" class="form-control text w300" value="">最多18个字符
+                    </div>
+                </td>
+            </tr>
+
+            <tr class="banner_item" style="display:none;">
+                <th><span style="color: red">*</span>banner副标题:</th>
+                <td>
+                    <div class="talk-tit">
+                        <input type="text" name="banner_sub_title" class="form-control text w300" value="">最多24个字符
+                    </div>
+                </td>
+            </tr>
+
+            <tr class="banner_item" style="display:none;">
+                <th><span style="color: red">*</span>banner跳转链接:</th>
+                <td>
+                    <div class="talk-tit">
+                        <select name="banner_redirect_type" class="form-control">
+                            <option value="0" selected="selected">帖子ID</option>
+                            <option value="1">其他链接</option>
+                        </select>
+                        <input type="text" name="banner_redirect_value" class="form-control text w500" value="">最多500字符
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th>是否feeds流展示</th>
+                <td>
+                    <label><input type="radio" value="1" name="show_in_feeds" disabled=""> 是</label>&nbsp;&nbsp;&nbsp;
+                    <label><input type="radio" value="0" name="show_in_feeds" checked="checked" disabled=""> 否</label>
+                </td>
+            </tr>
+            <tr>
+                <th><span class="required">*</span>状态</th>
+                <td>
+                    <label><input type="radio" value="1" name="status"> 上线</label>&nbsp;&nbsp;&nbsp;
+                    <label><input type="radio" value="2" name="status" checked="checked"> 下线</label>
+                </td>
+            </tr>
+
+                        <tr>
+                <th>推荐位置（未成年）:</th>
+                <td>
+                    第
+                    <input type="number" id="mode_position_4" data-mode="4" name="positions[4]" class="form-control text w100 mode_position" value="" readonly="readonly" max="20" placeholder="无">
+                    位
+
+                    <div id="position_check_4" style="color: red;"></div>
+                </td>
+            </tr>
+                        <tr>
+                <th>推荐位置（经期）:</th>
+                <td>
+                    第
+                    <input type="number" id="mode_position_0" data-mode="0" name="positions[0]" class="form-control text w100 mode_position" value="" readonly="readonly" max="20" placeholder="无">
+                    位
+
+                    <div id="position_check_0" style="color: red;"></div>
+                </td>
+            </tr>
+                        <tr>
+                <th>推荐位置（怀孕）:</th>
+                <td>
+                    第
+                    <input type="number" id="mode_position_1" data-mode="1" name="positions[1]" class="form-control text w100 mode_position" value="" readonly="readonly" max="20" placeholder="无">
+                    位
+
+                    <div id="position_check_1" style="color: red;"></div>
+                </td>
+            </tr>
+                        <tr>
+                <th>推荐位置（备孕）:</th>
+                <td>
+                    第
+                    <input type="number" id="mode_position_2" data-mode="2" name="positions[2]" class="form-control text w100 mode_position" value="" readonly="readonly" max="20" placeholder="无">
+                    位
+
+                    <div id="position_check_2" style="color: red;"></div>
+                </td>
+            </tr>
+                        <tr>
+                <th>推荐位置（辣妈）:</th>
+                <td>
+                    第
+                    <input type="number" id="mode_position_3" data-mode="3" name="positions[3]" class="form-control text w100 mode_position" value="" readonly="readonly" max="20" placeholder="无">
+                    位
+
+                    <div id="position_check_3" style="color: red;"></div>
+                </td>
+            </tr>
+                        <tr>
+                <th>推荐时间</th>
+                <td>
+                    <input type="text" id="start_time" disabled="disabled" name="recommend_start_time" class="form-control text w20" value="" limit="60"> -
+                    <input type="text" id="end_time" disabled="disabled" name="recommend_end_time" class="form-control text w20" value="" limit="60">
+
+                </td>
+            </tr>
+
+            <tr>
+                <th>热度标识</th>
+                <td>
+                    <div>
+                        <label>是否展示讨论热度</label>
+
+                        <label><input type="radio" value="1" name="hot_switch" disabled="">
+                            展示
+                        </label>&nbsp;&nbsp;&nbsp;
+                        <label><input type="radio" value="2" name="hot_switch" checked="checked" disabled="">
+                            不展示
+                        </label>
+                    </div>
+                    <div id="hot" hidden="" style="display: none;">
+                        <div>
+                            <label>展示方式</label>
+
+                            <label><input type="radio" value="1" name="hot_show_way" disabled="">
+                                阅读讨论量
+                            </label>&nbsp;&nbsp;&nbsp;
+                            <label><input type="radio" value="2" name="hot_show_way" checked="checked" disabled="">
+                                内容发布量
+                            </label>
+                        </div>
+                        <div>
+                            <label>标签文案</label>
+                            <input type="text" name="hot_label" class="form-control required text w300" value="" maxlength="4" placeholder="4个字以内" readonly="readonly">
+                        </div>
+                    </div>
+
+                </td>
+            </tr>
+            <tr>
+                <th>虚拟新增浏览量</th>
+                <td>
+                    <input type="text" name="fake_read_count" class="form-control required text w300" value="" limit="60">
+                </td>
+            </tr>
+
+            <tr>
+                <th>虚拟新增讨论量</th>
+                <td>
+                    <input type="text" name="fake_review_count" class="form-control required text w300" value="" limit="60">
+                </td>
+            </tr>
+
+            <tr>
+                <th>虚拟新增发帖量</th>
+                <td>
+                    <input type="text" name="fake_post_count" class="form-control required text w300" value="" limit="60">
+                </td>
+            </tr>
+            <tr>
+                <th><span class="required">*</span>编辑器话题标签</th>
+                <td>
+                    <label><input type="radio" value="0" name="tag_style" checked="checked"> 普通话题</label>&nbsp;&nbsp;&nbsp;
+                    <label><input type="radio" value="1" name="tag_style"> 热点话题</label>
+                    <label><input type="radio" value="2" name="tag_style"> 活动话题</label>
+                </td>
+            </tr>
+             <tr id="tag_style_time" style="display: none;">
+                <th style="width:160px;"><span class="required">*</span>标签有效期</th>
+                <td>
+                    <input type="text" id="tag_style_start" name="tag_style_start_time" class="form-control text w20" value="" limit="60"> -
+                    <input type="text" id="tag_style_end" name="tag_style_end_time" class="form-control text w20" value="" limit="60">
+                </td>
+            </tr>
+            <tr id="tag_icon_id" style="display: none;">
+                <th><span class="required">*</span>标签icon:</th>
+                <td>
+                    <img id="icon_img3" src="https://admin.seeyouyima.com/front/img/default-180.png" class="toppic-add-img">
+                    <span style="color: red;">  尺寸 : 42 X 42</span> <br>
+                    <input id="icon_input3" name="tag_icon" value="" type="hidden">
+                    <div class="img-file-button">
+                        <button type="button" class="btn btn-danger m-left imgfile-img" data-index="3">选择图片</button>
+                        <button type="button" class="btn btn-sumbit m-left delete-img" data-index="3">删除图片</button>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <button type="submit" class="btn btn-danger check-data btn-save" id="sumbit">保存</button>
+                    <input type="hidden" name="allow_edit_subject_feeds" value="">
+                    <input type="hidden" name="id" value="">
+                    <button type="button" class="btn btm-cancel" id="cancel">取消</button>
+                    <input type="hidden" name="is_new" value="1">
+                    <input type="hidden" name="is_force_position" value="0">
+                </td>
+            </tr>
+
+        </tbody></table>
+    </form>
+</div>
+</div>
+</div>
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/jquery.shiftcheckbox.js"></script>
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/select2/js/select2.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        // $('#mode_tr label').shiftcheckbox({
+        //     checkboxSelector: ':checkbox',
+        //     selectAll: $('#mode_tr .all-mode'),
+        //     ignoreClick: 'label',
+        // });
+
+        // 用 shiftcheckbox 会有bug，因此自己写功能
+        $('#mode_tr').on('change', 'input[type="checkbox"]', function() {
+            var status = $('input[name="status"]:checked').val();
+            var val = $(this).val(),
+            isChecked = $(this).prop("checked");
+            var allow_edit_subject_feeds = $('input[name="allow_edit_subject_feeds"]').val();
+            if (val != -1) {
+                if (isChecked) {
+                    if (status == 1 && allow_edit_subject_feeds) {
+                        $("#mode_position_" + val).removeAttr("readonly");
+                    }
+                    if ($(".node-mode:checked").size() == 5) {
+                        $(".all-mode").prop("checked", "checked");
+                    }
+                } else {
+                    $(".all-mode").prop("checked", "");
+                    $("#mode_position_" + val).attr("readonly", true).val('');
+                }
+            } else {
+                if (isChecked) {
+                    $(".node-mode").prop("checked", "checked");
+                    if (status == 1 && allow_edit_subject_feeds) {
+                        $(".mode_position").removeAttr("readonly");
+                    } else {
+                        $(".mode_position").attr("readonly", "true").val('');
+                    }
+                } else {
+                    $(".node-mode").prop("checked", "");
+                    $(".mode_position").attr("readonly", true).val('');
+                }
+            }
+        });
+
+        $('#form').on('change', 'input[name="status"]', function() {
+            var status = $('input[name="status"]:checked').val();
+            var allow_edit_subject_feeds = $('input[name="allow_edit_subject_feeds"]').val();
+            if (status == 1 && allow_edit_subject_feeds) {
+                $(".node-mode:checked").each(function(i, e) {
+                    $("#mode_position_" + $(e).val()).removeAttr("readonly");
+                });
+                // $('input[name="is_show_hot"]').removeAttr("disabled");
+                $('#start_time').removeAttr("disabled");
+                $('#end_time').removeAttr("disabled");
+            } else {
+                $(".node-mode:checked").each(function(i, e) {
+                    $("#mode_position_" + $(e).val()).attr("readonly", true).val('');
+                });
+                // $('input[name="is_show_hot"]').attr("disabled", "disabled");
+                $('#start_time').attr("disabled", "disabled");
+                $('#end_time').attr("disabled", "disabled");
+            }
+        });
+
+        $('.select2').select2({
+            placeholder: {text:'请选择分类'},
+        });
+
+        $('.select2_tpl').select2({
+            placeholder: {text:'请选择'},
+        });
+
+        $(".select2_tpl").on("select2:select", function (evt) {
+            var element = evt.params.data.element;
+            var $element = $(element);
+            $element.detach();
+            $(this).append($element);
+            $(this).trigger("change");
+        });
+
+        //
+        var card_mode_val = $("input[name='card_mode']").val();
+        if(card_mode_val == 5){
+            $("#tr_user_role").show();
+            $("#tr_tpl_ids").show();
+        }else{
+            $("#tr_user_role").hide();
+            $("#tr_tpl_ids").hide();
+        }
+
+        var tag_style_val = $('[name="tag_style"]:checked').val();
+        if(tag_style_val ==0 || tag_style_val==""){
+             $("#tag_style_time").hide();
+             $("#tag_icon_id").hide();
+        } else if(tag_style_val == 1){
+            $("#tag_style_time").show();
+            $("#tag_icon_id").hide();
+        }else if(tag_style_val == 2){
+             $("#tag_style_time").show();
+             $("#tag_icon_id").show();
+        }
+
+        var hot_switch = $("input[name='hot_switch']:checked").val();
+        if(hot_switch == 1){
+            $("#hot").show();
+        }else{
+            $("#hot").hide();
+        }
+    });
+
+    $('#cancel').click(function(){
+        location.href = "/topic/subject_list?search_mode=";
+    });
+
+    $("#forums").multiselect({
+        enableCaseInsensitiveFiltering: true,
+        maxHeight: 190,
+        buttonWidth: 200
+    });
+
+    $('#forums').change(function(){
+        var id = $(this).val();
+        var tag_obj = $('#tags');
+        $.get('/common/get_circle_tag', {id: id}, function(msg){
+            var html = "<option value='0'>请选择标签</option>";
+            if(msg.s == 'success'){
+                var tag_id = tag_obj.data('id');
+                for(var i in msg.r){
+                    html += "<option value='" + msg.r[i].id + "'" + (msg.r[i].id == tag_id ? 'selected="selected"' : '') + ">" + msg.r[i].name + "</option>";
+                }
+                tag_obj.html(html);
+            }
+            else{
+                tag_obj.html(html);
+            }
+        }, 'json');
+    });
+
+    $(function(){
+
+        winopen = art.dialog;
+        function winopen_close(){
+            winopen.close();
+        }
+
+        $('.imgfile-img').on('click', function () {
+            var index = $(this).data('index');
+            winopen.open("/common/file_upload?dir=forum&do_js=1&img_name=icon_img" + index + "&icon_input=icon_input" + index, {
+                lock: true,
+                title: '上传图片'
+            });
+        });
+        $('.delete-img').on('click', function () {
+            var index = $(this).data('index');
+            var imgfile_id = '#icon_img'+index;
+            var icon_input = '#icon_input'+index;
+            $(imgfile_id).attr("src", "/front/img/default-120.png");
+            $(icon_input).val("");
+        });
+
+        //卡片模式切换
+        var card_mode_sel = $('[name="card_mode"]:checked').val();
+        $('[name="card_mode"]').on('click', function () {
+            var card_mode = $(this).val();
+            if (card_mode == 3 && card_mode_sel != card_mode) {
+                art.dialog.confirm('切换到此模式会导致页面已填数据被清空，确定继续？', function () {
+                    if (card_mode == 0 || card_mode == 1 || card_mode == 2) {
+                        window.location.href = '/topic/edit_subject?card_mode='+card_mode;
+                    } else if (card_mode == 3){
+                        window.location.href = '/topic/edit_subject_new?card_mode=3';
+                    }
+                });
+                return false;
+            }
+            if (2 == card_mode) {
+                $('#mode_tr').hide();
+            } else {
+                $('#mode_tr').show();
+            }
+        });
+
+        $('[name="banner_type"]').on('click', function () {
+            var banner_type = $(this).val();
+            banner_type = parseInt(banner_type) || 0;
+            if (banner_type == 0) {
+                $('.banner_item').hide();
+            } else {
+                $('.banner_item').show();
+            }
+        })
+    });
+
+    function len(str) {
+        str = str.replace(/\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDE4F]/ig, "**");//emoji要求也要能输入10个
+        return str.replace(/[^\x00-\xff]/ig, '**').length;
+    }
+
+    $("#start_time").click(function(){
+        start_time("#start_time","#end_time");
+    });
+
+    $("#end_time").click(function(){
+        end_time("#start_time","#end_time");
+    });
+
+    $("#tag_style_start").click(function(){
+        start_time("#tag_style_start","#tag_style_end");
+    });
+
+    $("#tag_style_end").click(function(){
+        end_time("#tag_style_start","#tag_style_end");
+    });
+
+    function start_time(start_obj,end_obj){
+        var start_dt = $(start_obj).val();
+        var end_dt = $(end_obj).val();
+        WdatePicker({
+                        dateFmt:'yyyy-MM-dd HH:mm:ss',
+            startDate:'%y-%M-%d 00:00:00',
+                        maxDate:end_dt,
+            alwaysUseStartDate:true
+        });
+
+    }
+
+    function end_time(start_obj,end_obj){
+        var start_dt = $(start_obj).val();
+        var end_dt = $(end_obj).val();
+        WdatePicker({
+                        dateFmt:'yyyy-MM-dd HH:mm:ss',
+            startDate:'%y-%M-%d 00:00:00',
+                        minDate:start_dt,
+            alwaysUseStartDate:true
+        });
+
+    }
+
+
+    $('#sumbit').click(function(){
+        var card_mode = $("input[name='card_mode']:checked").val();
+        console.log(card_mode);
+        if(card_mode == 5){
+            var user_role =  $("input[name='user_role']:checked").val();
+            if(!user_role){
+                _alert('用户属性必须选择！');
+                return false;
+            }
+        }
+        var tpl_ids = [];
+        $('#tpl_ids option:selected').each(function () {
+            tpl_ids.push($(this).val());
+        });
+
+        if (tpl_ids.length > 6){
+            _alert('最多只能配置6个经验模板！');
+            return false;
+        }
+
+        var modeStrs = ['经期', '怀孕', '备孕', '辣妈', '未成年'];
+        //身份
+        var modes = [], modes_name = [];
+        $('[name="modes[]"]:checked').each(function () {
+            modes.push($(this).val());
+            modes_name.push($(this).data('name'));
+        });
+        var id = $('[name="id"]').val();
+        if (modes.length < 1) {
+            _alert('身份必须选择！');
+            return false;
+        }
+
+        if ($('input[name="name"]').val() == 0) {
+             _alert('名称不能为空');
+            return false;
+        }
+        if (len($('input[name="name"]').val()) > 30) {
+            _alert('名称不超出15个字（2个英文或数字算一个字）');
+            return false;
+        }
+        if (len($('input[name="sub_title"]').val()) > 30) {
+            _alert('副标题请不要超过 15 个字(2个英文算一个字)');
+            return false;
+        }
+        if (len($('#introduction').val()) > 240) {
+            _alert('简介请不要超过 120 个字(2个英文算一个字)');
+            return false;
+        }
+
+        //话题标签
+        var tag_style = $('[name="tag_style"]:checked').val();
+        if(tag_style == 1 || tag_style == 2){
+            if (!($('input[name="tag_style_start_time"]').val()) || !($('input[name="tag_style_end_time"]').val())) {
+                _alert('标签有效期必须填写！');
+                return false;
+            }
+        }
+        if(tag_style == 2){
+            if (!($('input[name="tag_icon"]').val()) ) {
+                _alert('标签icon必填');
+                return false;
+            }
+        }
+
+        //banner
+        var banner_type = $('[name="banner_type"]:checked').val();
+        banner_type = parseInt(banner_type) || 0;
+        if (banner_type == 1) {
+            var banner_icon = $('[name="banner_icon"]').val();
+            var banner_main_title = $('[name="banner_main_title"]').val();
+            var banner_sub_title = $('[name="banner_sub_title"]').val();
+            var banner_redirect_type = $('[name="banner_redirect_type"]').val();
+            var banner_redirect_value = $('[name="banner_redirect_value"]').val();
+            banner_icon = $.trim(banner_icon);
+            banner_main_title = $.trim(banner_main_title);
+            banner_sub_title = $.trim(banner_sub_title);
+            banner_redirect_type = parseInt(banner_redirect_type) || 0;
+            banner_redirect_value = $.trim(banner_redirect_value);
+
+            if (!banner_main_title) {
+                _alert('banner主标题不能为空');
+                return false;
+            } else if (banner_main_title.length > 18) {
+                _alert('banner主标题不能超过18个字符');
+                return false;
+            }
+            if (!banner_sub_title) {
+                _alert('banner副标题不能为空');
+                return false;
+            } else if (banner_sub_title.length > 24) {
+                _alert('banner副标题不能超过24个字符');
+                return false;
+            }
+            if (banner_redirect_type == 0) {
+                if (!banner_redirect_value) {
+                    _alert('帖子ID不能为空');
+                    return false;
+                }
+                if (!$.isNumeric(banner_redirect_value)) {
+                    _alert('帖子ID必须是整数');
+                    return false;
+                }
+                if (banner_redirect_value < 1) {
+                    _alert('帖子ID必须大于0');
+                    return false;
+                }
+            } else {
+                if (!banner_redirect_value) {
+                    _alert('跳转链接不能为空');
+                    return false;
+                }
+                if (!banner_redirect_value.length > 500) {
+                    _alert('跳转链接字符数不能超过500');
+                    return false;
+                }
+            }
+        }
+
+        var positions = [];
+        var rs = true;
+        $(".mode_position").each(function() {
+            if (parseInt($(this).val()) > 20 || parseInt($(this).val()) < 0) {
+                _alert('推荐位置只能设置在1~20之间');
+                rs = false;
+                return false;
+            }
+            if (parseInt($(this).val()) > 0) {
+                positions.push($(this).val());
+            }
+        })
+        if(positions.length > 0){
+            if (!($('input[name="recommend_start_time"]').val()) || !($('input[name="recommend_start_time"]').val())) {
+                _alert('推荐时间必须填写！');
+                return false;
+            }
+        }
+        if (!rs) {
+            return false;
+        }
+        if (rs) {
+            if ($("input[name='id']").val() > 0) {
+                submitForm();
+            } else {
+                art.dialog.confirm('您选择的身份是“'+ modes_name.join("、") +'”，请再次确认', function () {
+                    submitForm();
+                });
+            }
+
+            return false;
+        }
+
+        function submitForm() {
+            var $sumbit = $('#sumbit');
+            $sumbit.attr("disabled","disabled");
+            $sumbit.text('保存中...');
+
+            $.post('https://admin.seeyouyima.com/topic/edit_subject', $('#form').serialize(), function(resp) {
+                if (resp.code == 0) {
+                    _alert("保存成功");
+                    location.href = "/topic/subject_list?search_mode=";
+                } else if (resp.code == 1) {
+                    art.dialog.confirm(resp.message + '，确认是否使用该值', function () {
+                        $("input[name='is_force_position']").val(1);
+                        submitForm();
+                    }, function() {
+                        $sumbit.removeAttr("disabled");
+                        $sumbit.text('保存');
+                    });
+                } else {
+                    _alert(resp.message);
+                    $sumbit.removeAttr("disabled");
+                    $sumbit.text('保存');
+                }
+            }, 'json');
+        }
+    });
+
+
+    $("input[name='card_mode']").click(function (){
+        console.log('aaaa');
+        var card_mode_val = $(this).val();
+        console.log(card_mode_val)
+        if(card_mode_val == 5){
+            $("#tr_user_role").show();
+            $("#tr_tpl_ids").show();
+        }else{
+            $("#tr_user_role").hide();
+            $("#tr_tpl_ids").hide();
+        }
+    })
+    $("input[name='tag_style']").click(function (){
+        console.log('bbb');
+        var tag_style_val = $(this).val();
+        console.log(tag_style_val)
+        if(tag_style_val ==0 || tag_style_val==""){
+             $("#tag_style_time").hide();
+             $("#tag_icon_id").hide();
+        } else if(tag_style_val == 1){
+            $("#tag_style_time").show();
+            $("#tag_icon_id").hide();
+        }else if(tag_style_val == 2){
+             $("#tag_style_time").show();
+             $("#tag_icon_id").show();
+        }
+    })
+    $("input[name='hot_switch']").click(function (){
+        var switch_val = $(this).val();
+        if(switch_val == 1){
+            $("#hot").show();
+        }else{
+            $("#hot").hide();
+        }
+    })
+
+</script>
+
+
+<div id="flashEditorOut" style="display:none;position:fixed;top:50%;left:50%;margin-left:-350px;margin-top:-250px;padding:12.5px;border:1px solid gray;-webkit-border-radius:10px;border-radius:10px;background:#fff"><div id="close_flashEditorOut" style="position:absolute;width:30px;height:30px;top:-15px;right:-15px;-webkit-border-radius:100px;border-radius:100px;border:1px solid black;line-height:30px;text-align:center;z-index:999;background:#fff;"><img src="https://admin.seeyouyima.com/front/img/delete.gif"></div><div id="altContent2"><h1>美图秀秀</h1></div></div><div style="display: none; position: fixed; left: 0px; top: 0px; width: 100%; height: 100%; cursor: move; opacity: 0; background: rgb(255, 255, 255);"></div></body></html>
