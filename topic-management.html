@@ -431,11 +431,13 @@ window._TOPIC_PROMOTION = {
             return;
         }
         
-        // 重置弹窗中的选择器
-        document.getElementById('batch-tag-modal-popularity').value = '';
-        document.getElementById('batch-tag-modal-period').value = '';
-        document.getElementById('batch-tag-modal-frequency').value = '';
-        document.getElementById('batch-tag-modal-attribute').value = '';
+        // 重置弹窗中的选择器 & 清除已选标签显示
+        var dims = ['popularity', 'period', 'frequency', 'attribute'];
+        for (var i = 0; i < dims.length; i++) {
+            var sel = document.getElementById('batch-tag-modal-' + dims[i]);
+            if (sel) sel.value = '';
+        }
+        this._refreshSelectedTagsBar();
         
         // 显示弹窗
         var modal = document.getElementById('batch-tag-modal');
@@ -447,6 +449,43 @@ window._TOPIC_PROMOTION = {
                 modal.style.display = 'none';
             }
         };
+    },
+
+    // 下拉选择触发
+    batchTagSelectChange: function(dim) {
+        this._refreshSelectedTagsBar();
+    },
+
+    // 删除已选标签
+    batchTagRemove: function(dim) {
+        var sel = document.getElementById('batch-tag-modal-' + dim);
+        if (sel) sel.value = '';
+        this._refreshSelectedTagsBar();
+    },
+
+    // 刷新已选标签回显区
+    _refreshSelectedTagsBar: function() {
+        var bar = document.getElementById('batch-tag-selected-bar');
+        if (!bar) return;
+        var dims = ['popularity', 'period', 'frequency', 'attribute'];
+        var chips = [];
+        for (var i = 0; i < dims.length; i++) {
+            var sel = document.getElementById('batch-tag-modal-' + dims[i]);
+            if (!sel || !sel.value) continue;
+            chips.push({ dim: dims[i], label: sel.options[sel.selectedIndex].text });
+        }
+        if (chips.length === 0) {
+            bar.style.display = 'none';
+            bar.innerHTML = '<span style="font-size:12px;color:#999;margin-right:4px">已选：</span>';
+        } else {
+            bar.style.display = 'flex';
+            bar.innerHTML = '<span style="font-size:12px;color:#999;margin-right:4px">已选：</span>' + chips.map(function(c) {
+                return '<span style="display:inline-flex;align-items:center;gap:4px;background:#ff9900;color:#fff;padding:3px 8px;border-radius:12px;font-size:12px;font-weight:500">'
+                    + c.label
+                    + '<span onclick="window._TOPIC_PROMOTION.batchTagRemove(\'' + c.dim + '\')" style="cursor:pointer;font-weight:700;font-size:14px;line-height:1;opacity:0.8" title="移除">×</span>'
+                    + '</span>';
+            }).join('');
+        }
     },
     
     confirmBatchModifyTags: function() {
@@ -2925,35 +2964,39 @@ function toggleReqAnno(btn) {
                         <span style="font-size:15px;font-weight:700;color:#333">✎ 批量修改话题标签</span>
                         <button onclick="document.getElementById('batch-tag-modal').style.display='none'" style="background:none;border:none;font-size:22px;cursor:pointer;color:#aaa;padding:0;line-height:1">&times;</button>
                     </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;margin-bottom:20px">
-                        <div>
+                    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
+                        <!-- 已选标签回显区 -->
+                        <div id="batch-tag-selected-bar" style="display:none;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;background:#fff9f0;border-radius:4px;min-height:32px">
+                            <span style="font-size:12px;color:#999;margin-right:4px">已选：</span>
+                        </div>
+                        <div id="tag-dim-popularity">
                             <label style="display:block;font-size:12px;color:#666;margin-bottom:4px">是否特色：</label>
-                            <select id="batch-tag-modal-popularity" class="form-control" style="width:100%;padding:6px 8px;font-size:13px">
-                                <option value="">-- 不修改 --</option>
+                            <select id="batch-tag-modal-popularity" onchange="window._TOPIC_PROMOTION.batchTagSelectChange('popularity')" style="width:100%;padding:8px 10px;font-size:13px;border:1px solid #ddd;border-radius:4px;background:#fff;height:auto;min-height:36px">
+                                <option value="">-- 请选择 --</option>
                                 <option value="特色">特色</option>
                                 <option value="非特色">非特色</option>
                             </select>
                         </div>
-                        <div>
+                        <div id="tag-dim-period">
                             <label style="display:block;font-size:12px;color:#666;margin-bottom:4px">周期：</label>
-                            <select id="batch-tag-modal-period" class="form-control" style="width:100%;padding:6px 8px;font-size:13px">
-                                <option value="">-- 不修改 --</option>
+                            <select id="batch-tag-modal-period" onchange="window._TOPIC_PROMOTION.batchTagSelectChange('period')" style="width:100%;padding:8px 10px;font-size:13px;border:1px solid #ddd;border-radius:4px;background:#fff;height:auto;min-height:36px">
+                                <option value="">-- 请选择 --</option>
                                 <option value="长期">长期</option>
                                 <option value="短期">短期</option>
                             </select>
                         </div>
-                        <div>
+                        <div id="tag-dim-frequency">
                             <label style="display:block;font-size:12px;color:#666;margin-bottom:4px">频率：</label>
-                            <select id="batch-tag-modal-frequency" class="form-control" style="width:100%;padding:6px 8px;font-size:13px">
-                                <option value="">-- 不修改 --</option>
+                            <select id="batch-tag-modal-frequency" onchange="window._TOPIC_PROMOTION.batchTagSelectChange('frequency')" style="width:100%;padding:8px 10px;font-size:13px;border:1px solid #ddd;border-radius:4px;background:#fff;height:auto;min-height:36px">
+                                <option value="">-- 请选择 --</option>
                                 <option value="高频">高频</option>
                                 <option value="低频">低频</option>
                             </select>
                         </div>
-                        <div>
+                        <div id="tag-dim-attribute">
                             <label style="display:block;font-size:12px;color:#666;margin-bottom:4px">是否官方：</label>
-                            <select id="batch-tag-modal-attribute" class="form-control" style="width:100%;padding:6px 8px;font-size:13px">
-                                <option value="">-- 不修改 --</option>
+                            <select id="batch-tag-modal-attribute" onchange="window._TOPIC_PROMOTION.batchTagSelectChange('attribute')" style="width:100%;padding:8px 10px;font-size:13px;border:1px solid #ddd;border-radius:4px;background:#fff;height:auto;min-height:36px">
+                                <option value="">-- 请选择 --</option>
                                 <option value="官方">官方</option>
                                 <option value="非官方">非官方</option>
                             </select>
