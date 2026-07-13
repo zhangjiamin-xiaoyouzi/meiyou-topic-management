@@ -491,11 +491,21 @@ function toggleReqAnno(btn){
                 </td>
             </tr>
                         <tr>
-                <th>推荐时间</th>
+                <th>
+                    <button type="button" class="req-anno-btn" onclick="toggleReqAnno(this)" style="display:block;margin-bottom:4px">需求说明</button>
+                    推荐时间
+                    <div class="req-anno-box">【推荐时间】选择推荐开始时间和结束时间。支持快捷选择 7 天、30 天、90 天、365 天，快捷选择会以当天为起始自动计算结束日期。时间为必填项。</div>
+                </th>
                 <td>
-                    <input type="text" id="start_time" disabled="disabled" name="recommend_start_time" class="form-control text w20" value="" limit="60"> -
-                    <input type="text" id="end_time" disabled="disabled" name="recommend_end_time" class="form-control text w20" value="" limit="60">
-
+                    <input type="text" id="start_time" name="recommend_start_time" class="form-control text w20" value="" limit="60" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',startDate:'%y-%M-%d 00:00:00'})"> -
+                    <input type="text" id="end_time" name="recommend_end_time" class="form-control text w20" value="" limit="60" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',startDate:'%y-%M-%d 23:59:59'})">
+                    <span style="margin-left:12px;display:inline-flex;gap:6px;align-items:center">
+                        <span style="font-size:12px;color:#999">快捷：</span>
+                        <a href="javascript:void(0)" onclick="setRecommendTime(7)" style="font-size:12px;color:#ff4d88;text-decoration:none;padding:2px 8px;border:1px solid #ff4d88;border-radius:3px">7天</a>
+                        <a href="javascript:void(0)" onclick="setRecommendTime(30)" style="font-size:12px;color:#ff4d88;text-decoration:none;padding:2px 8px;border:1px solid #ff4d88;border-radius:3px">30天</a>
+                        <a href="javascript:void(0)" onclick="setRecommendTime(90)" style="font-size:12px;color:#ff4d88;text-decoration:none;padding:2px 8px;border:1px solid #ff4d88;border-radius:3px">90天</a>
+                        <a href="javascript:void(0)" onclick="setRecommendTime(365)" style="font-size:12px;color:#ff4d88;text-decoration:none;padding:2px 8px;border:1px solid #ff4d88;border-radius:3px">365天</a>
+                    </span>
                 </td>
             </tr>
 
@@ -828,6 +838,16 @@ function toggleReqAnno(btn){
             alwaysUseStartDate:true
         });
 
+    }
+
+    // 推荐时间快捷选择
+    function setRecommendTime(days) {
+        var pad = function(n) { return n < 10 ? '0' + n : '' + n; };
+        var fmt = function(d, hms) { return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) + ' ' + hms; };
+        var now = new Date();
+        var end = new Date(now.getTime() + (days - 1) * 24 * 60 * 60 * 1000);
+        document.getElementById('start_time').value = fmt(now, '00:00:00');
+        document.getElementById('end_time').value = fmt(end, '23:59:59');
     }
 
 
