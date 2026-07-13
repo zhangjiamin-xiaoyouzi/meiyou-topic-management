@@ -419,6 +419,7 @@ window._TOPIC_PROMOTION = {
     
     
     // ===== 批量修改标签 =====
+    // ===== 批量修改标签（弹窗版） =====
     batchModifyTags: function() {
         var selectedRows = this.getSelectedRows();
         
@@ -427,11 +428,34 @@ window._TOPIC_PROMOTION = {
             return;
         }
         
+        // 重置弹窗中的选择器
+        document.getElementById('batch-tag-modal-popularity').value = '';
+        document.getElementById('batch-tag-modal-period').value = '';
+        document.getElementById('batch-tag-modal-frequency').value = '';
+        document.getElementById('batch-tag-modal-attribute').value = '';
+        
+        // 显示弹窗
+        var modal = document.getElementById('batch-tag-modal');
+        modal.style.display = 'flex';
+        
+        // 点击背景关闭
+        modal.onclick = function(e) {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        };
+    },
+    
+    confirmBatchModifyTags: function() {
+        var selectedRows = this.getSelectedRows();
+        
+        if (selectedRows.length === 0) return;
+        
         // 获取用户选择的新标签
-        var popularity = document.getElementById('batch-label-popularity').value;    // 特色/非特色
-        var period = document.getElementById('batch-label-period').value;            // 长期/短期
-        var frequency = document.getElementById('batch-label-frequency').value;      // 高频/低频
-        var attribute = document.getElementById('batch-label-attribute').value;      // 官方/非官方
+        var popularity = document.getElementById('batch-tag-modal-popularity').value;
+        var period = document.getElementById('batch-tag-modal-period').value;
+        var frequency = document.getElementById('batch-tag-modal-frequency').value;
+        var attribute = document.getElementById('batch-tag-modal-attribute').value;
         
         // 检查是否至少选择了一个标签
         if (!popularity && !period && !frequency && !attribute) {
@@ -439,71 +463,11 @@ window._TOPIC_PROMOTION = {
             return;
         }
         
-        // 定义标签对应的相对标签（要改为X，话题必须当前有Y标签）
-        var oppositeTagMap = {
-            '特色': '非特色',
-            '非特色': '特色',
-            '长期': '短期',
-            '短期': '长期',
-            '高频': '低频',
-            '低频': '高频',
-            '官方': '非官方',
-            '非官方': '官方'
-        };
-        
-        // 筛选符合条件的行（拥有相对标签）
-        var validRows = [];
-        var skippedTopics = [];
-        
-        selectedRows.forEach(function(row) {
-            var cells = row.querySelectorAll('td');
-            if (cells.length <= 18) return;
-            
-            var tagCell = cells[18];
-            var currentTags = tagCell.textContent.trim();
-            var currentTagList = currentTags && currentTags !== '-' ? currentTags.split('·').map(function(t) { return t.trim(); }) : [];
-            
-            // 检查是否拥有必需的相对标签
-            var isValid = true;
-            
-            if (popularity && !currentTagList.includes(oppositeTagMap[popularity])) {
-                isValid = false;
-            }
-            if (period && !currentTagList.includes(oppositeTagMap[period])) {
-                isValid = false;
-            }
-            if (frequency && !currentTagList.includes(oppositeTagMap[frequency])) {
-                isValid = false;
-            }
-            if (attribute && !currentTagList.includes(oppositeTagMap[attribute])) {
-                isValid = false;
-            }
-            
-            if (isValid) {
-                validRows.push(row);
-            } else {
-                var topicName = row.querySelector('a[href*="topic_subject_info_list"]').textContent.trim();
-                skippedTopics.push(topicName);
-            }
-        });
-        
-        // 如果没有符合条件的行，提示用户
-        if (validRows.length === 0) {
-            var skipMessage = '选中的 ' + selectedRows.length + ' 个话题都不符合修改条件\n\n';
-            skipMessage += '修改条件如下：\n';
-            if (popularity) skipMessage += '- 改为"' + popularity + '"需要拥有"' + oppositeTagMap[popularity] + '"标签\n';
-            if (period) skipMessage += '- 改为"' + period + '"需要拥有"' + oppositeTagMap[period] + '"标签\n';
-            if (frequency) skipMessage += '- 改为"' + frequency + '"需要拥有"' + oppositeTagMap[frequency] + '"标签\n';
-            if (attribute) skipMessage += '- 改为"' + attribute + '"需要拥有"' + oppositeTagMap[attribute] + '"标签\n';
-            alert(skipMessage);
-            return;
-        }
-        
-        var topicNames = validRows.slice(0, 5).map(function(row) {
+        var topicNames = selectedRows.slice(0, 5).map(function(row) {
             return row.querySelector('a[href*="topic_subject_info_list"]').textContent.trim();
         });
         
-        var message = '确认为以下 ' + validRows.length + ' 个话题批量修改标签？\n\n';
+        var message = '确认为以下 ' + selectedRows.length + ' 个话题批量修改标签？\n\n';
         message += '新标签组合：';
         var newTags = [];
         if (popularity) newTags.push(popularity);
@@ -513,29 +477,24 @@ window._TOPIC_PROMOTION = {
         message += newTags.join('·') + '\n\n';
         message += '话题列表：\n';
         message += topicNames.join('\n');
-        if (validRows.length > 5) {
-            message += '\n... 等 ' + (validRows.length - 5) + ' 个';
-        }
-        if (skippedTopics.length > 0) {
-            message += '\n\n（' + skippedTopics.length + ' 个话题不符合修改条件，已跳过）';
+        if (selectedRows.length > 5) {
+            message += '\n... 等 ' + (selectedRows.length - 5) + ' 个';
         }
         
         if (confirm(message)) {
             var modifiedCount = 0;
-            validRows.forEach(function(row) {
+            selectedRows.forEach(function(row) {
                 var cells = row.querySelectorAll('td');
                 if (cells.length > 18) {
                     var tagCell = cells[18];
                     var currentTags = tagCell.textContent.trim();
                     
                     // 解析当前标签，保留用户没有修改的标签
-                    var existingTags = currentTags && currentTags !== '-' ? currentTags.split('·') : [];
+                    var existingTags = currentTags && currentTags !== '-' ? currentTags.split('·').map(function(t) { return t.trim(); }) : [];
                     var finalTags = [];
                     
                     // 保留用户没有修改的现有标签
                     existingTags.forEach(function(tag) {
-                        tag = tag.trim();
-                        // 如果用户选择了该类别的新标签，则移除旧的
                         if (popularity && (tag === '特色' || tag === '非特色')) return;
                         if (period && (tag === '长期' || tag === '短期')) return;
                         if (frequency && (tag === '高频' || tag === '低频')) return;
@@ -560,11 +519,8 @@ window._TOPIC_PROMOTION = {
             
             alert('✓ 已批量修改 ' + modifiedCount + ' 个话题的标签\n\n（演示模式，暂无后端功能）');
             
-            // 重置标签选择器
-            document.getElementById('batch-label-popularity').value = '';
-            document.getElementById('batch-label-period').value = '';
-            document.getElementById('batch-label-frequency').value = '';
-            document.getElementById('batch-label-attribute').value = '';
+            // 关闭弹窗
+            document.getElementById('batch-tag-modal').style.display = 'none';
             
             this.updateBatchOperationUI();
         }
@@ -1218,45 +1174,72 @@ function toggleReqAnno(btn) {
                     <!-- 批量修改标签 -->
                     <div style="margin-top:15px;padding-top:15px;border-top:1px solid #ddd">
                         <label style="font-weight:600;color:#333;display:block;margin-bottom:10px">批量修改话题标签：</label>
-                        <div style="display:flex;gap:15px;flex-wrap:wrap">
-                            <div>
-                                <label style="font-size:12px;color:#666">是否特色：</label>
-                                <select id="batch-label-popularity" class="form-control" style="width:100px;display:inline-block;padding:4px 8px;font-size:12px">
-                                    <option value="">-- 不修改 --</option>
-                                    <option value="特色">特色</option>
-                                    <option value="非特色">非特色</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label style="font-size:12px;color:#666">周期：</label>
-                                <select id="batch-label-period" class="form-control" style="width:100px;display:inline-block;padding:4px 8px;font-size:12px">
-                                    <option value="">-- 不修改 --</option>
-                                    <option value="长期">长期</option>
-                                    <option value="短期">短期</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label style="font-size:12px;color:#666">频率：</label>
-                                <select id="batch-label-frequency" class="form-control" style="width:100px;display:inline-block;padding:4px 8px;font-size:12px">
-                                    <option value="">-- 不修改 --</option>
-                                    <option value="高频">高频</option>
-                                    <option value="低频">低频</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label style="font-size:12px;color:#666">是否官方：</label>
-                                <select id="batch-label-attribute" class="form-control" style="width:100px;display:inline-block;padding:4px 8px;font-size:12px">
-                                    <option value="">-- 不修改 --</option>
-                                    <option value="官方">官方</option>
-                                    <option value="非官方">非官方</option>
-                                </select>
-                            </div>
-                            <button type="button" class="btn btn-sm" onclick="window._TOPIC_PROMOTION.batchModifyTags()" style="background:#ff9900;color:#fff;border:none;padding:4px 12px;cursor:pointer;font-weight:600;font-size:12px;align-self:flex-end">
+                        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+                            <button type="button" class="req-anno-btn" onclick="toggleReqAnno(this)" style="font-size:10px;padding:1px 5px">需求说明</button>
+                            <div class="req-anno-box">【批量修改话题标签】
+勾选话题后，点击"批量修改标签"在弹出的弹窗中选择要修改的标签项；
+支持同时修改四个维度：
+- 是否特色：特色 / 非特色
+- 周期：长期 / 短期
+- 频率：高频 / 低频
+- 是否官方：官方 / 非官方
+选择"不修改"表示该维度保持不变；
+至少选择一个维度后才可提交。
+提交后列表"话题标签"列即时更新显示。</div>
+                            <button type="button" class="btn btn-sm" onclick="window._TOPIC_PROMOTION.batchModifyTags()" style="background:#ff9900;color:#fff;border:none;padding:4px 12px;cursor:pointer;font-weight:600;font-size:12px">
                                 ✎ 批量修改标签
                             </button>
-                            <button type="button" class="btn btn-sm" onclick="window._TOPIC_PROMOTION.batchOffline()" style="background:#666;color:#fff;border:none;padding:4px 12px;cursor:pointer;font-weight:600;font-size:12px;align-self:flex-end">
+                            <button type="button" class="btn btn-sm" onclick="window._TOPIC_PROMOTION.batchOffline()" style="background:#666;color:#fff;border:none;padding:4px 12px;cursor:pointer;font-weight:600;font-size:12px">
                                 ⬇️ 批量下线
                             </button>
+                        </div>
+                    </div>
+
+                    <!-- 批量修改标签弹窗 -->
+                    <div id="batch-tag-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);z-index:99999;align-items:center;justify-content:center">
+                        <div style="background:#fff;border-radius:8px;padding:24px 28px 20px;max-width:480px;width:92%;box-shadow:0 8px 32px rgba(0,0,0,.22);border-top:4px solid #ff4d88">
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+                                <span style="font-size:15px;font-weight:700;color:#333">✎ 批量修改话题标签</span>
+                                <button onclick="document.getElementById('batch-tag-modal').style.display='none'" style="background:none;border:none;font-size:22px;cursor:pointer;color:#aaa;padding:0;line-height:1">&times;</button>
+                            </div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;margin-bottom:20px">
+                                <div>
+                                    <label style="display:block;font-size:12px;color:#666;margin-bottom:4px">是否特色：</label>
+                                    <select id="batch-tag-modal-popularity" class="form-control" style="width:100%;padding:6px 8px;font-size:13px">
+                                        <option value="">-- 不修改 --</option>
+                                        <option value="特色">特色</option>
+                                        <option value="非特色">非特色</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="display:block;font-size:12px;color:#666;margin-bottom:4px">周期：</label>
+                                    <select id="batch-tag-modal-period" class="form-control" style="width:100%;padding:6px 8px;font-size:13px">
+                                        <option value="">-- 不修改 --</option>
+                                        <option value="长期">长期</option>
+                                        <option value="短期">短期</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="display:block;font-size:12px;color:#666;margin-bottom:4px">频率：</label>
+                                    <select id="batch-tag-modal-frequency" class="form-control" style="width:100%;padding:6px 8px;font-size:13px">
+                                        <option value="">-- 不修改 --</option>
+                                        <option value="高频">高频</option>
+                                        <option value="低频">低频</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="display:block;font-size:12px;color:#666;margin-bottom:4px">是否官方：</label>
+                                    <select id="batch-tag-modal-attribute" class="form-control" style="width:100%;padding:6px 8px;font-size:13px">
+                                        <option value="">-- 不修改 --</option>
+                                        <option value="官方">官方</option>
+                                        <option value="非官方">非官方</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div style="text-align:right">
+                                <button type="button" class="btn btn-sm" onclick="document.getElementById('batch-tag-modal').style.display='none'" style="background:#fff;border:1px solid #ddd;padding:6px 16px;margin-right:10px;cursor:pointer;font-size:12px">取消</button>
+                                <button type="button" class="btn btn-sm" onclick="window._TOPIC_PROMOTION.confirmBatchModifyTags()" style="background:#ff9900;color:#fff;border:none;padding:6px 16px;cursor:pointer;font-weight:600;font-size:12px">确认修改</button>
+                            </div>
                         </div>
                     </div>
                 </div>
