@@ -391,15 +391,18 @@ window._TOPIC_PROMOTION = {
     
     updateBatchOperationUI: function() {
         var selectedRows = this.getSelectedRows();
-        var panel = document.getElementById('batch-operation-panel');
-        
-        if (!panel) return;
+        var topBar = document.getElementById('batch-top-bar');
+        var bottomBar = document.getElementById('batch-bottom-bar');
         
         if (selectedRows.length > 0) {
-            panel.style.display = '';
-            document.getElementById('batch-selected-count').textContent = selectedRows.length;
+            if (topBar) topBar.style.display = '';
+            if (bottomBar) {
+                bottomBar.style.display = '';
+                document.getElementById('batch-selected-count').textContent = selectedRows.length;
+            }
         } else {
-            panel.style.display = 'none';
+            if (topBar) topBar.style.display = 'none';
+            if (bottomBar) bottomBar.style.display = 'none';
         }
     },
     
@@ -1163,37 +1166,29 @@ function toggleReqAnno(btn) {
                     </div>
                 </div>
 
-                <!-- 批量操作工具栏 -->
-                <div id="batch-operation-panel" class="form-group" style="display:none;background:#f5f5f5;padding:12px 15px;border-radius:4px;margin:10px 0;border-left:3px solid #ff4d88">
+                <!-- 批量操作工具栏（表头上方：全选/取消） -->
+                <div id="batch-top-bar" class="form-group" style="display:none;background:#f5f5f5;padding:8px 15px;border-radius:4px;margin:10px 0 0 0;border-left:3px solid #ff4d88">
+                    <button type="button" class="btn btn-sm" onclick="window._TOPIC_PROMOTION.batchToggleSelect(true)" style="background:#fff;border:1px solid #ddd;padding:4px 12px;margin-right:8px;cursor:pointer;font-size:12px">全选当前页</button>
+                    <button type="button" class="btn btn-sm" onclick="window._TOPIC_PROMOTION.batchToggleSelect(false)" style="background:#fff;border:1px solid #ddd;padding:4px 12px;cursor:pointer;font-size:12px">取消选择</button>
+                </div>
+
+                <!-- 批量操作工具栏（页面底部：已选计数 + 操作按钮） -->
+                <div id="batch-bottom-bar" style="display:none;background:#fff;padding:12px 15px;border-radius:4px;margin:10px 0;border:1px solid #e0e0e0;border-left:3px solid #ff4d88;position:sticky;bottom:0;z-index:100;box-shadow:0 -2px 8px rgba(0,0,0,0.08)">
                     <span style="margin-right:20px;font-weight:600;color:#333">
                         ✓ 已选择 <span id="batch-selected-count" style="color:#ff4d88">0</span> 个话题
                     </span>
-                    <button type="button" class="btn btn-sm" onclick="window._TOPIC_PROMOTION.batchToggleSelect(true)" style="background:#fff;border:1px solid #ddd;padding:4px 12px;margin-right:8px;cursor:pointer;font-size:12px">全选当前页</button>
-                    <button type="button" class="btn btn-sm" onclick="window._TOPIC_PROMOTION.batchToggleSelect(false)" style="background:#fff;border:1px solid #ddd;padding:4px 12px;margin-right:15px;cursor:pointer;font-size:12px">取消选择</button>
                     
                     <!-- 批量修改标签 -->
-                    <div style="margin-top:15px;padding-top:15px;border-top:1px solid #ddd">
-                        <label style="font-weight:600;color:#333;display:block;margin-bottom:10px">批量修改话题标签：</label>
-                        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-                            <button type="button" class="req-anno-btn" onclick="toggleReqAnno(this)" style="font-size:10px;padding:1px 5px">需求说明</button>
-                            <div class="req-anno-box">【批量修改话题标签】
-勾选话题后，点击"批量修改标签"在弹出的弹窗中选择要修改的标签项；
-支持同时修改四个维度：
-- 是否特色：特色 / 非特色
-- 周期：长期 / 短期
-- 频率：高频 / 低频
-- 是否官方：官方 / 非官方
-选择"不修改"表示该维度保持不变；
-至少选择一个维度后才可提交。
-提交后列表"话题标签"列即时更新显示。</div>
-                            <button type="button" class="btn btn-sm" onclick="window._TOPIC_PROMOTION.batchModifyTags()" style="background:#ff9900;color:#fff;border:none;padding:4px 12px;cursor:pointer;font-weight:600;font-size:12px">
-                                ✎ 批量修改标签
-                            </button>
-                            <button type="button" class="btn btn-sm" onclick="window._TOPIC_PROMOTION.batchOffline()" style="background:#666;color:#fff;border:none;padding:4px 12px;cursor:pointer;font-weight:600;font-size:12px">
-                                ⬇️ 批量下线
-                            </button>
-                        </div>
-                    </div>
+                    <span style="display:inline-flex;gap:8px;align-items:center;margin-right:10px">
+                        <button type="button" class="req-anno-btn" onclick="toggleReqAnno(this)" style="font-size:10px;padding:1px 5px">需求说明</button>
+                        <div class="req-anno-box">【批量修改话题标签】<br>勾选话题后，点击「批量修改标签」在弹出的弹窗中选择要修改的标签项；<br>支持同时修改四个维度：是否特色、周期、频率、是否官方；<br>选择"不修改"表示该维度保持不变；至少选择一个维度后才可提交。<br>提交后列表"话题标签"列即时更新显示。</div>
+                        <button type="button" class="btn btn-sm" onclick="window._TOPIC_PROMOTION.batchModifyTags()" style="background:#ff9900;color:#fff;border:none;padding:4px 12px;cursor:pointer;font-weight:600;font-size:12px">
+                            ✎ 批量修改标签
+                        </button>
+                    </span>
+                    <button type="button" class="btn btn-sm" onclick="window._TOPIC_PROMOTION.batchOffline()" style="background:#666;color:#fff;border:none;padding:4px 12px;cursor:pointer;font-weight:600;font-size:12px">
+                        ⬇️ 批量下线
+                    </button>
 
                     <!-- 批量修改标签弹窗 -->
                     <div id="batch-tag-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);z-index:99999;align-items:center;justify-content:center">
