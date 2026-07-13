@@ -1166,79 +1166,6 @@ function toggleReqAnno(btn) {
                     </div>
                 </div>
 
-                <!-- 批量操作工具栏（表头上方：全选/取消） -->
-                <div id="batch-top-bar" class="form-group" style="display:none;background:#f5f5f5;padding:8px 15px;border-radius:4px;margin:10px 0 0 0;border-left:3px solid #ff4d88">
-                    <button type="button" class="btn btn-sm" onclick="window._TOPIC_PROMOTION.batchToggleSelect(true)" style="background:#fff;border:1px solid #ddd;padding:4px 12px;margin-right:8px;cursor:pointer;font-size:12px">全选当前页</button>
-                    <button type="button" class="btn btn-sm" onclick="window._TOPIC_PROMOTION.batchToggleSelect(false)" style="background:#fff;border:1px solid #ddd;padding:4px 12px;cursor:pointer;font-size:12px">取消选择</button>
-                </div>
-
-                <!-- 批量操作工具栏（页面底部：已选计数 + 操作按钮） -->
-                <div id="batch-bottom-bar" style="display:none;background:#fff;padding:12px 15px;border-radius:4px;margin:10px 0;border:1px solid #e0e0e0;border-left:3px solid #ff4d88;position:sticky;bottom:0;z-index:100;box-shadow:0 -2px 8px rgba(0,0,0,0.08)">
-                    <span style="margin-right:20px;font-weight:600;color:#333">
-                        ✓ 已选择 <span id="batch-selected-count" style="color:#ff4d88">0</span> 个话题
-                    </span>
-                    
-                    <!-- 批量修改标签 -->
-                    <span style="display:inline-flex;gap:8px;align-items:center;margin-right:10px">
-                        <button type="button" class="req-anno-btn" onclick="toggleReqAnno(this)" style="font-size:10px;padding:1px 5px">需求说明</button>
-                        <div class="req-anno-box">【批量修改话题标签】<br>勾选话题后，点击「批量修改标签」在弹出的弹窗中选择要修改的标签项；<br>支持同时修改四个维度：是否特色、周期、频率、是否官方；<br>选择"不修改"表示该维度保持不变；至少选择一个维度后才可提交。<br>提交后列表"话题标签"列即时更新显示。</div>
-                        <button type="button" class="btn btn-sm" onclick="window._TOPIC_PROMOTION.batchModifyTags()" style="background:#ff9900;color:#fff;border:none;padding:4px 12px;cursor:pointer;font-weight:600;font-size:12px">
-                            ✎ 批量修改标签
-                        </button>
-                    </span>
-                    <button type="button" class="btn btn-sm" onclick="window._TOPIC_PROMOTION.batchOffline()" style="background:#666;color:#fff;border:none;padding:4px 12px;cursor:pointer;font-weight:600;font-size:12px">
-                        ⬇️ 批量下线
-                    </button>
-
-                    <!-- 批量修改标签弹窗 -->
-                    <div id="batch-tag-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);z-index:99999;align-items:center;justify-content:center">
-                        <div style="background:#fff;border-radius:8px;padding:24px 28px 20px;max-width:480px;width:92%;box-shadow:0 8px 32px rgba(0,0,0,.22);border-top:4px solid #ff4d88">
-                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-                                <span style="font-size:15px;font-weight:700;color:#333">✎ 批量修改话题标签</span>
-                                <button onclick="document.getElementById('batch-tag-modal').style.display='none'" style="background:none;border:none;font-size:22px;cursor:pointer;color:#aaa;padding:0;line-height:1">&times;</button>
-                            </div>
-                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;margin-bottom:20px">
-                                <div>
-                                    <label style="display:block;font-size:12px;color:#666;margin-bottom:4px">是否特色：</label>
-                                    <select id="batch-tag-modal-popularity" class="form-control" style="width:100%;padding:6px 8px;font-size:13px">
-                                        <option value="">-- 不修改 --</option>
-                                        <option value="特色">特色</option>
-                                        <option value="非特色">非特色</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label style="display:block;font-size:12px;color:#666;margin-bottom:4px">周期：</label>
-                                    <select id="batch-tag-modal-period" class="form-control" style="width:100%;padding:6px 8px;font-size:13px">
-                                        <option value="">-- 不修改 --</option>
-                                        <option value="长期">长期</option>
-                                        <option value="短期">短期</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label style="display:block;font-size:12px;color:#666;margin-bottom:4px">频率：</label>
-                                    <select id="batch-tag-modal-frequency" class="form-control" style="width:100%;padding:6px 8px;font-size:13px">
-                                        <option value="">-- 不修改 --</option>
-                                        <option value="高频">高频</option>
-                                        <option value="低频">低频</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label style="display:block;font-size:12px;color:#666;margin-bottom:4px">是否官方：</label>
-                                    <select id="batch-tag-modal-attribute" class="form-control" style="width:100%;padding:6px 8px;font-size:13px">
-                                        <option value="">-- 不修改 --</option>
-                                        <option value="官方">官方</option>
-                                        <option value="非官方">非官方</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div style="text-align:right">
-                                <button type="button" class="btn btn-sm" onclick="document.getElementById('batch-tag-modal').style.display='none'" style="background:#fff;border:1px solid #ddd;padding:6px 16px;margin-right:10px;cursor:pointer;font-size:12px">取消</button>
-                                <button type="button" class="btn btn-sm" onclick="window._TOPIC_PROMOTION.confirmBatchModifyTags()" style="background:#ff9900;color:#fff;border:none;padding:6px 16px;cursor:pointer;font-weight:600;font-size:12px">确认修改</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="form-group">
                     <button type="button" class="req-anno-btn" onclick="toggleReqAnno(this)">需求说明</button><label>话题标签：</label>
                     <div class="form-group searchbox">
@@ -1284,6 +1211,12 @@ function toggleReqAnno(btn) {
             </form>
         </div>
     </div>
+
+                <!-- 批量操作工具栏（表头上方：全选/取消） -->
+                <div id="batch-top-bar" class="form-group" style="display:none;background:#f5f5f5;padding:8px 15px;border-radius:4px;margin:10px 0 0 0;border-left:3px solid #ff4d88">
+                    <button type="button" class="btn btn-sm" onclick="window._TOPIC_PROMOTION.batchToggleSelect(true)" style="background:#fff;border:1px solid #ddd;padding:4px 12px;margin-right:8px;cursor:pointer;font-size:12px">全选当前页</button>
+                    <button type="button" class="btn btn-sm" onclick="window._TOPIC_PROMOTION.batchToggleSelect(false)" style="background:#fff;border:1px solid #ddd;padding:4px 12px;cursor:pointer;font-size:12px">取消选择</button>
+                </div>
 
     <table id="table" class="table table-bordered table-hover">
         <thead>
@@ -2966,6 +2899,74 @@ function toggleReqAnno(btn) {
                 </td>
                 </tr>
                     </tbody></table>
+
+        <!-- 批量操作工具栏（页面底部：已选计数 + 操作按钮） -->
+        <div id="batch-bottom-bar" style="display:none;background:#fff;padding:12px 15px;border-radius:4px;margin:10px 0;border:1px solid #e0e0e0;border-left:3px solid #ff4d88;position:sticky;bottom:0;z-index:100;box-shadow:0 -2px 8px rgba(0,0,0,0.08)">
+            <span style="margin-right:20px;font-weight:600;color:#333">
+                ✓ 已选择 <span id="batch-selected-count" style="color:#ff4d88">0</span> 个话题
+            </span>
+            
+            <!-- 批量修改标签 -->
+            <span style="display:inline-flex;gap:8px;align-items:center;margin-right:10px">
+                <button type="button" class="req-anno-btn" onclick="toggleReqAnno(this)" style="font-size:10px;padding:1px 5px">需求说明</button>
+                <div class="req-anno-box">【批量修改话题标签】<br>勾选话题后，点击「批量修改标签」在弹出的弹窗中选择要修改的标签项；<br>支持同时修改四个维度：是否特色、周期、频率、是否官方；<br>选择"不修改"表示该维度保持不变；至少选择一个维度后才可提交。<br>提交后列表"话题标签"列即时更新显示。</div>
+                <button type="button" class="btn btn-sm" onclick="window._TOPIC_PROMOTION.batchModifyTags()" style="background:#ff9900;color:#fff;border:none;padding:4px 12px;cursor:pointer;font-weight:600;font-size:12px">
+                    ✎ 批量修改标签
+                </button>
+            </span>
+            <button type="button" class="btn btn-sm" onclick="window._TOPIC_PROMOTION.batchOffline()" style="background:#666;color:#fff;border:none;padding:4px 12px;cursor:pointer;font-weight:600;font-size:12px">
+                ⬇️ 批量下线
+            </button>
+
+            <!-- 批量修改标签弹窗 -->
+            <div id="batch-tag-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);z-index:99999;align-items:center;justify-content:center">
+                <div style="background:#fff;border-radius:8px;padding:24px 28px 20px;max-width:480px;width:92%;box-shadow:0 8px 32px rgba(0,0,0,.22);border-top:4px solid #ff4d88">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+                        <span style="font-size:15px;font-weight:700;color:#333">✎ 批量修改话题标签</span>
+                        <button onclick="document.getElementById('batch-tag-modal').style.display='none'" style="background:none;border:none;font-size:22px;cursor:pointer;color:#aaa;padding:0;line-height:1">&times;</button>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;margin-bottom:20px">
+                        <div>
+                            <label style="display:block;font-size:12px;color:#666;margin-bottom:4px">是否特色：</label>
+                            <select id="batch-tag-modal-popularity" class="form-control" style="width:100%;padding:6px 8px;font-size:13px">
+                                <option value="">-- 不修改 --</option>
+                                <option value="特色">特色</option>
+                                <option value="非特色">非特色</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display:block;font-size:12px;color:#666;margin-bottom:4px">周期：</label>
+                            <select id="batch-tag-modal-period" class="form-control" style="width:100%;padding:6px 8px;font-size:13px">
+                                <option value="">-- 不修改 --</option>
+                                <option value="长期">长期</option>
+                                <option value="短期">短期</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display:block;font-size:12px;color:#666;margin-bottom:4px">频率：</label>
+                            <select id="batch-tag-modal-frequency" class="form-control" style="width:100%;padding:6px 8px;font-size:13px">
+                                <option value="">-- 不修改 --</option>
+                                <option value="高频">高频</option>
+                                <option value="低频">低频</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display:block;font-size:12px;color:#666;margin-bottom:4px">是否官方：</label>
+                            <select id="batch-tag-modal-attribute" class="form-control" style="width:100%;padding:6px 8px;font-size:13px">
+                                <option value="">-- 不修改 --</option>
+                                <option value="官方">官方</option>
+                                <option value="非官方">非官方</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="text-align:right">
+                        <button type="button" class="btn btn-sm" onclick="document.getElementById('batch-tag-modal').style.display='none'" style="background:#fff;border:1px solid #ddd;padding:6px 16px;margin-right:10px;cursor:pointer;font-size:12px">取消</button>
+                        <button type="button" class="btn btn-sm" onclick="window._TOPIC_PROMOTION.confirmBatchModifyTags()" style="background:#ff9900;color:#fff;border:none;padding:6px 16px;cursor:pointer;font-weight:600;font-size:12px">确认修改</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="action border-b">
 		    <input style="margin-left: 0.5%;display:none" type="checkbox" class="check_all">
 		    <input id="offline" class="btn-sumbit" type="button" value="批量下线" style="display:none">
