@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>话题编辑 · 社区运营管理系统</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#ff4d88;--primary-light:#fff0f5;--primary-dark:#e0457a;
+  --bg:#f2f2f5;--surface:#fff;--border:#e8e8ed;--text:rgba(0,0,0,.8);--text-secondary:rgba(0,0,0,.55);
+  --success:#00cc99;--warning:#ff9f43;--danger:#ff4d4d;--info:#4f7cae;
+  --radius:8px;--radius-sm:4px;--radius-lg:12px;--shadow:0 1px 2px rgba(0,0,0,.04);--shadow-lg:0 4px 12px rgba(0,0,0,.08);
+}
+body{font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5}
+
+.page-form-header{display:flex;align-items:center;justify-content:space-between;padding:14px 32px;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:10}
+.page-form-header h3{font-size:16px;font-weight:600;flex:1;text-align:center}
+.page-form-body{max-width:1000px;margin:0;padding:20px 32px 40px}
+.page-form-footer{display:flex;gap:10px;justify-content:flex-end;padding:12px 32px;border-top:1px solid var(--border);position:sticky;bottom:0;background:var(--surface);z-index:10}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:0 16px;height:34px;border-radius:var(--radius);font-size:14px;font-weight:500;cursor:pointer;border:1px solid transparent;transition:all .15s;white-space:nowrap;line-height:1}
+.btn-primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+.btn-primary:hover{background:var(--primary-dark);transform:scale(.97)}
+.btn-outline{background:#fff;color:var(--text);border-color:var(--border)}
+.btn-outline:hover{border-color:var(--primary);color:var(--primary)}
+.btn-text{background:transparent;border:none;color:var(--text-secondary);font-size:13px;cursor:pointer;padding:4px 8px;border-radius:var(--radius-sm)}
+.btn-text:hover{color:var(--primary);background:var(--primary-light)}
+.btn-sm{height:30px;padding:0 12px;font-size:13px}
+.btn-xs{height:26px;padding:0 10px;font-size:12px;border-radius:4px}
+
+.form-section{margin-bottom:0;background:var(--surface);padding:24px 24px 20px 54px;border-bottom:1px solid #e0e0e4;position:relative}
+.form-section:last-child{border-bottom:none;margin-bottom:0}
+.form-section-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:16px}
+.form-section-step{position:absolute;left:24px;top:24px;display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--primary-light);color:var(--primary);font-size:12px;font-weight:700;flex-shrink:0}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-field{display:flex;flex-direction:column;gap:4px;text-align:left}
+.form-field.span-2{grid-column:span 2}
+.form-field label{font-size:13px;font-weight:500;color:var(--text);text-align:left;flex-shrink:0;height:20px;line-height:20px}
+.form-field label .required{color:var(--danger);margin-left:2px}
+.form-field label .hint{font-size:11px;color:var(--text-secondary);font-weight:400;margin-left:4px}
+.form-field input,.form-field select,.form-field textarea{min-height:36px;border:1px solid var(--border);border-radius:var(--radius);padding:0 10px;font-size:13px;outline:none;font-family:inherit;color:var(--text);background:var(--bg);transition:border-color .15s}
+.form-field textarea{padding:8px 10px;resize:vertical;min-height:70px}
+.form-field input:focus,.form-field select:focus,.form-field textarea:focus{border-color:var(--primary);background:#fff}
+.form-field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath d='M3 5l3 3 3-3' fill='none' stroke='%23aaa' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;background-color:var(--bg)}.checkbox-group{display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-height:36px}.checkbox-option{display:flex;align-items:center;gap:5px;cursor:pointer;font-size:13px;color:var(--text);-webkit-user-select:none;user-select:none}.checkbox-option input[type="checkbox"]{width:15px;height:15px;margin:0;accent-color:var(--primary);border-radius:3px}
+
+.radio-group{display:flex;gap:4px;background:var(--bg);border-radius:var(--radius);padding:3px}
+.radio-option{padding:6px 16px;border-radius:6px;font-size:12px;cursor:pointer;color:var(--text-secondary);transition:all .15s;text-align:center;border:1px solid transparent;flex:1}
+.radio-option:hover{color:var(--text);background:#fff}
+.radio-option.active{background:#fff;color:var(--primary);font-weight:600;border-color:var(--border);box-shadow:0 1px 2px rgba(0,0,0,.04)}
+
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:999;padding:10px 24px;border-radius:var(--radius);font-size:14px;color:#fff;box-shadow:var(--shadow-lg);animation:fadeIn .25s;display:none;text-align:center}
+.toast.success{background:var(--success)}
+.toast.error{background:var(--danger)}
+@keyframes fadeIn{from{opacity:0;transform:translateX(-50%) translateY(-8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+</style>
+</head>
+<body>
+
+<div class="page-form-header">
+<button class="btn btn-text" onclick="goBack()">← 返回</button>
+<h3 id="pageFormTitle">新建话题</h3>
+<div style="width:60px"></div>
+</div>
+
+<div class="page-form-body">
+<div class="form-section"><div class="form-section-title"><span class="form-section-step">1</span> 基础与样式模块</div>
+<div class="form-grid">
+<div class="form-field span-2"><label>话题名称 <span class="required">*</span> <span class="hint">最多15字</span></label><input type="text" id="formName" maxlength="15" placeholder="请输入话题名称"></div>
+<div class="form-field"><label>副标题</label><input type="text" id="formSubtitle" placeholder="选填"></div>
+<div class="form-field"><label>卡片模式 <span class="required">*</span></label><select id="formCardMode"><option value="image">大图模式</option><option value="text">文字模式</option></select></div>
+<div class="form-field span-2"><label>简介</label><textarea id="formDesc" rows="2" placeholder="话题简介描述"></textarea></div>
+<div class="form-field"><label>ICON图片 <span class="hint">300×300</span></label><input type="text" id="formIcon" placeholder="图片URL"></div>
+<div class="form-field"><label>热度标识</label><select id="formHotTag"><option value="none">无</option><option value="hot">热门</option><option value="new">新品</option><option value="rec">推荐</option></select></div>
+<div class="form-field span-2"><label>虚拟热度值</label><input type="number" id="formVirtual" placeholder="选填" value="0"></div>
+<div class="form-field span-2"><label>展示位置</label><div class="checkbox-group">
+<label class="checkbox-option"><input type="checkbox" id="formShowBanner"> 展示Banner</label>
+<label class="checkbox-option"><input type="checkbox" id="formShowFeeds" checked> 展示Feeds</label>
+</div></div>
+
+<div class="form-field span-2"><label>适用身份</label>
+<div class="checkbox-group">
+<label class="checkbox-option"><input type="checkbox" class="formIdentity" value="minor" checked> 未成年</label>
+<label class="checkbox-option"><input type="checkbox" class="formIdentity" value="period" checked> 经期</label>
+<label class="checkbox-option"><input type="checkbox" class="formIdentity" value="pregnant"> 怀孕</label>
+<label class="checkbox-option"><input type="checkbox" class="formIdentity" value="preparing"> 备孕</label>
+<label class="checkbox-option"><input type="checkbox" class="formIdentity" value="mom" checked> 辣妈</label>
+
+</div></div>
+</div>
+
+<div class="form-section"><div class="form-section-title"><span class="form-section-step">2</span> 业务属性模块</div>
+<div class="form-grid">
+<div class="form-field"><label>发帖灵感分类</label><select id="formCategory"><option value="emotion">情感交流</option><option value="health">健康养生</option><option value="beauty">美妆护肤</option><option value="parenting">育儿经验</option><option value="life">生活日常</option></select></div>
+<div class="form-field"><label>话题特色 <span class="required">*</span></label>
+<div class="radio-group" id="radioFeature"><div class="radio-option active" onclick="selectRadio('radioFeature',this,'mutual')" data-value="mutual">互助</div><div class="radio-option" onclick="selectRadio('radioFeature',this,'non_mutual')" data-value="non_mutual">非互助</div></div>
+</div>
+<div class="form-field"><label>话题频率 <span class="required">*</span></label>
+<div class="radio-group" id="radioFreq"><div class="radio-option active" onclick="selectRadio('radioFreq',this,'high')" data-value="high">高频</div><div class="radio-option" onclick="selectRadio('radioFreq',this,'low')" data-value="low">低频</div></div>
+</div>
+<div class="form-field"><label>周期类型 <span class="required">*</span></label>
+<div class="radio-group" id="radioCycle"><div class="radio-option active" data-value="long" onclick="selectRadio('radioCycle',this,'long');onCycleChange()">长期</div><div class="radio-option" data-value="periodic" onclick="selectRadio('radioCycle',this,'periodic');onCycleChange()">周期性</div><div class="radio-option" data-value="short" onclick="selectRadio('radioCycle',this,'short');onCycleChange()">短期</div></div>
+</div>
+</div>
+</div>
+
+<div class="form-section"><div class="form-section-title"><span class="form-section-step">3</span> 智能时效配置</div>
+<div class="form-grid">
+<div class="form-field span-2">
+<label>快捷时效</label>
+<div style="display:flex;gap:6px;flex-wrap:wrap">
+<button class="btn btn-outline btn-sm" onclick="setQuickTime(7)">7天</button>
+<button class="btn btn-outline btn-sm" onclick="setQuickTime(30)">30天</button>
+<button class="btn btn-outline btn-sm" onclick="setQuickTime(90)">90天</button>
+<button class="btn btn-outline btn-sm" onclick="setQuickTime(365)">1年</button>
+<button class="btn btn-outline btn-sm" onclick="setQuickTime(0)">自定义</button>
+</div>
+</div>
+<div class="form-field"><label>推荐开始时间 <span class="required" id="reqStart">*</span></label><input type="date" id="formDateStart"></div>
+<div class="form-field"><label>推荐结束时间 <span class="required" id="reqEnd">*</span></label><input type="date" id="formDateEnd"></div>
+<div class="form-field span-2" id="cycleHint" style="display:none;background:#fff3e6;border-radius:8px;padding:10px 14px;font-size:12px;color:#b8730a"></div>
+</div>
+</div>
+
+<div class="form-section"><div class="form-section-title"><span class="form-section-step">4</span> 分发位置模块</div>
+<div class="form-grid">
+<div class="form-field"><label>未成年 · 推荐位</label><input type="number" id="formPosMinor" placeholder="第几位" min="1" value="1"></div>
+<div class="form-field"><label>经期 · 推荐位</label><input type="number" id="formPosPeriod" placeholder="第几位" min="1" value="1"></div>
+<div class="form-field"><label>怀孕 · 推荐位</label><input type="number" id="formPosPregnant" placeholder="第几位" min="1" value="1"></div>
+<div class="form-field"><label>备孕 · 推荐位</label><input type="number" id="formPosPreparing" placeholder="第几位" min="1" value="1"></div>
+<div class="form-field"><label>辣妈 · 推荐位</label><input type="number" id="formPosMom" placeholder="第几位" min="1" value="1"></div>
+</div>
+</div>
+
+</div>
+
+<div class="page-form-footer">
+<button class="btn btn-outline" onclick="goBack()">取消</button>
+<button class="btn btn-outline" onclick="saveDraft()">存草稿</button>
+<button class="btn btn-primary" onclick="saveTopic()">保存话题</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var editingId=null;
+var topicData=null;
+
+function initForm(){
+  // Try to get data from URL hash first (for edit mode)
+  var hash=window.location.hash;
+  if(hash && hash.startsWith('#data=')){
+    try{
+      var json=decodeURIComponent(escape(atob(hash.substring(6))));
+      topicData=JSON.parse(json);
+      editingId=topicData.id;
+      document.getElementById('pageFormTitle').textContent='编辑话题 #'+topicData.id;
+      populateForm(topicData);
+      return;
+    }catch(e){ console.log('Hash parse error:',e); }
+  }
+  // Check URL search params for simple id
+  var params=new URLSearchParams(window.location.search);
+  var id=params.get('id');
+  if(id){
+    editingId=parseInt(id);
+    // Try postMessage to opener to request data
+    if(window.opener){
+      window.opener.postMessage({type:'getTopic',id:editingId},'*');
+    }
+  }
+  document.getElementById('pageFormTitle').textContent='新建话题';
+}
+
+// Listen for topic data from opener
+window.addEventListener('message',function(e){
+  if(e.data && e.data.type==='topicData' && e.data.topic){
+    topicData=e.data.topic;
+    editingId=topicData.id;
+    document.getElementById('pageFormTitle').textContent='编辑话题 #'+topicData.id;
+    populateForm(topicData);
+  }
+});
+
+function populateForm(t){
+  document.getElementById('formName').value=t.name||'';
+  document.getElementById('formSubtitle').value=t.subtitle||'';
+  document.getElementById('formCardMode').value=t.card||'image';
+  document.getElementById('formDesc').value=t.desc||'';
+  document.getElementById('formIcon').value=t.icon||'';
+  document.getElementById('formHotTag').value=t.hotTag||'none';
+  document.getElementById('formVirtual').value=t.virtual||0;
+  document.getElementById('formShowBanner').checked=t.showBanner||false;
+  document.getElementById('formShowFeeds').checked=t.showFeeds!==false;
+  document.getElementById('formCategory').value=t.category||'emotion';
+  document.getElementById('formDateStart').value=t.dateStart||'';
+  document.getElementById('formDateEnd').value=t.dateEnd||'';
+  document.getElementById('formPosMinor').value=t.posMinor||1;
+  document.getElementById('formPosPeriod').value=t.posPeriod||1;
+  document.getElementById('formPosPregnant').value=t.posPregnant||1;
+  document.getElementById('formPosPreparing').value=t.posPreparing||1;
+  document.getElementById('formPosMom').value=t.posMom||1;
+  setRadioGroup('radioFeature',t.feature||'mutual');
+  setRadioGroup('radioFreq',t.freq||'high');
+  setRadioGroup('radioCycle',t.cycle||'long');
+  document.querySelectorAll('.formIdentity').forEach(function(cb){
+    cb.checked=t.identity?t.identity.split(',').includes(cb.value):false;
+  });
+  onCycleChange();
+}
+
+function selectRadio(groupId,el,value){
+  var group=document.getElementById(groupId);
+  group.querySelectorAll('.radio-option').forEach(function(o){o.classList.remove('active')});
+  el.classList.add('active');el.setAttribute('data-value',value);
+}
+function setRadioGroup(groupId,value){
+  var group=document.getElementById(groupId);
+  group.querySelectorAll('.radio-option').forEach(function(o){
+    var dv=o.getAttribute('data-value');
+    if(dv===value)o.classList.add('active');else o.classList.remove('active');
+  });
+}
+function getRadioValue(groupId){
+  var group=document.getElementById(groupId);
+  var active=group.querySelector('.radio-option.active');
+  return active?active.getAttribute('data-value'):'';
+}
+
+function onCycleChange(){
+  var cycle=getRadioValue('radioCycle'),hint=document.getElementById('cycleHint'),
+      se=document.getElementById('formDateStart'),ee=document.getElementById('formDateEnd'),
+      rs=document.getElementById('reqStart'),re=document.getElementById('reqEnd');
+  if(cycle==='long'){
+    hint.style.display='block';
+    hint.innerHTML='<b>注释</b>：长期话题将自动填充 3 年有效期';
+    se.value='2026-06-04';ee.value='2029-06-04';
+    se.style.borderColor='var(--border)';ee.style.borderColor='var(--border)';
+    rs.style.display='none';re.style.display='none';
+  }else{
+    hint.style.display='block';
+    hint.innerHTML='<b>联动规则 B</b>：周期性/短期话题必须手动设置具体的起止时间';
+    if(!se.value)se.value='';if(!ee.value)ee.value='';
+    rs.style.display='inline';re.style.display='inline';
+  }
+}
+
+function setQuickTime(days){
+  var se=document.getElementById('formDateStart'),ee=document.getElementById('formDateEnd'),today=new Date();
+  if(days===0){se.focus();return;}
+  var ed=new Date(today);ed.setDate(ed.getDate()+days);
+  se.value=today.toISOString().slice(0,10);ee.value=ed.toISOString().slice(0,10);
+  showToast('success','已设置为 '+days+' 天（'+se.value+' ~ '+ee.value+'）');
+}
+
+function saveDraft(){
+  var name=document.getElementById('formName').value.trim();
+  if(!name){showToast('error','请输入话题名称');return;}
+  showToast('success','草稿已保存');
+}
+
+function saveTopic(){
+  var name=document.getElementById('formName').value.trim();
+  if(!name){showToast('error','请输入话题名称');return;}
+  var cycle=getRadioValue('radioCycle'),ds=document.getElementById('formDateStart').value,
+      de=document.getElementById('formDateEnd').value;
+  if(cycle!=='long'&&(!ds||!de)){showToast('error','周期性/短期话题必须设置起止时间');return;}
+  var ics=document.querySelectorAll('.formIdentity:checked'),idt=Array.from(ics).map(function(cb){return cb.value}).join(',');
+  if(!idt)idt='mom';
+  var data={name:name,status:'online',official:'official',
+    feature:getRadioValue('radioFeature')||'mutual',cycle:cycle||'long',freq:getRadioValue('radioFreq')||'high',
+    source:editingId&&topicData?topicData.source||'operation':'operation',
+    card:document.getElementById('formCardMode').value,identity:idt,homepage:true,
+    editor:'张小美',dailyPosts:0,interactRate:'-',
+    updated:new Date().toISOString().slice(0,10),
+    subtitle:document.getElementById('formSubtitle').value.trim(),
+    desc:document.getElementById('formDesc').value.trim(),
+    icon:document.getElementById('formIcon').value.trim(),
+    hotTag:document.getElementById('formHotTag').value,
+    virtual:parseInt(document.getElementById('formVirtual').value)||0,
+    showBanner:document.getElementById('formShowBanner').checked,
+    showFeeds:document.getElementById('formShowFeeds').checked,
+    category:document.getElementById('formCategory').value,
+    posMinor:parseInt(document.getElementById('formPosMinor').value)||1,
+    posPeriod:parseInt(document.getElementById('formPosPeriod').value)||1,
+    posPregnant:parseInt(document.getElementById('formPosPregnant').value)||1,
+    posPreparing:parseInt(document.getElementById('formPosPreparing').value)||1,
+    posMom:parseInt(document.getElementById('formPosMom').value)||1,
+    dateStart:ds,dateEnd:de};
+
+  // Send data back to opener via postMessage
+  if(window.opener){
+    window.opener.postMessage({type:'saveTopic',editId:editingId,data:data},'*');
+  }
+  showToast('success',editingId?'话题「'+name+'」已更新':'话题「'+name+'」创建成功');
+  setTimeout(function(){ window.close(); },600);
+}
+
+function goBack(){ if(window.opener){window.close()}else{window.location.href="话题管理.html"} }
+
+function showToast(type,msg){
+  var toast=document.getElementById('toast');
+  toast.className='toast '+type;toast.textContent=msg;toast.style.display='block';
+  setTimeout(function(){toast.style.display='none'},2500);
+}
+
+initForm();
+onCycleChange();
+</script>
+</body>
+</html>
