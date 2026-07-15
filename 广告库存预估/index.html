@@ -1,0 +1,2012 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>品牌广告CPM曝光量预估</title>
+  <style>
+    :root {
+      --bg: #f7f7f7;
+      --surface: #ffffff;
+      --surface-muted: #fafafa;
+      --border: #ececec;
+      --border-strong: #dfdfdf;
+      --text: #4a4a4a;
+      --text-soft: #8c8c8c;
+      --text-faint: #b5b5b5;
+      --nav: #5a6068;
+      --nav-text: #f4f4f4;
+      --pink: #ff5a95;
+      --green: #6bc13d;
+      --green-hover: #5ab02f;
+      --blue: #409eff;
+      --track: #dfe3ea;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font: 12px/1.4 "Microsoft YaHei", "PingFang SC", sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+      color: inherit;
+    }
+
+    .app-shell {
+      min-height: 100vh;
+    }
+
+    .topbar {
+      height: 34px;
+      display: flex;
+      align-items: stretch;
+      padding: 0 14px;
+      background: linear-gradient(180deg, #666b73 0%, #575d65 100%);
+      box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.08);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      padding-right: 22px;
+      color: #ffffff;
+      font-size: 12px;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+    }
+
+    .top-tabs {
+      display: flex;
+      gap: 26px;
+      align-items: center;
+      color: rgba(255, 255, 255, 0.92);
+    }
+
+    .top-tab {
+      display: inline-flex;
+      align-items: center;
+      height: 100%;
+      position: relative;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+
+    .top-tab:hover,
+    .top-tab.active {
+      color: #ffffff;
+    }
+
+    .top-tab.active::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 2px;
+      background: #dce7ff;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 132px 1fr;
+      min-height: calc(100vh - 34px);
+    }
+
+    .sidebar {
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+    }
+
+    .userbar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 16px 10px 12px;
+    }
+
+    .user-chip,
+    .logout-btn {
+      min-width: 36px;
+      height: 20px;
+      border: 1px solid var(--border);
+      background: #fafafa;
+      color: #666;
+      border-radius: 3px;
+      padding: 0 8px;
+      cursor: pointer;
+    }
+
+    .menu {
+      padding: 6px 0 18px;
+    }
+
+    .menu-group {
+      border-top: 1px solid #fff;
+    }
+
+    .menu-heading,
+    .menu-link,
+    .menu-sublink {
+      display: flex;
+      align-items: center;
+      min-height: 32px;
+      padding: 0 12px;
+      cursor: pointer;
+      user-select: none;
+      color: #555;
+    }
+
+    .menu-heading:hover,
+    .menu-link:hover,
+    .menu-sublink:hover {
+      background: #fafafa;
+    }
+
+    .menu-heading::after,
+    .menu-link.has-children::after {
+      content: "⌄";
+      margin-left: auto;
+      color: #b3b3b3;
+      transform: translateY(-1px);
+      font-size: 10px;
+    }
+
+    .menu-heading.collapsed::after,
+    .menu-link.has-children.collapsed::after {
+      transform: rotate(-90deg) translateX(1px);
+    }
+
+    .submenu {
+      display: block;
+    }
+
+    .submenu.hidden {
+      display: none;
+    }
+
+    .menu-sublink {
+      padding-left: 24px;
+      color: #666;
+      position: relative;
+    }
+
+    .menu-sublink.active {
+      color: #2f2f2f;
+      font-weight: 600;
+      background: #fbfbfb;
+    }
+
+    .content {
+      background: var(--surface);
+      padding: 22px 0 48px;
+    }
+
+    .form-wrap {
+      width: min(1380px, calc(100vw - 168px));
+      margin-left: 12px;
+    }
+
+    .estimate-workbench {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 28px;
+      align-items: start;
+    }
+
+    .estimate-form-panel {
+      min-width: 0;
+    }
+
+    .action-bar {
+      margin-top: 18px;
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .action-main {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .detail-panel {
+      display: none;
+      min-width: 0;
+      width: 100%;
+      margin-top: 0;
+      padding: 8px 0 0;
+      background: #fff;
+      overflow: auto;
+    }
+
+    .detail-panel.visible {
+      display: block;
+    }
+
+    .detail-panel.loading {
+      opacity: 0.92;
+    }
+
+    .detail-main-position {
+      margin: 0 0 28px;
+      color: var(--pink);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .detail-main-position .value {
+      color: #111;
+      font-weight: 700;
+    }
+
+    .detail-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      border: 1px solid #e8edf5;
+      background: #fff;
+    }
+
+    .detail-table th,
+    .detail-table td {
+      border-right: 1px solid #e8edf5;
+      border-bottom: 1px solid #e8edf5;
+      padding: 10px 12px;
+      vertical-align: top;
+      font-size: 11px;
+      line-height: 1.75;
+      color: #222;
+      word-break: break-word;
+    }
+
+    .detail-table th:last-child,
+    .detail-table td:last-child {
+      border-right: 0;
+    }
+
+    .detail-table th {
+      color: #8a96a8;
+      background: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .detail-table td:first-child {
+      text-align: center;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    .detail-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .detail-table tr.is-muted td {
+      background: #f6f6f6;
+    }
+
+    .detail-plan-line {
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .detail-plan-line:last-child {
+      margin-bottom: 0;
+    }
+
+    .detail-plan-id-note,
+    .detail-status-note {
+      color: #ff3b30;
+    }
+
+    .detail-status-main {
+      display: block;
+      text-align: center;
+    }
+
+    .detail-status-note {
+      display: block;
+      text-align: center;
+    }
+
+    .result-panel {
+      display: none;
+      min-width: 0;
+      margin-top: 18px;
+      padding: 6px 0 0;
+    }
+
+    .result-panel.visible {
+      display: block;
+    }
+
+    .result-summary {
+      margin-bottom: 10px;
+      color: #7e8a98;
+      font-size: 12px;
+      line-height: 1.9;
+    }
+
+    .result-summary strong,
+    .result-summary .value {
+      color: var(--pink);
+      font-weight: 700;
+    }
+
+    .result-summary .title {
+      margin-right: 12px;
+    }
+
+    .result-summary .dot-line {
+      display: block;
+      color: #1d2129;
+    }
+
+    .result-summary .dot-line::before {
+      content: "●";
+      margin-right: 4px;
+      color: #111;
+      font-size: 10px;
+    }
+
+    .result-divider {
+      height: 1px;
+      margin: 10px 0 14px;
+      background: #f0f3f6;
+    }
+
+    .result-section-title {
+      margin: 0 0 8px;
+      font-size: 12px;
+      color: var(--pink);
+      font-weight: 600;
+    }
+
+    .result-main-position {
+      margin: 0 0 12px;
+      color: var(--pink);
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.7;
+    }
+
+    .result-main-position .value {
+      color: #111;
+      font-weight: 700;
+    }
+
+    .result-position {
+      margin: 0 0 10px;
+      font-size: 12px;
+      color: #111;
+      font-weight: 700;
+    }
+
+    .result-position .value {
+      color: #111;
+    }
+
+    .result-position-meta {
+      margin: 0 0 14px;
+      font-size: 12px;
+      color: #111;
+      line-height: 1.8;
+    }
+
+    .result-position-meta .value {
+      color: var(--pink);
+      font-weight: 700;
+    }
+
+    .result-block {
+      margin-bottom: 22px;
+      padding: 14px 16px 16px;
+      border: 1px solid #edf1f6;
+      border-radius: 10px;
+      background: linear-gradient(180deg, #ffffff 0%, #fcfdff 100%);
+      box-shadow: 0 6px 18px rgba(31, 45, 61, 0.04);
+    }
+
+    .result-block.priority-block {
+      border-color: rgba(255, 90, 149, 0.22);
+      background: linear-gradient(180deg, rgba(255, 90, 149, 0.05) 0%, #ffffff 36%);
+    }
+
+    .result-block.reserve-block {
+      border-color: rgba(64, 158, 255, 0.22);
+      background: linear-gradient(180deg, rgba(64, 158, 255, 0.06) 0%, #ffffff 36%);
+    }
+
+    .result-block-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .result-block-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin: 0;
+      color: #111;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .result-block-title .dot {
+      margin-right: 4px;
+    }
+
+    .result-block-title .note-tooltip-icon {
+      width: 14px;
+      height: 14px;
+      font-size: 9px;
+    }
+
+    .result-block-tag {
+      display: inline-flex;
+      align-items: center;
+      height: 22px;
+      padding: 0 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+    }
+
+    .priority-block .result-block-tag {
+      background: rgba(255, 90, 149, 0.12);
+      color: #e84b88;
+    }
+
+    .reserve-block .result-block-tag {
+      background: rgba(64, 158, 255, 0.14);
+      color: #2f86eb;
+    }
+
+    .result-block-desc {
+      margin: 0 0 12px;
+      color: #7b8794;
+      font-size: 11px;
+      line-height: 1.7;
+    }
+
+    .priority-block .result-table th {
+      background: #fff2f7;
+      color: #cc6c90;
+    }
+
+    .reserve-block .result-table th {
+      background: #eef6ff;
+      color: #5b89bc;
+    }
+
+    .priority-block .result-note .value {
+      color: #ff5a95;
+    }
+
+    .reserve-block .result-note .value {
+      color: #409eff;
+    }
+
+    .result-note {
+      margin: 10px 0 0;
+      color: #111;
+      font-size: 12px;
+    }
+
+    .result-note.with-tooltip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .result-note .value {
+      color: var(--pink);
+      font-weight: 700;
+    }
+
+    .note-tooltip {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .note-tooltip-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 1px solid currentColor;
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 1;
+      cursor: help;
+      user-select: none;
+    }
+
+    .reserve-block .note-tooltip-icon {
+      color: #409eff;
+      background: rgba(64, 158, 255, 0.08);
+    }
+
+    .note-tooltip-content {
+      position: absolute;
+      left: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      min-width: 320px;
+      max-width: 520px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: rgba(24, 31, 40, 0.92);
+      color: #fff;
+      font-size: 11px;
+      line-height: 1.6;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.16);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.18s ease;
+      white-space: normal;
+      z-index: 2;
+    }
+
+    .note-tooltip:hover .note-tooltip-content,
+    .note-tooltip:focus-within .note-tooltip-content {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .daily-remain-table {
+      margin-top: 10px;
+    }
+
+    .result-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: auto;
+      background: #fff;
+    }
+
+    .result-table th,
+    .result-table td {
+      padding: 7px 12px;
+      border-bottom: 1px solid #edf2f8;
+      font-size: 11px;
+      color: #5d6773;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    .result-table th {
+      background: #f4f7fb;
+      color: #9aa5b3;
+      font-weight: 600;
+    }
+
+    .result-table .summary-row td {
+      background: #fafbfd;
+      color: #3f4b57;
+      font-weight: 600;
+    }
+
+    .result-table td:first-child,
+    .result-table th:first-child {
+      width: 84px;
+    }
+
+    .result-table tr:hover td {
+      background: #fcfdff;
+    }
+
+    .muted-label {
+      color: #8f98a3;
+    }
+
+    .pink-value {
+      color: var(--pink);
+      font-weight: 700;
+    }
+
+    .page-title {
+      margin: 0 0 16px;
+      font-size: 22px;
+      line-height: 1.2;
+      color: var(--pink);
+      font-weight: 600;
+    }
+
+    .section-title {
+      margin: 18px 0 10px;
+      font-size: 18px;
+      color: var(--pink);
+      font-weight: 600;
+    }
+
+    .section-title.compact {
+      margin-top: 14px;
+    }
+
+    .grid-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 40px;
+      row-gap: 14px;
+    }
+
+    .full-span {
+      grid-column: 1 / -1;
+    }
+
+    .field {
+      display: grid;
+      grid-template-columns: 68px 1fr;
+      align-items: center;
+      min-height: 28px;
+    }
+
+    .field-left {
+      grid-column: 1 / 2;
+    }
+
+    .field-long-label {
+      grid-template-columns: 104px 1fr;
+    }
+
+    .label {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      color: #666;
+      white-space: nowrap;
+    }
+
+    .required {
+      color: #ff7d96;
+      font-weight: 700;
+    }
+
+    .control,
+    .select,
+    .date-input {
+      width: 100%;
+      height: 26px;
+      padding: 0 10px;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      background: #fff;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .control:focus,
+    .select:focus,
+    .date-input:focus,
+    .stepper-btn:focus,
+    .radio-chip input:focus-visible + span,
+    .option-chip input:focus-visible + span {
+      border-color: #aac9ff;
+      box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.12);
+    }
+
+    .input-with-count {
+      position: relative;
+    }
+
+    .char-count {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #b2b2b2;
+      pointer-events: none;
+    }
+
+    .inline-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .inline-group .select,
+    .inline-group .control {
+      min-width: 0;
+    }
+
+    .stepper {
+      display: inline-flex;
+      align-items: center;
+      height: 26px;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .stepper-btn {
+      width: 22px;
+      height: 24px;
+      border: 0;
+      background: #f8f8f8;
+      color: #999;
+      cursor: pointer;
+    }
+
+    .stepper-btn:hover {
+      background: #f0f0f0;
+      color: #666;
+    }
+
+    .stepper-value {
+      width: 56px;
+      height: 24px;
+      border: 0;
+      border-left: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      text-align: center;
+      outline: none;
+    }
+
+    .time-options,
+    .audience-options {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .multi-select {
+      position: relative;
+      width: 100%;
+      min-width: 0;
+    }
+
+    .multi-select-toggle {
+      width: 100%;
+      height: 26px;
+      padding: 0 28px 0 10px;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      background: #fff;
+      color: #666;
+      text-align: left;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .multi-select-toggle::after {
+      content: "⌄";
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #b4bcc7;
+      font-size: 10px;
+    }
+
+    .multi-select.is-open .multi-select-toggle {
+      border-color: #aac9ff;
+      box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.12);
+    }
+
+    .multi-select-panel {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      width: 100%;
+      padding: 6px 0;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      background: #fff;
+      box-shadow: 0 8px 16px rgba(50, 72, 97, 0.12);
+      z-index: 6;
+      display: none;
+    }
+
+    .multi-select.is-open .multi-select-panel {
+      display: block;
+    }
+
+    .multi-select-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 28px;
+      padding: 0 10px;
+      color: #666;
+      cursor: pointer;
+    }
+
+    .multi-select-option:hover {
+      background: #f7fbff;
+    }
+
+    .multi-select-option input {
+      margin: 0;
+      accent-color: var(--blue);
+    }
+
+    .radio-chip,
+    .option-chip {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .radio-chip input,
+    .option-chip input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .radio-chip span,
+    .option-chip span {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 24px;
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fff;
+      color: #8a8a8a;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .radio-chip input:checked + span,
+    .option-chip input:checked + span {
+      color: var(--blue);
+      border-color: rgba(64, 158, 255, 0.45);
+      background: rgba(64, 158, 255, 0.08);
+    }
+
+    .date-range {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .date-item {
+      position: relative;
+      flex: 1;
+    }
+
+    .date-item::before {
+      content: "◷";
+      position: absolute;
+      left: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #c7c7c7;
+      pointer-events: none;
+      font-size: 12px;
+    }
+
+    .date-input {
+      padding-left: 24px;
+    }
+
+    .dash {
+      color: #a4a4a4;
+    }
+
+    .switch-row {
+      display: grid;
+      grid-template-columns: 68px 1fr;
+      align-items: center;
+      min-height: 28px;
+    }
+
+    .switch-control {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .switch {
+      position: relative;
+      width: 28px;
+      height: 16px;
+      display: inline-flex;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background: var(--track);
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .slider::before {
+      content: "";
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      left: 2px;
+      top: 2px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s ease;
+    }
+
+    .switch input:checked + .slider {
+      background: var(--blue);
+    }
+
+    .switch input:checked + .slider::before {
+      transform: translateX(12px);
+    }
+
+    .target-grid,
+    .limit-grid {
+      display: grid;
+      row-gap: 14px;
+    }
+
+    .disabled-block {
+      opacity: 0.45;
+      pointer-events: none;
+    }
+
+    .estimate-btn {
+      min-width: 82px;
+      height: 28px;
+      padding: 0 16px;
+      border: 0;
+      border-radius: 3px;
+      background: linear-gradient(180deg, #7bd64f 0%, #62bb38 100%);
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.08);
+    }
+
+    .estimate-btn:hover {
+      background: linear-gradient(180deg, #72ce47 0%, #57ac32 100%);
+    }
+
+    .estimate-btn:active {
+      transform: translateY(1px);
+    }
+
+    .validation {
+      margin-top: 10px;
+      color: #f36b86;
+      display: none;
+    }
+
+    .validation.visible {
+      display: block;
+    }
+
+    @media (max-width: 1280px) {
+      .form-wrap {
+        width: calc(100vw - 172px);
+      }
+
+      .estimate-workbench {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 980px) {
+      .layout {
+        grid-template-columns: 132px minmax(0, 1fr);
+      }
+
+      .form-wrap {
+        width: calc(100vw - 176px);
+      }
+
+      .estimate-workbench {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .detail-panel {
+        min-width: 0;
+        width: 100%;
+      }
+
+      .grid-form {
+        grid-template-columns: 1fr;
+        column-gap: 0;
+      }
+
+      .field,
+      .switch-row {
+        grid-template-columns: 76px 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        border-right: 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .content {
+        padding-top: 14px;
+      }
+
+      .form-wrap {
+        width: calc(100vw - 24px);
+        margin: 0 12px;
+      }
+
+      .topbar {
+        overflow-x: auto;
+        gap: 18px;
+      }
+
+      .field,
+      .switch-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+
+      .date-range,
+      .inline-group,
+      .switch-control,
+      .platform-options,
+      .time-options,
+      .audience-options {
+        flex-wrap: wrap;
+      }
+
+      .result-table {
+        display: block;
+        overflow-x: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">广告投放运营后台</div>
+      <nav class="top-tabs" aria-label="顶部导航">
+        <span class="top-tab">广告资源管理后台</span>
+        <span class="top-tab">商业产品后台</span>
+        <span class="top-tab">报表统计系统</span>
+        <span class="top-tab active">广告投放运营后台</span>
+        <span class="top-tab">专题系统</span>
+        <span class="top-tab">权限申请</span>
+      </nav>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="userbar">
+          <button class="user-chip" type="button">张家欢</button>
+          <button class="logout-btn" type="button">退出</button>
+        </div>
+
+        <nav class="menu" aria-label="侧边导航">
+          <div class="menu-group">
+            <div class="menu-heading" data-target="menu-1">广告交互管理</div>
+            <div class="submenu hidden" id="menu-1"></div>
+          </div>
+
+          <div class="menu-group">
+            <div class="menu-heading" data-target="menu-2">品牌管理</div>
+            <div class="submenu hidden" id="menu-2"></div>
+          </div>
+
+          <div class="menu-group">
+            <div class="menu-link has-children" data-target="menu-3">品牌小工具</div>
+            <div class="submenu" id="menu-3">
+              <div class="menu-sublink">流量预警</div>
+              <div class="menu-sublink">审批消息重发</div>
+              <div class="menu-sublink">福利拍报单审核</div>
+              <div class="menu-sublink">数据导出</div>
+              <div class="menu-sublink">DSP 解析计划</div>
+              <div class="menu-sublink">返点项目打款至用户钱包</div>
+              <div class="menu-sublink">素材预览</div>
+              <div class="menu-sublink">生成式推荐人群包</div>
+              <div class="menu-sublink">搜索关键词干预</div>
+              <div class="menu-sublink">月投放信息统计</div>
+              <div class="menu-sublink">销售单审批日志</div>
+              <div class="menu-sublink">修改合同结束日期日志</div>
+              <div class="menu-sublink">参数配置</div>
+              <div class="menu-sublink">品牌广告分类列表</div>
+              <div class="menu-sublink">人群包</div>
+              <div class="menu-sublink">品牌精细化运营策略</div>
+              <div class="menu-sublink active">CPM曝光预估</div>
+            </div>
+          </div>
+
+          <div class="menu-group">
+            <div class="menu-link has-children" data-target="menu-4">抽-管理</div>
+            <div class="submenu hidden" id="menu-4"></div>
+          </div>
+        </nav>
+      </aside>
+
+      <main class="content">
+        <div class="form-wrap">
+          <h1 class="page-title">品牌广告CPM曝光量预估</h1>
+
+          <div class="estimate-workbench">
+            <div class="estimate-form-panel">
+              <form id="estimateForm" novalidate>
+            <div class="grid-form">
+              <div class="field full-span">
+                <label class="label" for="title">
+                  <span class="required">*</span>
+                  <span>预估标题</span>
+                </label>
+                <div class="input-with-count">
+                  <input class="control" id="title" name="title" type="text" maxlength="32" value="0602曝光预估" placeholder="请输入预估标题">
+                  <span class="char-count"><span id="titleCount">8</span>/32</span>
+                </div>
+              </div>
+            </div>
+
+            <h2 class="section-title">广告位信息</h2>
+            <div class="grid-form">
+              <div class="field">
+                <label class="label" for="appSelect">
+                  <span class="required">*</span>
+                  <span>应用</span>
+                </label>
+                <select class="select" id="appSelect" name="appSelect">
+                  <option value="美柚" selected>美柚</option>
+                  <option value="美柚极速版">美柚极速版</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label class="label" for="pageSelect">
+                  <span class="required">*</span>
+                  <span>页面</span>
+                </label>
+                <select class="select" id="pageSelect" name="pageSelect">
+                  <option value="启动页" selected>启动页</option>
+                  <option value="首页">首页</option>
+                  <option value="社区">社区</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label class="label" for="slotSelect">
+                  <span class="required">*</span>
+                  <span>广告位</span>
+                </label>
+                <select class="select" id="slotSelect" name="slotSelect">
+                  <option value="美柚-开屏" selected>美柚-开屏</option>
+                  <option value="美柚-首页焦点图">美柚-首页焦点图</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label class="label" for="styleSelect">
+                  <span>样式</span>
+                </label>
+                <select class="select" id="styleSelect" name="styleSelect">
+                  <option value="">请选择</option>
+                  <option value="静态图">静态图</option>
+                  <option value="视频">视频</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label class="label">
+                  <span class="required">*</span>
+                  <span>子位</span>
+                </label>
+                <div class="inline-group">
+                  <div class="stepper" aria-label="子位数量">
+                    <button class="stepper-btn" type="button" data-step="down">−</button>
+                    <input class="stepper-value" id="subSlot" name="subSlot" type="number" min="1" max="9" value="1">
+                    <button class="stepper-btn" type="button" data-step="up">＋</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="label">
+                  <span class="required">*</span>
+                  <span>手机平台</span>
+                </label>
+                <div class="multi-select" id="platformSelect">
+                  <button class="multi-select-toggle" id="platformToggle" type="button" aria-haspopup="listbox" aria-expanded="false">IOS、Android、鸿蒙</button>
+                  <div class="multi-select-panel" role="listbox" aria-label="手机平台多选">
+                    <label class="multi-select-option">
+                      <input type="checkbox" name="platform" value="IOS" checked>
+                      <span>IOS</span>
+                    </label>
+                    <label class="multi-select-option">
+                      <input type="checkbox" name="platform" value="Android" checked>
+                      <span>Android</span>
+                    </label>
+                    <label class="multi-select-option">
+                      <input type="checkbox" name="platform" value="鸿蒙" checked>
+                      <span>鸿蒙</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="label" for="saleType">
+                  <span class="required">*</span>
+                  <span>售卖方式</span>
+                </label>
+                <select class="select" id="saleType" name="saleType">
+                  <option value="单独售卖" selected>单独售卖</option>
+                  <option value="组合售卖">组合售卖</option>
+                </select>
+              </div>
+
+              <div class="field full-span">
+                <label class="label">
+                  <span class="required">*</span>
+                  <span>投放起止时间</span>
+                </label>
+                <div class="date-range">
+                  <div class="date-item">
+                    <input class="date-input" id="startDate" name="startDate" type="text" value="2026-06-01 00:00:00" placeholder="开始时间">
+                  </div>
+                  <span class="dash">-</span>
+                  <div class="date-item">
+                    <input class="date-input" id="endDate" name="endDate" type="text" value="2026-06-15 00:00:00" placeholder="结束时间">
+                  </div>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="label" for="minVersion">最小版本</label>
+                <input class="control" id="minVersion" name="minVersion" type="text" placeholder="">
+              </div>
+
+              <div class="field">
+                <label class="label" for="maxVersion">最大版本</label>
+                <input class="control" id="maxVersion" name="maxVersion" type="text" placeholder="">
+              </div>
+
+              <div class="field field-left field-long-label">
+                <label class="label" for="conversionRatio">
+                  <span class="required">*</span>
+                  <span>库存曝光转化率</span>
+                </label>
+                <input class="control" id="conversionRatio" name="conversionRatio" type="text" value="0.8928" placeholder="请输入库存曝光转化率">
+              </div>
+            </div>
+
+            <h2 class="section-title compact">定向信息</h2>
+            <div class="target-grid">
+              <div class="switch-row">
+                <span class="label">身份限定</span>
+                <div class="switch-control">
+                  <label class="switch">
+                    <input type="checkbox" id="identityToggle">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="switch-row">
+                <span class="label">年龄限定</span>
+                <div class="switch-control">
+                  <label class="switch">
+                    <input type="checkbox" id="ageToggle">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="switch-row">
+                <span class="label">地区限定</span>
+                <div class="switch-control">
+                  <label class="switch">
+                    <input type="checkbox" id="regionToggle">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="switch-row">
+                <span class="label">人群限定</span>
+                <div class="switch-control">
+                  <label class="switch">
+                    <input type="checkbox" id="crowdToggle">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <h2 class="section-title compact">投放限制</h2>
+            <div class="limit-grid">
+              <div class="switch-row">
+                <span class="label">投放限制</span>
+                <div class="switch-control">
+                  <label class="switch">
+                    <input id="limitToggle" type="checkbox" checked data-toggle="limitPanel">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="switch-row" id="limitPanel">
+                <span class="label">时间类型</span>
+                <div class="time-options" role="radiogroup" aria-label="时间类型">
+                  <label class="radio-chip">
+                    <input type="radio" name="timeType" value="0点-0点">
+                    <span>0点-0点</span>
+                  </label>
+                  <label class="radio-chip">
+                    <input type="radio" name="timeType" value="10点-10点" checked>
+                    <span>10点-10点</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="grid-form">
+                <div class="field">
+                  <label class="label" for="deviceDaily">单用户总限制</label>
+                  <input class="control" id="deviceDaily" name="deviceDaily" type="text" placeholder="不填为不限">
+                </div>
+
+                <div class="field">
+                  <label class="label" for="deviceHour">单用户每周限制</label>
+                  <input class="control" id="deviceHour" name="deviceHour" type="text" placeholder="不填为不限">
+                </div>
+
+                <div class="field">
+                  <label class="label" for="deviceDay">单用户每日限制</label>
+                  <input class="control" id="deviceDay" name="deviceDay" type="text" placeholder="不填为不限">
+                </div>
+              </div>
+            </div>
+
+            <div class="action-bar">
+              <div class="action-main">
+                <button class="estimate-btn" type="submit">预估曝光</button>
+                <div class="validation" id="validationText"></div>
+              </div>
+            </div>
+              </form>
+            </div>
+
+            <aside class="detail-panel" id="detailPanel" aria-label="预估细节">
+              <h2 class="result-section-title">预估细节</h2>
+              <p class="detail-main-position">主位置（<span class="value" id="detailPosition">美柚-首页贴边-子位:1</span>）</p>
+              <table class="detail-table" aria-label="预估细节计划列表">
+                <thead>
+                  <tr>
+                    <th style="width: 16%;">交叉计划ID</th>
+                    <th style="width: 26%;">计划信息</th>
+                    <th style="width: 25%;">投放细节</th>
+                    <th style="width: 14%;">状态</th>
+                    <th>说明</th>
+                  </tr>
+                </thead>
+                <tbody id="detailTableBody"></tbody>
+              </table>
+            </aside>
+          </div>
+
+          <section class="result-panel" id="resultPanel" aria-label="预估结果">
+            <div class="result-summary" id="resultSummary"></div>
+
+            <div class="result-block priority-block">
+              <div class="result-block-head">
+                <div class="result-block-title"><span class="dot">●</span>优先占量计划<span class="note-tooltip" tabindex="0" aria-label="优先占量计划优先级说明"><span class="note-tooltip-icon">?</span><span class="note-tooltip-content">计划id数值越小优先级越高，越先占量</span></span></div>
+                <span class="result-block-tag">第一层扣减</span>
+              </div>
+              <p class="result-position-meta">初始库存： <span class="value">106903</span> &nbsp;&nbsp;&nbsp;&nbsp; 库存曝光转化率： <span class="value" id="resultConversionRatio">0.8928</span></p>
+              <table class="result-table">
+                <thead>
+                  <tr>
+                    <th>交叉计划Id</th>
+                    <th>广告主</th>
+                    <th>计划投放类型</th>
+                    <th>计划来源</th>
+                    <th>库存交叉占量（非CPM）</th>
+                    <th>库存交叉占量</th>
+                    <th>曝光交叉占量</th>
+                    <th>投放时间</th>
+                  </tr>
+                </thead>
+                <tbody id="priorityTableBody"></tbody>
+              </table>
+              <p class="result-note" id="priorityNote"></p>
+              <table class="result-table daily-remain-table" aria-label="分天剩余库存与曝光">
+                <thead>
+                  <tr>
+                    <th>日期</th>
+                    <th>剩余库存（非CPM）</th>
+                    <th>剩余库存</th>
+                    <th>剩余曝光（剩余库存 * 库存曝光转化率）</th>
+                  </tr>
+                </thead>
+                <tbody id="dailyRemainTableBody"></tbody>
+              </table>
+            </div>
+
+            <div class="result-block reserve-block">
+              <div class="result-block-head">
+                <div class="result-block-title"><span class="dot">●</span>预定计划<span class="note-tooltip" tabindex="0" aria-label="预定计划优先级说明"><span class="note-tooltip-icon">?</span><span class="note-tooltip-content">计划id数值越小优先级越高，越先占量</span></span></div>
+                <span class="result-block-tag">第二层扣减</span>
+              </div>
+              <table class="result-table">
+                <thead>
+                  <tr>
+                    <th>交叉计划Id</th>
+                    <th>广告主</th>
+                    <th>计划投放类型</th>
+                    <th>库存交叉占量（非CPM）</th>
+                    <th>库存交叉占量</th>
+                    <th>曝光交叉占量</th>
+                    <th>投放时间</th>
+                  </tr>
+                </thead>
+                <tbody id="reserveTableBody"></tbody>
+              </table>
+              <p class="result-note" id="reserveNote"></p>
+              <table class="result-table daily-remain-table" aria-label="预定计划分天剩余库存与曝光">
+                <thead>
+                  <tr>
+                    <th>日期</th>
+                    <th>剩余库存（非CPM）</th>
+                    <th>剩余库存</th>
+                    <th>剩余曝光（剩余库存 * 库存曝光转化率）</th>
+                  </tr>
+                </thead>
+                <tbody id="reserveDailyRemainTableBody"></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const INITIAL_INVENTORY = 106903;
+
+    const titleInput = document.getElementById('title');
+    const titleCount = document.getElementById('titleCount');
+    const form = document.getElementById('estimateForm');
+    const workbench = document.querySelector('.estimate-workbench');
+    const actionBar = document.querySelector('.action-bar');
+    const validationText = document.getElementById('validationText');
+    const subSlotInput = document.getElementById('subSlot');
+    const platformSelect = document.getElementById('platformSelect');
+    const platformToggle = document.getElementById('platformToggle');
+    const detailPanel = document.getElementById('detailPanel');
+    const detailPosition = document.getElementById('detailPosition');
+    const detailTableBody = document.getElementById('detailTableBody');
+    const resultPanel = document.getElementById('resultPanel');
+    const resultSummary = document.getElementById('resultSummary');
+    const resultConversionRatio = document.getElementById('resultConversionRatio');
+    const priorityTableBody = document.getElementById('priorityTableBody');
+    const reserveTableBody = document.getElementById('reserveTableBody');
+    const dailyRemainTableBody = document.getElementById('dailyRemainTableBody');
+    const priorityNote = document.getElementById('priorityNote');
+    const reserveNote = document.getElementById('reserveNote');
+    const reserveDailyRemainTableBody = document.getElementById('reserveDailyRemainTableBody');
+    let estimateTimer = null;
+
+    function updateTitleCount() {
+      titleCount.textContent = titleInput.value.length;
+    }
+
+    function getSelectedPlatforms() {
+      return Array.from(document.querySelectorAll('input[name="platform"]:checked')).map((input) => input.value);
+    }
+
+    function updatePlatformLabel() {
+      const selected = getSelectedPlatforms();
+      platformToggle.textContent = selected.length ? selected.join('、') : '请选择';
+    }
+
+    function togglePlatformPanel(forceOpen) {
+      const nextOpen = typeof forceOpen === 'boolean' ? forceOpen : !platformSelect.classList.contains('is-open');
+      platformSelect.classList.toggle('is-open', nextOpen);
+      platformToggle.setAttribute('aria-expanded', String(nextOpen));
+    }
+
+    function toggleMenu(trigger) {
+      const targetId = trigger.dataset.target;
+      if (!targetId) {
+        return;
+      }
+
+      const panel = document.getElementById(targetId);
+      if (!panel) {
+        return;
+      }
+
+      panel.classList.toggle('hidden');
+      trigger.classList.toggle('collapsed', panel.classList.contains('hidden'));
+    }
+
+    function clampSubSlot(nextValue) {
+      if (Number.isNaN(nextValue)) {
+        return 1;
+      }
+      return Math.min(9, Math.max(1, nextValue));
+    }
+
+    function formatDateLabel(dateText) {
+      const matched = dateText.match(/^(\d{4})-(\d{2})-(\d{2})\s+(\d{2})/);
+      if (!matched) {
+        return dateText;
+      }
+
+      return matched[1].slice(2) + '/' + matched[2] + '/' + matched[3] + ' ' + matched[4] + '点';
+    }
+
+    function buildPlanId(estimatedExposure, subSlot) {
+      const basis = String(estimatedExposure).slice(-3);
+      return String(48000 + Number(basis || 0) + subSlot * 7);
+    }
+
+    function buildPriorityPlans(payload) {
+      const timeRange = payload.startDate + ' ~ ' + payload.endDate;
+
+      return [
+        { id: '209935', cross: 69, remain: 61, range: timeRange },
+        { id: '209943', cross: 151, remain: 135, range: timeRange },
+        { id: '209968', cross: 366, remain: 327, range: timeRange },
+        { id: '210016', cross: 996, remain: 889, range: timeRange },
+        { id: '210026', cross: 130, remain: 116, range: timeRange }
+      ].map((item) => ({
+        id: item.id,
+        advertiser: '康臣药业',
+        type: 'CPM广告',
+        volume: '美玖A1P（品牌CPM）',
+        cross: item.cross,
+        remain: item.remain,
+        range: item.range
+      }));
+    }
+
+    function buildReservePlans(payload) {
+      const timeRange = payload.startDate + ' ~ ' + payload.endDate;
+
+      return [
+        { id: '70202', total: 10129, cross: 90, daily: timeRange },
+        { id: '70203', total: 13916, cross: 124, daily: timeRange },
+        { id: '70204', total: 14186, cross: 127, daily: timeRange },
+        { id: '70205', total: 15761, cross: 141, daily: timeRange },
+        { id: '70206', total: 15161, cross: 135, daily: timeRange },
+        { id: '70207', total: 15017, cross: 134, daily: timeRange },
+        { id: '70208', total: 14847, cross: 133, daily: timeRange },
+        { id: '70209', total: 4233, cross: 38, daily: timeRange },
+        { id: '70841', total: 15161, cross: 135, daily: timeRange },
+        { id: '70842', total: 15017, cross: 134, daily: timeRange },
+        { id: '70843', total: 14847, cross: 133, daily: timeRange },
+        { id: '70844', total: 4233, cross: 38, daily: timeRange },
+        { id: '71642', total: 29224, cross: 261, daily: timeRange },
+        { id: '71643', total: 14526, cross: 130, daily: timeRange },
+        { id: '71644', total: 9079, cross: 81, daily: timeRange },
+        { id: '71645', total: 4536, cross: 41, daily: timeRange }
+      ].map((item) => ({
+        id: item.id,
+        advertiser: '康臣药业',
+        type: 'CPM广告',
+        total: item.total,
+        cross: item.cross,
+        daily: item.daily
+      }));
+    }
+
+    function renderPlanRows(rows, mode) {
+      const conversionRatio = Number(resultConversionRatio.textContent || 0);
+
+      return rows
+        .slice()
+        .sort((left, right) => Number(left.id) - Number(right.id))
+        .map((row) => {
+        const crossExposure = Math.round(row.cross * conversionRatio);
+
+        if (mode === 'priority') {
+          return '<tr>' +
+            '<td>' + row.id + '</td>' +
+            '<td>' + row.advertiser + '</td>' +
+            '<td>' + row.type + '</td>' +
+            '<td>' + row.volume + '</td>' +
+            '<td>' + formatNumeric(row.cross * 1000) + '</td>' +
+            '<td>' + formatNumeric(row.cross) + '</td>' +
+            '<td>' + formatNumeric(crossExposure) + '</td>' +
+            '<td>' + row.range + '</td>' +
+          '</tr>';
+        }
+
+        return '<tr>' +
+          '<td>' + row.id + '</td>' +
+          '<td>' + row.advertiser + '</td>' +
+          '<td>' + row.type + '</td>' +
+          '<td>' + formatNumeric(row.cross * 1000) + '</td>' +
+          '<td>' + formatNumeric(row.cross) + '</td>' +
+          '<td>' + formatNumeric(crossExposure) + '</td>' +
+          '<td>' + row.daily + '</td>' +
+        '</tr>';
+      }).join('');
+    }
+
+    function formatNumeric(value) {
+      const numericValue = Number(value);
+
+      if (!Number.isFinite(numericValue)) {
+        return String(value);
+      }
+
+      return numericValue.toLocaleString('zh-CN');
+    }
+
+    function formatCpmValue(value) {
+      return (value / 1000).toFixed(3);
+    }
+
+    function formatDailyLabel(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return year + '-' + month + '-' + day;
+    }
+
+    function buildDailyRemainRows(totalRemainInventory, payload) {
+      const ratio = Number(payload.conversionRatio) || 0;
+      const start = new Date(payload.startDate.replace(/-/g, '/'));
+      const end = new Date(payload.endDate.replace(/-/g, '/'));
+      const dayCount = Math.max(1, Math.round((end - start) / 86400000));
+      const baseInventory = Math.floor(totalRemainInventory / dayCount);
+      const inventoryRemainder = totalRemainInventory % dayCount;
+      const rows = [];
+
+      for (let index = 0; index < dayCount; index += 1) {
+        const currentDate = new Date(start.getTime() + index * 86400000);
+        const remainInventory = baseInventory + (index < inventoryRemainder ? 1 : 0);
+        const exactExposure = remainInventory * ratio;
+
+        rows.push({
+          date: formatDailyLabel(currentDate),
+          remainInventory,
+          remainExposure: Math.floor(exactExposure),
+          fraction: exactExposure - Math.floor(exactExposure)
+        });
+      }
+
+      const targetExposure = Math.round(totalRemainInventory * ratio);
+      let allocatedExposure = rows.reduce((sum, row) => sum + row.remainExposure, 0);
+
+      rows
+        .slice()
+        .sort((left, right) => right.fraction - left.fraction)
+        .forEach((row) => {
+          if (allocatedExposure >= targetExposure) {
+            return;
+          }
+
+          row.remainExposure += 1;
+          allocatedExposure += 1;
+        });
+
+      return rows;
+    }
+
+    function getRemainSummary(rows) {
+      return rows.reduce((summary, row) => ({
+        remainInventory: summary.remainInventory + row.remainInventory,
+        remainExposure: summary.remainExposure + row.remainExposure
+      }), { remainInventory: 0, remainExposure: 0 });
+    }
+
+    function getCrossOccupiedInventory(rows) {
+      return rows.reduce((sum, row) => sum + row.cross, 0);
+    }
+
+    function renderDailyRemainRows(rows) {
+      return rows.map((row) => '<tr>' +
+        '<td>' + row.date + '</td>' +
+        '<td>' + formatNumeric(row.remainInventory * 1000) + '</td>' +
+        '<td>' + formatNumeric(row.remainInventory) + '</td>' +
+        '<td>' + formatNumeric(row.remainExposure) + '</td>' +
+      '</tr>').join('');
+    }
+
+    function syncDetailPanelOffset() {
+      if (!workbench || !actionBar) {
+        return;
+      }
+
+      if (window.innerWidth <= 980) {
+        detailPanel.style.marginTop = '0';
+        detailPanel.style.maxHeight = 'none';
+        return;
+      }
+
+      const workbenchTop = workbench.getBoundingClientRect().top;
+      const actionBottom = actionBar.getBoundingClientRect().bottom;
+      const availableHeight = Math.max(0, actionBottom - workbenchTop);
+      detailPanel.style.marginTop = '0';
+      detailPanel.style.maxHeight = availableHeight + 'px';
+    }
+
+    function buildDetailRows() {
+      return [
+        {
+          id: '2097439',
+          planInfo: [
+            '名称： 5.6.6-3吉瑞贴边（女大学生）',
+            '时间： 26/05/01 10点~26/08/01 10点',
+            '类型： CPM广告'
+          ],
+          delivery: [
+            '限制： 总曝光 23558000(溢出率2%) 日曝光 400000',
+            '人群包： 限定-吉瑞贴边人群'
+          ],
+          statusMain: '交叉占量',
+          statusNote: '',
+          description: [
+            '*总曝光： 23558000',
+            '每日限制曝光： 400000',
+            '已执行： 10918732',
+            '预计： 2026-07-06执行完毕'
+          ],
+          muted: false
+        },
+        {
+          id: '2100094',
+          planInfo: [
+            '名称： 5.28弘爱妇产-首页首页贴边-厦门-怀孕人群500CPM',
+            '时间： 26/05/28 10点~26/08/01 10点',
+            '类型： CPM广告'
+          ],
+          delivery: [
+            '身份： 怀孕-(0~42)周',
+            '城市： 其它',
+            '限制： 总曝光 500000(溢出率4%)'
+          ],
+          statusMain: '交叉占量',
+          statusNote: '',
+          description: [
+            '*总曝光： 500000',
+            '已执行： 38357',
+            '预计： 2026-08-19执行完毕'
+          ],
+          muted: false
+        },
+        {
+          id: '70441',
+          idNote: '（预定计划）',
+          planInfo: [
+            '时间： 26/07/01 10点~26/09/01 10点',
+            '类型： CPM广告'
+          ],
+          delivery: [
+            '身份： 怀孕',
+            '限制： 总曝光 3000000(溢出率4%)'
+          ],
+          statusMain: '不占量',
+          statusNote: '（预定计划不占量）',
+          description: [],
+          muted: false
+        },
+        {
+          id: '2097438',
+          planInfo: [
+            '名称： 6.4 吉瑞女大学生贴边',
+            '时间： 26/05/01 10点~26/08/01 10点',
+            '类型： CPM广告'
+          ],
+          delivery: [
+            '限制： 总曝光 382000(溢出率5%) 日曝光 400000',
+            '人群包： 限定-吉瑞贴边人群'
+          ],
+          statusMain: '不交叉',
+          statusNote: '（预估开始前完成）',
+          description: [
+            '*总曝光： 382000',
+            '每日限制曝光： 400000',
+            '已执行： 0',
+            '预计： 2026-06-04执行完毕'
+          ],
+          muted: true
+        }
+      ];
+    }
+
+    function renderDetailTableRows(rows) {
+      return rows.map((row) => '<tr' + (row.muted ? ' class="is-muted"' : '') + '>' +
+        '<td>' + row.id + (row.idNote ? '<span class="detail-plan-id-note">' + row.idNote + '</span>' : '') + '</td>' +
+        '<td>' + row.planInfo.map((line) => '<span class="detail-plan-line">' + line + '</span>').join('') + '</td>' +
+        '<td>' + row.delivery.map((line) => '<span class="detail-plan-line">' + line + '</span>').join('') + '</td>' +
+        '<td><span class="detail-status-main">' + row.statusMain + '</span>' + (row.statusNote ? '<span class="detail-status-note">' + row.statusNote + '</span>' : '') + '</td>' +
+        '<td>' + row.description.map((line) => '<span class="detail-plan-line">' + line + '</span>').join('') + '</td>' +
+      '</tr>').join('');
+    }
+
+    function renderDetailPanel(payload, isLoading) {
+      detailPosition.textContent = payload.detailPositionText;
+      detailTableBody.innerHTML = renderDetailTableRows(buildDetailRows());
+      detailPanel.classList.add('visible');
+      detailPanel.classList.toggle('loading', isLoading);
+    }
+
+    function renderBottomResult(payload) {
+      const priorityPlans = buildPriorityPlans(payload);
+      const reservePlans = buildReservePlans(payload);
+      const priorityCrossOccupiedInventory = getCrossOccupiedInventory(priorityPlans);
+      const priorityRemainInventory = Math.max(0, INITIAL_INVENTORY - priorityCrossOccupiedInventory);
+      const priorityDailyRemainRows = buildDailyRemainRows(priorityRemainInventory, payload);
+      const prioritySummary = getRemainSummary(priorityDailyRemainRows);
+      const reserveCrossOccupiedInventory = getCrossOccupiedInventory(reservePlans);
+      const reserveRemainInventory = Math.max(0, INITIAL_INVENTORY - reserveCrossOccupiedInventory);
+      const reserveDailyRemainRows = buildDailyRemainRows(reserveRemainInventory, payload);
+      const reserveSummary = getRemainSummary(reserveDailyRemainRows);
+      const totalRemainExposure = prioritySummary.remainExposure + reserveSummary.remainExposure;
+
+      resultSummary.innerHTML = [
+        '<span class="title"><strong>预估结果</strong> (单位：CPM)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="muted-label">剩余曝光总量：</span> <span class="value">' + formatNumeric(totalRemainExposure) + '</span>',
+        '<span class="dot-line">初始库存: <span class="pink-value">' + formatNumeric(INITIAL_INVENTORY) + '</span></span>'
+      ].join('');
+
+      resultConversionRatio.textContent = payload.conversionRatio;
+      priorityTableBody.innerHTML = renderPlanRows(priorityPlans, 'priority');
+      reserveTableBody.innerHTML = renderPlanRows(reservePlans, 'reserve');
+      dailyRemainTableBody.innerHTML = renderDailyRemainRows(priorityDailyRemainRows);
+      priorityNote.classList.add('with-tooltip');
+      priorityNote.innerHTML = '● 剩余曝光： <span class="value">' + formatNumeric(prioritySummary.remainExposure) + '</span> &nbsp;&nbsp;&nbsp;（剩余库存： <span class="value">' + formatNumeric(prioritySummary.remainInventory) + '</span> * <span class="value">' + payload.conversionRatio + '</span>）' +
+        '<span class="note-tooltip" tabindex="0" aria-label="优先占量计划剩余说明">' +
+          '<span class="note-tooltip-icon">?</span>' +
+          '<span class="note-tooltip-content">先从初始库存中扣减优先占量计划，得到第一阶段剩余库存与剩余曝光。</span>' +
+        '</span>';
+      reserveDailyRemainTableBody.innerHTML = renderDailyRemainRows(reserveDailyRemainRows);
+      reserveNote.classList.add('with-tooltip');
+      reserveNote.innerHTML = '● 剩余曝光： <span class="value">' + formatNumeric(reserveSummary.remainExposure) + '</span> &nbsp;&nbsp;&nbsp;（剩余库存： <span class="value">' + formatNumeric(reserveSummary.remainInventory) + '</span> * <span class="value">' + payload.conversionRatio + '</span>）' +
+        '<span class="note-tooltip" tabindex="0" aria-label="预定计划剩余说明">' +
+          '<span class="note-tooltip-icon">?</span>' +
+          '<span class="note-tooltip-content">在优先占量后的剩余库存基础上，再扣减预定计划占量，得到最终剩余库存与剩余曝光。</span>' +
+        '</span>';
+      resultPanel.classList.add('visible');
+    }
+
+    document.querySelectorAll('[data-step]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const direction = button.dataset.step === 'up' ? 1 : -1;
+        const nextValue = clampSubSlot(Number(subSlotInput.value) + direction);
+        subSlotInput.value = String(nextValue);
+      });
+    });
+
+    subSlotInput.addEventListener('input', () => {
+      subSlotInput.value = String(clampSubSlot(Number(subSlotInput.value)));
+    });
+
+    titleInput.addEventListener('input', updateTitleCount);
+    updateTitleCount();
+
+    platformToggle.addEventListener('click', (event) => {
+      event.stopPropagation();
+      togglePlatformPanel();
+    });
+
+    document.querySelectorAll('input[name="platform"]').forEach((checkbox) => {
+      checkbox.addEventListener('change', () => {
+        updatePlatformLabel();
+      });
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!platformSelect.contains(event.target)) {
+        togglePlatformPanel(false);
+      }
+    });
+
+    updatePlatformLabel();
+
+    document.querySelectorAll('.menu-heading, .menu-link.has-children').forEach((trigger) => {
+      trigger.addEventListener('click', () => toggleMenu(trigger));
+    });
+
+    window.addEventListener('resize', syncDetailPanelOffset);
+    syncDetailPanelOffset();
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+
+      const title = titleInput.value.trim();
+      const style = document.getElementById('styleSelect').value;
+      const startDate = document.getElementById('startDate').value.trim();
+      const endDate = document.getElementById('endDate').value.trim();
+      const conversionRatio = document.getElementById('conversionRatio').value.trim();
+      const platforms = getSelectedPlatforms();
+      const subSlot = clampSubSlot(Number(subSlotInput.value));
+      const limitEnabled = document.getElementById('limitToggle').checked;
+
+      if (!title || !startDate || !endDate || !conversionRatio || platforms.length === 0) {
+        validationText.textContent = '请补全预估标题、库存曝光转化率、手机平台和投放起止时间后再进行预估。';
+        validationText.classList.add('visible');
+        detailPanel.classList.remove('visible');
+        detailPanel.classList.remove('loading');
+        resultPanel.classList.remove('visible');
+        return;
+      }
+
+      validationText.classList.remove('visible');
+
+      const durationDays = Math.max(1, Math.round((new Date(endDate.replace(/-/g, '/')) - new Date(startDate.replace(/-/g, '/'))) / 86400000));
+      const baseExposure = durationDays * 365000 * subSlot;
+      const platformFactor = platforms.reduce((sum, platform) => {
+        if (platform === 'IOS') {
+          return sum + 0.78;
+        }
+        if (platform === 'Android') {
+          return sum + 1.12;
+        }
+        return sum + 0.56;
+      }, 0) / platforms.length;
+      const limitFactor = limitEnabled ? 0.88 : 1;
+      const estimatedExposure = Math.round(baseExposure * platformFactor * limitFactor);
+      const payload = {
+        title,
+        position: document.getElementById('appSelect').value + '-' + document.getElementById('slotSelect').value.replace('美柚-', '') + '广告-子位:' + subSlot,
+        positionText: document.getElementById('appSelect').value + '-' + document.getElementById('appSelect').value + '-' + document.getElementById('slotSelect').value.replace('美柚-', '') + ' 子位 ' + subSlot,
+        detailPositionText: document.getElementById('appSelect').value + '-首页贴边-子位:' + subSlot,
+        planId: buildPlanId(estimatedExposure, subSlot),
+        timeRange: formatDateLabel(startDate) + '~' + formatDateLabel(endDate),
+        totalExposure: estimatedExposure.toLocaleString('zh-CN'),
+        executedExposure: Math.max(1, Math.round(estimatedExposure * 0.063)).toLocaleString('zh-CN'),
+        finishDate: endDate.split(' ')[0],
+        startDate,
+        endDate,
+        estimatedExposure,
+        conversionRatio
+      };
+
+      if (estimateTimer) {
+        clearTimeout(estimateTimer);
+      }
+
+      renderDetailPanel(payload, true);
+      resultPanel.classList.remove('visible');
+
+      estimateTimer = window.setTimeout(() => {
+        renderDetailPanel(payload, false);
+        renderBottomResult(payload);
+        estimateTimer = null;
+      }, 1400);
+    });
+  </script>
+</body>
+</html>

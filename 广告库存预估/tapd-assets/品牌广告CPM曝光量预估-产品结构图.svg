@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="1020" viewBox="0 0 1280 1020">
+  <defs>
+    <style>
+      .bg { fill: #ffffff; }
+      .title { font: 700 28px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #111111; }
+      .subtitle { font: 400 15px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #444444; }
+      .node { fill: #ffffff; stroke: #111111; stroke-width: 2.2; rx: 18; ry: 18; }
+      .root { fill: #f5f5f5; }
+      .text { font: 15px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #111111; }
+      .strong { font: 700 22px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #111111; }
+      .line { stroke: #111111; stroke-width: 2.2; fill: none; }
+    </style>
+  </defs>
+  <rect class="bg" width="1280" height="1020" />
+  <text x="56" y="58" class="title">品牌广告 CPM 曝光量预估 · 产品结构图</text>
+  <text x="56" y="86" class="subtitle">信息结构分层展示，模块间保持均匀留白，无交叠</text>
+
+  <!-- 根节点 -->
+  <g transform="translate(450,90)">
+    <rect class="node root" width="380" height="80" />
+    <text x="56" y="48" class="strong">品牌广告CPM曝光量预估</text>
+  </g>
+
+  <!-- 从根到三个子模块的连线 -->
+  <path class="line" d="M640 170 L270 260" />
+  <path class="line" d="M640 170 L640 260" />
+  <path class="line" d="M640 170 L1015 260" />
+
+  <!-- 表单区 - 高度压缩 -->
+  <g transform="translate(70,260)">
+    <rect class="node" width="400" height="430" />
+    <text x="28" y="44" class="strong">表单区</text>
+    <text x="28" y="84" class="text">• 预估标题</text>
+    <text x="28" y="118" class="text">• 广告位信息</text>
+    <text x="56" y="150" class="text">- 应用 / 页面 / 广告位 / 样式</text>
+    <text x="56" y="182" class="text">- 子位 / 手机平台 / 售卖方式</text>
+    <text x="56" y="214" class="text">- 投放起止时间 / 版本限制</text>
+    <text x="56" y="246" class="text">- 库存曝光转化率</text>
+    <text x="28" y="294" class="text">• 定向信息</text>
+    <text x="28" y="328" class="text">• 投放限制</text>
+    <text x="28" y="372" class="text">• 校验规则</text>
+    <text x="56" y="404" class="text">- 标题 / 时间 / 平台 / 转化率必填</text>
+    <text x="56" y="436" class="text">- 样式非必填，手机平台默认全选</text>
+  </g>
+
+  <!-- 预估细节区 -->
+  <g transform="translate(500,260)">
+    <rect class="node" width="280" height="260" />
+    <text x="28" y="44" class="strong">预估细节区</text>
+    <text x="28" y="88" class="text">• 页面右侧展示</text>
+    <text x="28" y="124" class="text">• 主位置说明</text>
+    <text x="28" y="160" class="text">• 交叉计划明细表</text>
+    <text x="54" y="194" class="text">- 交叉计划ID</text>
+    <text x="54" y="228" class="text">- 计划信息 / 投放细节</text>
+    <text x="54" y="262" class="text">- 状态 / 说明</text>
+  </g>
+
+  <!-- 预估结果区 -->
+  <g transform="translate(820,260)">
+    <rect class="node" width="390" height="390" />
+    <text x="28" y="44" class="strong">预估结果区</text>
+    <text x="28" y="88" class="text">• 结果摘要</text>
+    <text x="28" y="124" class="text">• 优先占量计划</text>
+    <text x="56" y="156" class="text">- 广告主 / 计划来源</text>
+    <text x="56" y="188" class="text">- 库存交叉占量（非CPM）/ 库存交叉占量</text>
+    <text x="56" y="220" class="text">- 曝光交叉占量 / 投放时间</text>
+    <text x="28" y="272" class="text">• 预定计划</text>
+    <text x="56" y="304" class="text">- 字段口径与优先占量计划一致</text>
+    <text x="28" y="356" class="text">• 分天剩余结果</text>
+    <text x="56" y="388" class="text">- 剩余库存（非CPM）/ 剩余库存 / 剩余曝光</text>
+  </g>
+
+  <!-- 底部连线 -->
+  <path class="line" d="M640 520 L640 760" />
+
+  <!-- 统一规则层 - 放在最底部，与上方无交叠 -->
+  <g transform="translate(340,760)">
+    <rect class="node root" width="600" height="150" />
+    <text x="34" y="46" class="strong">统一规则层</text>
+    <text x="34" y="88" class="text">• 流程顺序：先展示预估细节，再展示预估结果</text>
+    <text x="34" y="124" class="text">• 展示规范：关键数值统一千分位展示，CPM / 非CPM 口径区分明确</text>
+  </g>
+</svg>

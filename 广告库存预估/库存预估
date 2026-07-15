@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>品牌广告CPM曝光量预估</title>
+	<style>
+		:root {
+			--bg: #f7f7f7;
+			--panel: #ffffff;
+			--text: #5e6670;
+			--text-strong: #42474f;
+			--line: #e7ebf0;
+			--soft: #f5f7fa;
+			--topbar: #5e6670;
+			--sidebar: #ffffff;
+			--accent: #ff7eb6;
+			--accent-soft: #fff0f6;
+			--green: #76c043;
+			--blue: #409eff;
+			--muted: #a8b0ba;
+			--shadow: 0 8px 24px rgba(35, 46, 60, 0.06);
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		html,
+		body {
+			margin: 0;
+			min-height: 100%;
+			font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+			color: var(--text);
+			background: var(--bg);
+		}
+
+		button,
+		input,
+		select {
+			font: inherit;
+		}
+
+		.app-shell {
+			min-height: 100vh;
+			display: flex;
+			flex-direction: column;
+		}
+
+		.topbar {
+			height: 34px;
+			background: var(--topbar);
+			color: rgba(255, 255, 255, 0.95);
+			display: flex;
+			align-items: center;
+			padding: 0 20px;
+			gap: 28px;
+			font-size: 12px;
+			box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+			position: sticky;
+			top: 0;
+			z-index: 10;
+		}
+
+		.topbar__item {
+			white-space: nowrap;
+			opacity: 0.9;
+		}
+
+		.topbar__item.is-active {
+			color: #ffffff;
+			font-weight: 600;
+		}
+
+		.layout {
+			display: flex;
+			flex: 1;
+			min-height: calc(100vh - 34px);
+		}
+
+		.sidebar {
+			width: 132px;
+			background: var(--sidebar);
+			border-right: 1px solid var(--line);
+			padding: 16px 0 18px;
+		}
+
+		.sidebar__user {
+			display: flex;
+			align-items: center;
+			gap: 0;
+			margin: 0 12px 16px;
+		}
+
+		.sidebar__user span,
+		.sidebar__user button {
+			height: 20px;
+			border: 1px solid #e4e8ed;
+			background: #fff;
+			padding: 0 10px;
+			font-size: 11px;
+			color: #6d7480;
+		}
+
+		.sidebar__user span {
+			border-radius: 3px 0 0 3px;
+			display: inline-flex;
+			align-items: center;
+		}
+
+		.sidebar__user button {
+			border-left: 0;
+			border-radius: 0 3px 3px 0;
+			cursor: pointer;
+		}
+
+		.nav-group {
+			margin-bottom: 4px;
+		}
+
+		.nav-title,
+		.nav-link,
+		.nav-sublink {
+			font-size: 12px;
+			line-height: 1.2;
+		}
+
+		.nav-title,
+		.nav-link {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 10px 14px;
+			color: #626a75;
+		}
+
+		.nav-title::after,
+		.nav-link::after {
+			content: "⌄";
+			color: #c0c6cf;
+			font-size: 10px;
+			transform: translateY(-1px);
+		}
+
+		.nav-link.is-active,
+		.nav-sublink.is-active {
+			color: #333b45;
+			font-weight: 600;
+		}
+
+		.nav-sublink {
+			display: block;
+			padding: 8px 14px 8px 24px;
+			color: #6e7782;
+			text-decoration: none;
+		}
+
+		.content {
+			flex: 1;
+			background: #fff;
+			padding: 18px 0 28px 0;
+			overflow: auto;
+		}
+
+		.page {
+			width: 920px;
+			margin-left: 14px;
+		}
+
+		.page-title {
+			margin: 0 0 18px;
+			font-size: 20px;
+			font-weight: 600;
+			color: var(--accent);
+		}
+
+		.section-title {
+			margin: 18px 0 12px;
+			font-size: 15px;
+			color: var(--accent);
+			font-weight: 600;
+		}
+
+		.grid {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			column-gap: 40px;
+			row-gap: 14px;
+			width: 760px;
+		}
+
+		.field {
+			display: grid;
+			grid-template-columns: 66px 1fr;
+			align-items: center;
+			min-height: 28px;
+		}
+
+		.field--full {
+			grid-column: 1 / -1;
+		}
+
+		.field--compact {
+			width: 356px;
+		}
+
+		.label {
+			font-size: 12px;
+			color: #6f7680;
+			white-space: nowrap;
+		}
+
+		.required::before {
+			content: "*";
+			color: #ff8ba9;
+			margin-right: 4px;
+		}
+
+		.control,
+		.control-group,
+		.date-range,
+		.radio-row {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			min-width: 0;
+		}
+
+		.input,
+		.select,
+		.readonly {
+			height: 28px;
+			border: 1px solid var(--line);
+			border-radius: 2px;
+			background: #fff;
+			color: #616975;
+			padding: 0 10px;
+			font-size: 12px;
+			outline: none;
+			transition: border-color 0.15s ease, box-shadow 0.15s ease;
+		}
+
+		.input:focus,
+		.select:focus,
+		.stepper button:focus,
+		.toggle input:focus + span,
+		.chip-radio input:focus + span {
+			border-color: #9fc7ff;
+			box-shadow: 0 0 0 3px rgba(64, 158, 255, 0.1);
+		}
+
+		.input,
+		.readonly {
+			width: 100%;
+		}
+
+		.readonly {
+			background: #fafbfd;
+			color: #a0a8b4;
+		}
+
+		.select {
+			min-width: 114px;
+			padding-right: 26px;
+			appearance: none;
+			background-image: linear-gradient(45deg, transparent 50%, #b3bbc5 50%), linear-gradient(135deg, #b3bbc5 50%, transparent 50%);
+			background-position: calc(100% - 14px) 11px, calc(100% - 9px) 11px;
+			background-size: 5px 5px, 5px 5px;
+			background-repeat: no-repeat;
+		}
+
+		.input--title {
+			width: 334px;
+		}
+
+		.char-count {
+			font-size: 10px;
+			color: #b4bcc7;
+			margin-left: -6px;
+		}
+
+		.stepper {
+			display: inline-flex;
+			align-items: center;
+			border: 1px solid var(--line);
+			border-radius: 2px;
+			overflow: hidden;
+			background: #fff;
+			height: 28px;
+		}
+
+		.stepper button {
+			width: 24px;
+			height: 28px;
+			border: 0;
+			border-right: 1px solid var(--line);
+			background: #f7f9fc;
+			color: #9aa3ae;
+			cursor: pointer;
+		}
+
+		.stepper button:last-child {
+			border-right: 0;
+			border-left: 1px solid var(--line);
+		}
+
+		.stepper input {
+			width: 48px;
+			height: 28px;
+			border: 0;
+			text-align: center;
+			color: #5f6771;
+			outline: none;
+		}
+
+		.chip-radio {
+			position: relative;
+			display: inline-flex;
+			align-items: center;
+			gap: 4px;
+			font-size: 12px;
+			color: #87909b;
+			cursor: pointer;
+		}
+
+		.chip-radio input {
+			position: absolute;
+			opacity: 0;
+			pointer-events: none;
+		}
+
+		.chip-radio span {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			min-width: 42px;
+			height: 20px;
+			padding: 0 10px;
+			border-radius: 10px;
+			background: #eef2f6;
+			border: 1px solid #e1e6ee;
+		}
+
+		.chip-radio input:checked + span {
+			background: #eaf3ff;
+			color: var(--blue);
+			border-color: #b8d6ff;
+		}
+
+		.date-range {
+			gap: 8px;
+		}
+
+		.date-wrap {
+			position: relative;
+		}
+
+		.date-wrap::before {
+			content: "◌";
+			position: absolute;
+			left: 8px;
+			top: 6px;
+			color: #c1c8d1;
+			font-size: 12px;
+			pointer-events: none;
+		}
+
+		.date-input {
+			width: 158px;
+			padding-left: 28px;
+		}
+
+		.date-sep {
+			color: #98a1ad;
+			font-size: 12px;
+		}
+
+		.toggle-row {
+			display: flex;
+			flex-direction: column;
+			gap: 16px;
+			width: 320px;
+		}
+
+		.toggle-item,
+		.limit-row,
+		.radio-line {
+			display: flex;
+			align-items: center;
+			gap: 14px;
+		}
+
+		.toggle-item .label,
+		.radio-line .label,
+		.limit-row .label {
+			width: 66px;
+			flex: 0 0 66px;
+		}
+
+		.toggle {
+			position: relative;
+			width: 26px;
+			height: 16px;
+			display: inline-block;
+		}
+
+		.toggle input {
+			position: absolute;
+			inset: 0;
+			opacity: 0;
+			margin: 0;
+			cursor: pointer;
+		}
+
+		.toggle span {
+			display: block;
+			width: 26px;
+			height: 16px;
+			background: #d8dde5;
+			border-radius: 999px;
+			position: relative;
+			transition: background 0.15s ease;
+		}
+
+		.toggle span::after {
+			content: "";
+			width: 12px;
+			height: 12px;
+			border-radius: 50%;
+			background: #fff;
+			position: absolute;
+			left: 2px;
+			top: 2px;
+			transition: transform 0.15s ease;
+			box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+		}
+
+		.toggle input:checked + span {
+			background: var(--blue);
+		}
+
+		.toggle input:checked + span::after {
+			transform: translateX(10px);
+		}
+
+		.radio-row {
+			gap: 20px;
+		}
+
+		.dot-radio {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			font-size: 12px;
+			color: #858f9b;
+			cursor: pointer;
+			position: relative;
+		}
+
+		.dot-radio input {
+			position: absolute;
+			opacity: 0;
+			pointer-events: none;
+		}
+
+		.dot-radio span::before {
+			content: "";
+			display: inline-block;
+			width: 10px;
+			height: 10px;
+			margin-right: 6px;
+			border-radius: 50%;
+			border: 1px solid #d8dde5;
+			vertical-align: -1px;
+			background: #fff;
+			box-sizing: border-box;
+		}
+
+		.dot-radio input:checked + span {
+			color: var(--blue);
+		}
+
+		.dot-radio input:checked + span::before {
+			border: 3px solid var(--blue);
+		}
+
+		.limit-fields {
+			display: flex;
+			gap: 14px;
+			width: 520px;
+		}
+
+		.limit-field {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			min-width: 0;
+			flex: 1;
+		}
+
+		.limit-field .label {
+			width: auto;
+			flex: 0 0 auto;
+		}
+
+		.btn-submit {
+			margin-top: 18px;
+			width: 52px;
+			height: 20px;
+			border: 0;
+			border-radius: 2px;
+			background: var(--green);
+			color: #fff;
+			font-size: 10px;
+			font-weight: 600;
+			cursor: pointer;
+			box-shadow: 0 3px 10px rgba(118, 192, 67, 0.18);
+		}
+
+		.feedback {
+			margin-top: 14px;
+			width: 760px;
+			display: none;
+			align-items: flex-start;
+			gap: 10px;
+			padding: 10px 12px;
+			border-radius: 4px;
+			font-size: 12px;
+			line-height: 1.6;
+			border: 1px solid transparent;
+			box-shadow: var(--shadow);
+			background: #fff;
+		}
+
+		.feedback.is-visible {
+			display: flex;
+		}
+
+		.feedback--error {
+			border-color: #ffd1dc;
+			background: #fff7fa;
+			color: #be4b73;
+		}
+
+		.feedback--success {
+			border-color: #d9f0c4;
+			background: #f7fff0;
+			color: #56753b;
+		}
+
+		.feedback__icon {
+			font-size: 14px;
+			line-height: 1;
+			margin-top: 2px;
+		}
+
+		.summary {
+			margin-top: 18px;
+			width: 760px;
+			display: none;
+			border: 1px solid #edf0f4;
+			background: #fbfcfd;
+			border-radius: 4px;
+			padding: 14px 16px;
+			font-size: 12px;
+			color: #64707d;
+			box-shadow: var(--shadow);
+		}
+
+		.summary.is-visible {
+			display: block;
+		}
+
+		.summary h2 {
+			margin: 0 0 10px;
+			font-size: 13px;
+			color: #505964;
+		}
+
+		.summary-grid {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 8px 18px;
+		}
+
+		.summary-item {
+			display: flex;
+			gap: 8px;
+			min-width: 0;
+		}
+
+		.summary-item strong {
+			flex: 0 0 auto;
+			color: #4f5864;
+			font-weight: 600;
+		}
+
+		.summary-item span {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		@media (max-width: 1100px) {
+			.page {
+				width: auto;
+				margin: 0 16px;
+			}
+
+			.grid,
+			.summary,
+			.feedback {
+				width: 100%;
+			}
+		}
+
+		@media (max-width: 900px) {
+			.layout {
+				flex-direction: column;
+			}
+
+			.sidebar {
+				width: 100%;
+				border-right: 0;
+				border-bottom: 1px solid var(--line);
+			}
+
+			.grid {
+				grid-template-columns: 1fr;
+			}
+
+			.field,
+			.field--compact {
+				width: 100%;
+			}
+
+			.limit-fields {
+				flex-direction: column;
+				width: 100%;
+			}
+		}
+
+		@media (max-width: 640px) {
+			.topbar {
+				gap: 14px;
+				overflow-x: auto;
+				padding: 0 12px;
+			}
+
+			.field {
+				grid-template-columns: 1fr;
+				gap: 6px;
+			}
+
+			.date-range,
+			.control-group,
+			.radio-row,
+			.toggle-item,
+			.radio-line,
+			.limit-row,
+			.limit-field {
+				flex-wrap: wrap;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="app-shell">
+		<header class="topbar" aria-label="顶部导航">
+			<span class="topbar__item is-active">广告投放运营后台</span>
+			<span class="topbar__item">广告资源管理后台</span>
+			<span class="topbar__item">商业产品后台</span>
+			<span class="topbar__item">报表统计系统</span>
+			<span class="topbar__item">广告投放运营后台</span>
+			<span class="topbar__item">专题系统</span>
+			<span class="topbar__item">权限申请</span>
+		</header>
+
+		<div class="layout">
+			<aside class="sidebar" aria-label="侧边菜单">
+				<div class="sidebar__user">
+					<span>张家歌</span>
+					<button type="button">退出</button>
+				</div>
+
+				<div class="nav-group">
+					<div class="nav-title">广告交互管理</div>
+				</div>
+				<div class="nav-group">
+					<div class="nav-title">品牌管理</div>
+				</div>
+				<div class="nav-group">
+					<div class="nav-link">品牌小工具</div>
+					<a class="nav-sublink" href="javascript:void(0)">流量预警</a>
+					<a class="nav-sublink" href="javascript:void(0)">审批消息重发</a>
+					<a class="nav-sublink" href="javascript:void(0)">福利拍报单审核</a>
+					<a class="nav-sublink" href="javascript:void(0)">数据导出</a>
+					<a class="nav-sublink" href="javascript:void(0)">DSP 解析计划</a>
+					<a class="nav-sublink" href="javascript:void(0)">返现项目打款至用户钱包</a>
+					<a class="nav-sublink" href="javascript:void(0)">素材预览</a>
+					<a class="nav-sublink" href="javascript:void(0)">生成式推荐人群包</a>
+					<a class="nav-sublink" href="javascript:void(0)">搜索关键词干预</a>
+					<a class="nav-sublink" href="javascript:void(0)">月投放信息统计</a>
+					<a class="nav-sublink" href="javascript:void(0)">销售单审批日志</a>
+					<a class="nav-sublink" href="javascript:void(0)">修改合同结束日期日志</a>
+					<a class="nav-sublink" href="javascript:void(0)">参数配置</a>
+					<a class="nav-sublink" href="javascript:void(0)">品牌广告分类列表</a>
+					<a class="nav-sublink" href="javascript:void(0)">人群包</a>
+					<a class="nav-sublink" href="javascript:void(0)">品牌精细化运营策略</a>
+					<a class="nav-sublink is-active" href="javascript:void(0)">CPM曝光预估</a>
+				</div>
+				<div class="nav-group">
+					<div class="nav-link">袖+管理</div>
+				</div>
+			</aside>
+
+			<main class="content">
+				<div class="page">
+					<h1 class="page-title">品牌广告CPM曝光量预估</h1>
+
+					<form id="forecastForm" novalidate>
+						<div class="grid">
+							<div class="field field--full">
+								<label class="label required" for="title">预估标题</label>
+								<div class="control-group">
+									<input class="input input--title" id="title" name="title" maxlength="32" value="0602曝光预估" placeholder="请输入预估标题">
+									<span class="char-count"><span id="titleCount">8</span>/32</span>
+								</div>
+							</div>
+						</div>
+
+						<div class="section-title">广告位信息</div>
+						<div class="grid">
+							<div class="field">
+								<label class="label required" for="app">应用</label>
+								<select class="select" id="app" name="app">
+									<option value="美柚" selected>美柚</option>
+									<option value="柚宝宝">柚宝宝</option>
+								</select>
+							</div>
+
+							<div class="field">
+								<label class="label required" for="pageName">页面</label>
+								<select class="select" id="pageName" name="pageName">
+									<option value="启动页" selected>启动页</option>
+									<option value="首页">首页</option>
+									<option value="频道页">频道页</option>
+								</select>
+							</div>
+
+							<div class="field">
+								<label class="label required" for="adSlot">广告位</label>
+								<select class="select" id="adSlot" name="adSlot">
+									<option value="美柚-开屏" selected>美柚-开屏</option>
+									<option value="美柚-首页 Banner">美柚-首页 Banner</option>
+								</select>
+							</div>
+
+							<div class="field">
+								<label class="label required" for="style">样式</label>
+								<select class="select" id="style" name="style">
+									<option value="">请选择</option>
+									<option value="静态大图">静态大图</option>
+									<option value="视频">视频</option>
+								</select>
+							</div>
+
+							<div class="field">
+								<label class="label required" for="subSlot">子位</label>
+								<div class="control-group">
+									<div class="stepper" aria-label="子位数量">
+										<button type="button" id="subSlotMinus" aria-label="减少子位">−</button>
+										<input id="subSlot" name="subSlot" type="number" min="1" max="9" step="1" value="1">
+										<button type="button" id="subSlotPlus" aria-label="增加子位">＋</button>
+									</div>
+								</div>
+							</div>
+
+							<div class="field"></div>
+
+							<div class="field">
+								<label class="label required">手机平台</label>
+								<div class="radio-row">
+									<label class="chip-radio">
+										<input type="radio" name="platform" value="iOS" checked>
+										<span>iOS</span>
+									</label>
+									<label class="chip-radio">
+										<input type="radio" name="platform" value="Android">
+										<span>Android</span>
+									</label>
+								</div>
+							</div>
+
+							<div class="field">
+								<label class="label required" for="saleType">售卖方式</label>
+								<select class="select" id="saleType" name="saleType">
+									<option value="单独售卖" selected>单独售卖</option>
+									<option value="组合售卖">组合售卖</option>
+								</select>
+							</div>
+
+							<div class="field field--full">
+								<label class="label required">投放起止时间</label>
+								<div class="date-range">
+									<div class="date-wrap">
+										<input class="input date-input" id="startTime" name="startTime" type="text" value="2026-06-02 00:00:00" placeholder="开始时间">
+									</div>
+									<span class="date-sep">-</span>
+									<div class="date-wrap">
+										<input class="input date-input" id="endTime" name="endTime" type="text" value="2026-06-27 00:00:00" placeholder="结束时间">
+									</div>
+								</div>
+							</div>
+
+							<div class="field field--compact">
+								<label class="label" for="minVersion">最小版本</label>
+								<input class="input" id="minVersion" name="minVersion" placeholder="请输入最小版本">
+							</div>
+
+							<div class="field field--compact">
+								<label class="label" for="maxVersion">最大版本</label>
+								<input class="input" id="maxVersion" name="maxVersion" placeholder="请输入最大版本">
+							</div>
+						</div>
+
+						<div class="section-title">定向信息</div>
+						<div class="toggle-row">
+							<div class="toggle-item">
+								<span class="label">身份限定</span>
+								<label class="toggle">
+									<input id="identityToggle" type="checkbox">
+									<span></span>
+								</label>
+							</div>
+							<div class="toggle-item">
+								<span class="label">年龄限定</span>
+								<label class="toggle">
+									<input id="ageToggle" type="checkbox">
+									<span></span>
+								</label>
+							</div>
+							<div class="toggle-item">
+								<span class="label">地区限定</span>
+								<label class="toggle">
+									<input id="regionToggle" type="checkbox">
+									<span></span>
+								</label>
+							</div>
+							<div class="toggle-item">
+								<span class="label" for="audience">人群限定</span>
+								<select class="select" id="audience" name="audience">
+									<option value="不限" selected>不限</option>
+									<option value="育儿人群">育儿人群</option>
+									<option value="备孕人群">备孕人群</option>
+									<option value="高活人群">高活人群</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="section-title">投放限制</div>
+						<div class="toggle-row">
+							<div class="toggle-item">
+								<span class="label">投放限制</span>
+								<label class="toggle">
+									<input id="limitToggle" type="checkbox" checked>
+									<span></span>
+								</label>
+							</div>
+
+							<div class="radio-line">
+								<span class="label">时间类型</span>
+								<div class="radio-row">
+									<label class="dot-radio">
+										<input type="radio" name="timeType" value="0点-0点">
+										<span>0点-0点</span>
+									</label>
+									<label class="dot-radio">
+										<input type="radio" name="timeType" value="10点-10点" checked>
+										<span>10点-10点</span>
+									</label>
+								</div>
+							</div>
+
+							<div class="limit-row">
+								<div class="limit-fields" id="limitFields">
+									<div class="limit-field">
+										<span class="label">单用户总限制</span>
+										<input class="readonly" id="userTotalLimit" name="userTotalLimit" value="不填为不限" readonly>
+									</div>
+									<div class="limit-field">
+										<span class="label">单用户每周限制</span>
+										<input class="readonly" id="userWeeklyLimit" name="userWeeklyLimit" value="不填为不限" readonly>
+									</div>
+								</div>
+							</div>
+
+							<div class="limit-row">
+								<div class="limit-fields">
+									<div class="limit-field">
+										<span class="label">单用户每日限制</span>
+										<input class="readonly" id="userDailyLimit" name="userDailyLimit" value="不填为不限" readonly>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<button class="btn-submit" type="submit">预估曝光</button>
+					</form>
+
+					<div class="feedback" id="feedback" aria-live="polite">
+						<span class="feedback__icon" id="feedbackIcon">!</span>
+						<div id="feedbackText"></div>
+					</div>
+
+					<section class="summary" id="summary" aria-label="预估结果">
+						<h2>预估参数概览</h2>
+						<div class="summary-grid" id="summaryGrid"></div>
+					</section>
+				</div>
+			</main>
+		</div>
+	</div>
+
+	<script>
+		(function () {
+			var form = document.getElementById('forecastForm');
+			var titleInput = document.getElementById('title');
+			var titleCount = document.getElementById('titleCount');
+			var subSlotInput = document.getElementById('subSlot');
+			var minusButton = document.getElementById('subSlotMinus');
+			var plusButton = document.getElementById('subSlotPlus');
+			var feedback = document.getElementById('feedback');
+			var feedbackIcon = document.getElementById('feedbackIcon');
+			var feedbackText = document.getElementById('feedbackText');
+			var summary = document.getElementById('summary');
+			var summaryGrid = document.getElementById('summaryGrid');
+			var limitToggle = document.getElementById('limitToggle');
+			var limitFieldIds = ['userTotalLimit', 'userWeeklyLimit', 'userDailyLimit'];
+
+			function setTitleCount() {
+				titleCount.textContent = String(titleInput.value.length);
+			}
+
+			function clampSubSlot(nextValue) {
+				var parsed = parseInt(nextValue, 10);
+				if (isNaN(parsed)) {
+					parsed = 1;
+				}
+				parsed = Math.max(1, Math.min(9, parsed));
+				subSlotInput.value = String(parsed);
+			}
+
+			function setLimitFieldsEditable(enabled) {
+				limitFieldIds.forEach(function (id) {
+					var input = document.getElementById(id);
+					if (!input) {
+						return;
+					}
+					input.readOnly = !enabled;
+					input.className = enabled ? 'input' : 'readonly';
+					if (enabled && input.value === '不填为不限') {
+						input.value = '';
+						input.placeholder = '不填为不限';
+					}
+					if (!enabled && input.value.trim() === '') {
+						input.value = '不填为不限';
+					}
+				});
+			}
+
+			function showFeedback(type, message) {
+				feedback.className = 'feedback is-visible ' + (type === 'error' ? 'feedback--error' : 'feedback--success');
+				feedbackIcon.textContent = type === 'error' ? '!' : '✓';
+				feedbackText.textContent = message;
+			}
+
+			function collectData() {
+				var data = {
+					预估标题: titleInput.value.trim(),
+					应用: document.getElementById('app').value,
+					页面: document.getElementById('pageName').value,
+					广告位: document.getElementById('adSlot').value,
+					样式: document.getElementById('style').value,
+					子位: subSlotInput.value,
+					手机平台: form.elements.platform.value,
+					售卖方式: document.getElementById('saleType').value,
+					投放开始: document.getElementById('startTime').value.trim(),
+					投放结束: document.getElementById('endTime').value.trim(),
+					最小版本: document.getElementById('minVersion').value.trim() || '未限制',
+					最大版本: document.getElementById('maxVersion').value.trim() || '未限制',
+					身份限定: document.getElementById('identityToggle').checked ? '已开启' : '未开启',
+					年龄限定: document.getElementById('ageToggle').checked ? '已开启' : '未开启',
+					地区限定: document.getElementById('regionToggle').checked ? '已开启' : '未开启',
+					人群限定: document.getElementById('audience').value,
+					投放限制: limitToggle.checked ? '已开启' : '未开启',
+					时间类型: form.elements.timeType.value,
+					单用户总限制: document.getElementById('userTotalLimit').value.trim() || '不限',
+					单用户每周限制: document.getElementById('userWeeklyLimit').value.trim() || '不限',
+					单用户每日限制: document.getElementById('userDailyLimit').value.trim() || '不限'
+				};
+
+				if (!limitToggle.checked) {
+					data.时间类型 = '未启用';
+					data.单用户总限制 = '未启用';
+					data.单用户每周限制 = '未启用';
+					data.单用户每日限制 = '未启用';
+				}
+
+				return data;
+			}
+
+			function renderSummary(data) {
+				summaryGrid.innerHTML = Object.keys(data).map(function (key) {
+					return '<div class="summary-item"><strong>' + key + '</strong><span>' + data[key] + '</span></div>';
+				}).join('');
+				summary.classList.add('is-visible');
+			}
+
+			function validate(data) {
+				if (!data.预估标题) {
+					return '请填写预估标题';
+				}
+				if (!data.样式) {
+					return '请选择广告样式';
+				}
+				if (!data.投放开始 || !data.投放结束) {
+					return '请填写完整的投放起止时间';
+				}
+				if (data.投放开始 > data.投放结束) {
+					return '投放开始时间不能晚于结束时间';
+				}
+				return '';
+			}
+
+			titleInput.addEventListener('input', setTitleCount);
+			subSlotInput.addEventListener('input', function () {
+				clampSubSlot(subSlotInput.value);
+			});
+
+			minusButton.addEventListener('click', function () {
+				clampSubSlot(Number(subSlotInput.value || 1) - 1);
+			});
+
+			plusButton.addEventListener('click', function () {
+				clampSubSlot(Number(subSlotInput.value || 1) + 1);
+			});
+
+			limitToggle.addEventListener('change', function () {
+				setLimitFieldsEditable(limitToggle.checked);
+			});
+
+			form.addEventListener('submit', function (event) {
+				event.preventDefault();
+				clampSubSlot(subSlotInput.value);
+				var data = collectData();
+				var errorMessage = validate(data);
+				if (errorMessage) {
+					summary.classList.remove('is-visible');
+					showFeedback('error', errorMessage);
+					return;
+				}
+				showFeedback('success', '已根据当前参数生成预估结果预览，可继续调整表单后再次提交。');
+				renderSummary(data);
+			});
+
+			setTitleCount();
+			setLimitFieldsEditable(limitToggle.checked);
+		}());
+	</script>
+</body>
+</html>

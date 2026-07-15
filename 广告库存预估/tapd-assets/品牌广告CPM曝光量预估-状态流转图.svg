@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="600" viewBox="0 0 1280 600">
+  <defs>
+    <style>
+      .bg { fill: #ffffff; }
+      .title { font: 700 28px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #111111; }
+      .subtitle { font: 400 15px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #444444; }
+      .state { fill: #ffffff; stroke: #111111; stroke-width: 2.2; rx: 22; ry: 22; }
+      .terminal { fill: #f5f5f5; stroke: #111111; stroke-width: 2.2; }
+      .text { font: 16px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #111111; }
+      .small { font: 13px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #444444; }
+      .line { stroke: #111111; stroke-width: 2.2; fill: none; marker-end: url(#arrow); }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#111111" />
+    </marker>
+  </defs>
+  <rect class="bg" width="1280" height="600" />
+  <text x="56" y="58" class="title">品牌广告 CPM 曝光量预估 · 状态流转图</text>
+  <text x="56" y="86" class="subtitle">状态节点横向展开，标签置于连线外侧，无重叠</text>
+
+  <!-- 开始 -->
+  <g transform="translate(70,270)">
+    <circle cx="26" cy="26" r="22" fill="#111111" />
+    <text x="64" y="32" class="text">开始</text>
+  </g>
+
+  <!-- 初始态 -->
+  <g transform="translate(190,220)">
+    <rect class="state terminal" width="170" height="100" />
+    <text x="58" y="42" class="text">初始态</text>
+    <text x="22" y="68" class="small">页面待填写、待触发</text>
+  </g>
+
+  <!-- 校验失败态（上方） -->
+  <g transform="translate(430,80)">
+    <rect class="state" width="220" height="100" />
+    <text x="60" y="42" class="text">校验失败态</text>
+    <text x="26" y="72" class="small">字段缺失，显示校验提示</text>
+  </g>
+
+  <!-- 细节展示态（下方左） -->
+  <g transform="translate(430,380)">
+    <rect class="state" width="220" height="100" />
+    <text x="60" y="42" class="text">细节展示态</text>
+    <text x="26" y="72" class="small">右侧立即展示预估细节</text>
+  </g>
+
+  <!-- 预估中态（下方中） -->
+  <g transform="translate(720,380)">
+    <rect class="state" width="190" height="100" />
+    <text x="54" y="42" class="text">预估中态</text>
+    <text x="28" y="72" class="small">进入等待，准备输出结果</text>
+  </g>
+
+  <!-- 结果展示态（下方右） -->
+  <g transform="translate(990,380)">
+    <rect class="state" width="220" height="100" />
+    <text x="58" y="42" class="text">结果展示态</text>
+    <text x="28" y="72" class="small">下方完整展示预估结果</text>
+  </g>
+
+  <!-- 连线：开始 → 初始态 -->
+  <path class="line" d="M118 296 L190 270" />
+
+  <!-- 连线：初始态 → 校验失败态（右上） -->
+  <path class="line" d="M360 250 C400 250, 400 130, 430 130" />
+  <rect x="379" y="131" width="74" height="22" fill="#ffffff" />
+  <text x="392" y="146" class="small">字段缺失</text>
+
+  <!-- 连线：初始态 → 细节展示态（右下） -->
+  <path class="line" d="M360 290 C400 290, 400 430, 430 430" />
+  <rect x="377" y="405" width="68" height="22" fill="#ffffff" />
+  <text x="392" y="420" class="small">校验通过</text>
+
+  <!-- 连线：细节展示态 → 预估中态 -->
+  <path class="line" d="M650 430 L720 430" />
+  <rect x="655" y="402" width="68" height="22" fill="#ffffff" />
+  <text x="670" y="418" class="small">自动进入</text>
+
+  <!-- 连线：预估中态 → 结果展示态 -->
+  <path class="line" d="M910 430 L990 430" />
+  <rect x="915" y="402" width="68" height="22" fill="#ffffff" />
+  <text x="930" y="418" class="small">预估完成</text>
+
+  <!-- 连线：结果展示态 → 初始态（底部回绕） -->
+  <path class="line" d="M1100 480 C1100 560, 275 560, 275 380" />
+  <rect x="646" y="541" width="172" height="22" fill="#ffffff" />
+  <text x="660" y="554" class="small">用户修改条件并重新预估</text>
+
+  <!-- 连线：校验失败态 → 初始态（左侧回绕） -->
+  <path class="line" d="M540 130 C540 180, 275 180, 275 270" />
+  <rect x="381" y="154" width="68" height="22" fill="#ffffff" />
+  <text x="394" y="170" class="small">补全字段</text>
+</svg>

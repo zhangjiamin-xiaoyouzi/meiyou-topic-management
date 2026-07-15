@@ -1,0 +1,18 @@
+{
+    "oaicopilot.commitLanguage": "Chinese (Simplified)",
+    "oaicopilot.baseUrl": "https://napi.xmmeiyou.com/v1",
+    "oaicopilot.models": [],
+    "chat.mcpServers": {
+        "open-design": {
+            "command": "C:\\Program Files\\nodejs\\node.exe",
+            "args": [
+                "C:\\Users\\MeetYou\\vscode-workspace\\open-design\\apps\\daemon\\dist\\cli.js",
+                "mcp"
+            ],
+            "env": {
+                "OD_DATA_DIR": "C:\\Users\\MeetYou\\vscode-workspace\\open-design\\.od",
+                "OD_SIDECAR_IPC_PATH": "\\\\.\\pipe\\open-design-default-daemon"
+            }
+        }
+    }
+}

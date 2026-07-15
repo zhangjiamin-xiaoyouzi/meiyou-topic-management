@@ -1,0 +1,50 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "启动 Open Design",
+			"type": "shell",
+			"command": "pnpm",
+			"args": [
+				"tools-dev",
+				"run",
+				"web"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}/open-design"
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"presentation": {
+				"reveal": "always",
+				"panel": "new"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "安装 Open Design 依赖",
+			"type": "shell",
+			"command": "pnpm",
+			"args": [
+				"install"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}/open-design"
+			},
+			"presentation": {
+				"reveal": "always",
+				"panel": "new"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "dev-community-exchange",
+			"type": "shell",
+			"command": "pnpm dev",
+			"isBackground": true,
+			"problemMatcher": []
+		}
+	]
+}

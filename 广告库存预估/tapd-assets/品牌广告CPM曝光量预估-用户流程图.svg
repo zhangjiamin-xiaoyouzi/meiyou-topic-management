@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1360" height="880" viewBox="0 0 1360 880">
+  <defs>
+    <style>
+      .bg { fill: #ffffff; }
+      .title { font: 700 28px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #111111; }
+      .subtitle { font: 400 15px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #444444; }
+      .lane { fill: #ffffff; stroke: #111111; stroke-width: 2; rx: 18; ry: 18; }
+      .laneHead { fill: #f5f5f5; stroke: #111111; stroke-width: 2; rx: 18; ry: 18; }
+      .node { fill: #ffffff; stroke: #111111; stroke-width: 2.2; rx: 16; ry: 16; }
+      .decision { fill: #f5f5f5; stroke: #111111; stroke-width: 2.2; }
+      .text { font: 15px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #111111; }
+      .headText { font: 700 20px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #111111; }
+      .line { stroke: #111111; stroke-width: 2.2; fill: none; marker-end: url(#arrow); }
+      .dash { stroke: #111111; stroke-width: 2.2; fill: none; stroke-dasharray: 8 6; marker-end: url(#arrow); }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#111111" />
+    </marker>
+  </defs>
+  <rect class="bg" width="1360" height="880" />
+  <text x="56" y="58" class="title">品牌广告 CPM 曝光量预估 · 用户流程图</text>
+  <text x="56" y="86" class="subtitle">按泳道分层，节点均匀排布，连线避开图形区域</text>
+
+  <!-- ===== 泳道 1: 运营 ===== -->
+  <g transform="translate(40,120)">
+    <rect class="lane" width="1280" height="210" />
+    <rect class="laneHead" width="1280" height="48" />
+    <text x="24" y="31" class="headText">运营</text>
+  </g>
+
+  <!-- ===== 泳道 2: 页面系统 ===== -->
+  <g transform="translate(40,360)">
+    <rect class="lane" width="1280" height="240" />
+    <rect class="laneHead" width="1280" height="48" />
+    <text x="24" y="31" class="headText">页面系统</text>
+  </g>
+
+  <!-- ===== 泳道 3: 结果查看 ===== -->
+  <g transform="translate(40,640)">
+    <rect class="lane" width="1280" height="180" />
+    <rect class="laneHead" width="1280" height="48" />
+    <text x="24" y="31" class="headText">结果查看</text>
+  </g>
+
+  <!-- ===== 泳道 1 节点 ===== -->
+  <g transform="translate(90,190)">
+    <rect class="node" width="180" height="70" />
+    <text x="40" y="42" class="text">进入预估页面</text>
+  </g>
+  <g transform="translate(330,190)">
+    <rect class="node" width="220" height="70" />
+    <text x="48" y="42" class="text">填写预估条件</text>
+  </g>
+  <g transform="translate(610,172)">
+    <polygon class="decision" points="100,0 200,53 100,106 0,53" />
+    <text x="46" y="58" class="text">关键字段</text>
+    <text x="52" y="76" class="text">是否完整</text>
+  </g>
+  <g transform="translate(900,190)">
+    <rect class="node" width="190" height="70" />
+    <text x="42" y="42" class="text">点击预估曝光</text>
+  </g>
+
+  <!-- ===== 泳道 2 节点 ===== -->
+  <g transform="translate(270,420)">
+    <rect class="node" width="220" height="70" />
+    <text x="54" y="42" class="text">显示校验提示</text>
+  </g>
+  <g transform="translate(800,420)">
+    <rect class="node" width="230" height="70" />
+    <text x="42" y="42" class="text">右侧展示预估细节</text>
+  </g>
+  <g transform="translate(1080,420)">
+    <rect class="node" width="150" height="70" />
+    <text x="33" y="42" class="text">进入预估中</text>
+  </g>
+
+  <!-- ===== 泳道 3 节点 ===== -->
+  <g transform="translate(340,690)">
+    <rect class="node" width="240" height="70" />
+    <text x="42" y="42" class="text">下方展示预估结果</text>
+  </g>
+  <g transform="translate(620,690)">
+    <rect class="node" width="240" height="70" />
+    <text x="34" y="42" class="text">查看优先占量计划</text>
+  </g>
+  <g transform="translate(900,690)">
+    <rect class="node" width="240" height="70" />
+    <text x="26" y="42" class="text">查看预定 / 分天结果</text>
+  </g>
+
+  <!-- ===== 连线: 泳道 1 内 ===== -->
+  <path class="line" d="M270 225 L330 225" />
+  <path class="line" d="M550 225 L610 225" />
+  <path class="line" d="M810 225 L900 225" />
+
+  <!-- ===== 连线: 钻石判断 → NO → 显示校验提示 ===== -->
+  <path class="dash" d="M710 278 L710 420 L490 420" />
+
+  <!-- ===== 连线: 显示校验提示 → 回到泳道1（从左侧绕行） ===== -->
+  <path class="dash" d="M270 490 L100 490 L100 260 L90 260" />
+
+  <!-- ===== 连线: 点击预估曝光 → 右侧展示预估细节 ===== -->
+  <path class="line" d="M995 260 L995 420" />
+
+  <!-- ===== 连线: 右侧展示 → 进入预估中 ===== -->
+  <path class="line" d="M1030 455 L1080 455" />
+
+  <!-- ===== 连线: 进入预估中 → 泳道3（从右侧下方绕行） ===== -->
+  <path class="line" d="M1155 490 L1155 790 L580 790 L580 760" />
+
+  <!-- ===== 连线: 泳道 3 内 ===== -->
+  <path class="line" d="M580 725 L620 725" />
+  <path class="line" d="M860 725 L900 725" />
+
+  <!-- ===== 标签 ===== -->
+  <rect x="832" y="196" width="26" height="22" fill="#ffffff" />
+  <text x="845" y="212" class="text">是</text>
+  <rect x="718" y="336" width="26" height="22" fill="#ffffff" />
+  <text x="730" y="352" class="text">否</text>
+</svg>

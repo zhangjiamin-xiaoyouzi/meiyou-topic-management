@@ -1,0 +1,2015 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>ADX流量工具 - 流量分组管理</title>
+	<style>
+		:root {
+			--bg: #f5f6fa;
+			--panel: #ffffff;
+			--panel-soft: #faf8fb;
+			--line: #e8e8ef;
+			--line-strong: #d6d6e2;
+			--text: #1f2430;
+			--muted: #83889a;
+			--brand: #e24b8d;
+			--brand-soft: rgba(226, 75, 141, 0.1);
+			--brand-strong: #c73676;
+			--blue: #4b7cf7;
+			--green: #2eb67d;
+			--orange: #f3a31b;
+			--danger: #ef5350;
+			--shadow: 0 12px 30px rgba(28, 32, 45, 0.08);
+			--radius: 18px;
+			--sidebar-width: 224px;
+			--header-height: 56px;
+			font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		body {
+			margin: 0;
+			background: var(--bg);
+			color: var(--text);
+		}
+
+		button,
+		input,
+		select,
+		textarea {
+			font: inherit;
+		}
+
+		button {
+			cursor: pointer;
+			border: none;
+			background: none;
+		}
+
+		.app-shell {
+			min-height: 100vh;
+			display: grid;
+			grid-template-columns: var(--sidebar-width) 1fr;
+		}
+
+		.sidebar {
+			background: #fff;
+			border-right: 1px solid var(--line);
+			display: flex;
+			flex-direction: column;
+		}
+
+		.brand {
+			height: var(--header-height);
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			padding: 0 16px;
+			border-bottom: 1px solid var(--line);
+			font-size: 18px;
+			font-weight: 600;
+		}
+
+		.brand-badge,
+		.nav-icon,
+		.crumb-sep,
+		.metric-tip,
+		.chip-dot,
+		.edit-icon {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.brand-badge {
+			width: 18px;
+			height: 18px;
+			border: 2px solid #2f3444;
+			border-radius: 4px;
+			font-size: 11px;
+		}
+
+		.nav-list {
+			padding: 8px;
+			display: grid;
+			gap: 2px;
+		}
+
+		.nav-item,
+		.nav-subitem {
+			width: 100%;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 10px;
+			color: var(--text);
+			padding: 12px 10px;
+			border-radius: 12px;
+			font-size: 15px;
+			text-align: left;
+			position: relative;
+		}
+
+		.nav-item:hover,
+		.nav-subitem:hover {
+			background: #f7f8fb;
+		}
+
+		.nav-item.active,
+		.nav-subitem.active {
+			color: var(--brand);
+			background: linear-gradient(90deg, rgba(226, 75, 141, 0.08), rgba(226, 75, 141, 0));
+		}
+
+		.nav-item.active::before,
+		.nav-subitem.active::before {
+			content: "";
+			position: absolute;
+			left: 0;
+			width: 3px;
+			height: 26px;
+			background: var(--brand);
+			border-radius: 999px;
+		}
+
+		.nav-main {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			min-width: 0;
+		}
+
+		.nav-icon {
+			width: 14px;
+			height: 14px;
+			border: 1.6px solid currentColor;
+			border-radius: 2px;
+			position: relative;
+			flex: 0 0 auto;
+			opacity: 0.85;
+		}
+
+		.nav-icon::after {
+			content: "";
+			position: absolute;
+			inset: 3px;
+			border-top: 1px solid currentColor;
+		}
+
+		.nav-label {
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		.nav-group.open .nav-arrow {
+			transform: rotate(180deg);
+		}
+
+		.nav-arrow {
+			transition: transform 0.2s ease;
+			color: #99a1b3;
+		}
+
+		.nav-sublist {
+			display: grid;
+			gap: 2px;
+			margin-top: 2px;
+			padding-left: 12px;
+		}
+
+		.nav-subitem {
+			padding-left: 32px;
+			font-size: 14px;
+		}
+
+		.content {
+			display: flex;
+			flex-direction: column;
+			min-width: 0;
+		}
+
+		.topbar {
+			height: var(--header-height);
+			display: flex;
+			align-items: center;
+			padding: 0 26px;
+			background: rgba(255, 255, 255, 0.88);
+			border-bottom: 1px solid var(--line);
+			backdrop-filter: blur(10px);
+		}
+
+		.breadcrumbs {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			color: var(--muted);
+			font-size: 14px;
+		}
+
+		.breadcrumbs strong {
+			color: var(--text);
+			font-weight: 500;
+		}
+
+		.crumb-sep {
+			width: 6px;
+			height: 6px;
+			border-top: 1.5px solid #a2a6b3;
+			border-right: 1.5px solid #a2a6b3;
+			transform: rotate(45deg);
+		}
+
+		.page {
+			padding: 18px 24px 30px;
+			display: grid;
+			gap: 20px;
+		}
+
+		.filter-bar {
+			display: flex;
+			gap: 14px;
+			flex-wrap: wrap;
+			align-items: center;
+		}
+
+		.filter-item {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			color: #666b7b;
+			font-size: 14px;
+		}
+
+		.select-wrap {
+			position: relative;
+		}
+
+		.select-wrap::after {
+			content: "▾";
+			position: absolute;
+			right: 14px;
+			top: 50%;
+			transform: translateY(-50%);
+			color: #a4a9b7;
+			pointer-events: none;
+			font-size: 12px;
+		}
+
+		select,
+		.text-input,
+		.number-input,
+		textarea {
+			appearance: none;
+			border: 1px solid var(--line);
+			background: #fff;
+			min-height: 36px;
+			padding: 0 38px 0 14px;
+			border-radius: 10px;
+			color: var(--text);
+			min-width: 112px;
+			outline: none;
+			transition: border-color 0.2s ease, box-shadow 0.2s ease;
+		}
+
+		textarea {
+			min-height: 84px;
+			resize: vertical;
+			padding: 10px 14px;
+		}
+
+		select:focus,
+		.text-input:focus,
+		.number-input:focus,
+		textarea:focus {
+			border-color: rgba(226, 75, 141, 0.6);
+			box-shadow: 0 0 0 4px rgba(226, 75, 141, 0.08);
+		}
+
+		.select-chip {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			min-width: 108px;
+			padding: 0 38px 0 14px;
+			height: 36px;
+			background: #fff;
+			border: 1px solid var(--line);
+			border-radius: 10px;
+			box-shadow: 0 4px 12px rgba(40, 44, 58, 0.04);
+		}
+
+		.chip-dot {
+			width: 8px;
+			height: 8px;
+			border-radius: 50%;
+			background: #7a4bf2;
+			box-shadow: 0 0 0 4px rgba(122, 75, 242, 0.1);
+		}
+
+		.card {
+			background: var(--panel);
+			border: 1px solid var(--line);
+			border-radius: var(--radius);
+			box-shadow: var(--shadow);
+			overflow: hidden;
+		}
+
+		.card-header {
+			padding: 16px;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 16px;
+			border-bottom: 1px solid var(--line);
+		}
+
+		.card-header.tight {
+			padding-bottom: 12px;
+		}
+
+		.ghost-button,
+		.outline-button,
+		.brand-button,
+		.danger-button,
+		.icon-button,
+		.tiny-button {
+			border-radius: 12px;
+			transition: 0.2s ease;
+		}
+
+		.ghost-button,
+		.outline-button,
+		.danger-button {
+			min-height: 34px;
+			padding: 0 15px;
+			border: 1px solid rgba(226, 75, 141, 0.45);
+			color: var(--brand);
+			background: #fff;
+		}
+
+		.ghost-button:hover,
+		.outline-button:hover,
+		.danger-button:hover {
+			background: rgba(226, 75, 141, 0.06);
+		}
+
+		.brand-button {
+			min-height: 38px;
+			padding: 0 18px;
+			background: linear-gradient(135deg, var(--brand), #f26fa7);
+			color: #fff;
+			box-shadow: 0 10px 20px rgba(226, 75, 141, 0.22);
+		}
+
+		.brand-button:hover {
+			transform: translateY(-1px);
+			box-shadow: 0 14px 26px rgba(226, 75, 141, 0.28);
+		}
+
+		.danger-button {
+			color: var(--danger);
+			border-color: rgba(239, 83, 80, 0.3);
+		}
+
+		.tiny-button,
+		.icon-button {
+			width: 28px;
+			height: 28px;
+			border: 1px solid transparent;
+			color: #8d93a6;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.tiny-button:hover,
+		.icon-button:hover {
+			background: #f7f8fb;
+			border-color: var(--line);
+			color: var(--text);
+		}
+
+		.plus {
+			font-size: 20px;
+			line-height: 1;
+			margin-right: 6px;
+		}
+
+		.group-tabs {
+			padding: 0 16px;
+			display: flex;
+			gap: 12px;
+			align-items: center;
+			flex-wrap: wrap;
+			border-bottom: 1px solid var(--line);
+			background: linear-gradient(180deg, #fff, #fff8fc);
+		}
+
+		.group-tab {
+			position: relative;
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			min-height: 52px;
+			color: #7d7483;
+			padding: 0 2px;
+			font-size: 15px;
+		}
+
+		.group-tab.active {
+			color: var(--brand);
+			font-weight: 600;
+		}
+
+		.group-tab.active::after {
+			content: "";
+			position: absolute;
+			left: 0;
+			right: 0;
+			bottom: -1px;
+			height: 2px;
+			background: var(--brand);
+			border-radius: 999px;
+		}
+
+		.group-body {
+			padding: 14px 16px 18px;
+			background: #fcfcff;
+			display: grid;
+			gap: 16px;
+		}
+
+		.group-row {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 12px;
+			flex-wrap: wrap;
+		}
+
+		.field-inline {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			color: #565d6e;
+		}
+
+		.tag {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			min-height: 28px;
+			padding: 0 10px;
+			border-radius: 999px;
+			color: #3773d7;
+			background: rgba(55, 115, 215, 0.08);
+			border: 1px solid rgba(55, 115, 215, 0.18);
+			font-size: 14px;
+		}
+
+		.switch {
+			position: relative;
+			width: 32px;
+			height: 20px;
+			border-radius: 999px;
+			background: #cad0db;
+			transition: background 0.2s ease;
+			vertical-align: middle;
+			flex: 0 0 auto;
+		}
+
+		.switch::after {
+			content: "";
+			position: absolute;
+			width: 16px;
+			height: 16px;
+			left: 2px;
+			top: 2px;
+			border-radius: 50%;
+			background: #fff;
+			box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+			transition: transform 0.2s ease;
+		}
+
+		.switch.on {
+			background: linear-gradient(135deg, #4d80ff, #67a0ff);
+		}
+
+		.switch.on::after {
+			transform: translateX(12px);
+		}
+
+		.table-wrap {
+			overflow: auto;
+		}
+
+		table {
+			width: 100%;
+			min-width: 1250px;
+			border-collapse: collapse;
+			font-size: 14px;
+		}
+
+		th,
+		td {
+			padding: 13px 12px;
+			text-align: left;
+			border-bottom: 1px solid #f0f1f5;
+			white-space: nowrap;
+		}
+
+		thead th {
+			color: #4f5668;
+			font-weight: 500;
+			background: #fff;
+			position: sticky;
+			top: 0;
+			z-index: 1;
+		}
+
+		tbody tr:hover {
+			background: #fafbfe;
+		}
+
+		.summary-row {
+			background: #fff6fa;
+			color: #50596b;
+		}
+
+		.summary-row:hover {
+			background: #fff2f8;
+		}
+
+		.edit-link {
+			color: #2d63d8;
+			font-weight: 500;
+		}
+
+		.status-dot {
+			width: 8px;
+			height: 8px;
+			border-radius: 50%;
+			display: inline-block;
+			margin-right: 8px;
+			vertical-align: middle;
+		}
+
+		.status-dot.green {
+			background: var(--green);
+		}
+
+		.status-dot.orange {
+			background: var(--orange);
+		}
+
+		.status-dot.gray {
+			background: #adb4c2;
+		}
+
+		.editable-cell {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+		}
+
+		.edit-icon {
+			width: 16px;
+			height: 16px;
+			color: #9ca2b0;
+			font-size: 13px;
+		}
+
+		.metric-tip {
+			width: 15px;
+			height: 15px;
+			margin-left: 4px;
+			border-radius: 50%;
+			border: 1px solid #d1d5e0;
+			color: #9ea4b5;
+			font-size: 11px;
+			line-height: 1;
+		}
+
+		.sortable {
+			display: inline-flex;
+			align-items: center;
+			gap: 1px;
+			color: inherit;
+		}
+
+		.sortable.active {
+			color: var(--brand);
+		}
+
+		.sort-arrow {
+			font-size: 10px;
+			color: #a0a6b6;
+		}
+
+		.sort-arrow.active {
+			color: var(--brand);
+		}
+
+		.rules-list,
+		.form-grid,
+		.ab-layout,
+		.stats-panel {
+			display: grid;
+			gap: 12px;
+		}
+
+		.stats-panel {
+			grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+			margin-top: 8px;
+		}
+
+		.stats-card {
+			border: 1px solid var(--line);
+			border-radius: 14px;
+			padding: 12px 14px;
+			background: linear-gradient(180deg, #fff, #fff8fc);
+		}
+
+		.stats-card .label {
+			color: var(--muted);
+			font-size: 12px;
+			margin-bottom: 8px;
+		}
+
+		.stats-card strong {
+			font-size: 18px;
+		}
+
+		.rule-item,
+		.inline-fields,
+		.modal-footer,
+		.toast-stack {
+			display: flex;
+			gap: 10px;
+			align-items: center;
+		}
+
+		.rule-item {
+			flex-wrap: wrap;
+			background: #fafbff;
+			border: 1px dashed #d9dce8;
+			border-radius: 12px;
+			padding: 10px;
+		}
+
+		.rule-item span {
+			color: #677086;
+			font-size: 13px;
+		}
+
+		.form-grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+
+		.form-block {
+			display: grid;
+			gap: 8px;
+		}
+
+		.form-block.full {
+			grid-column: 1 / -1;
+		}
+
+		.form-label {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			color: #525a6d;
+			font-size: 14px;
+		}
+
+		.required::before {
+			content: "*";
+			color: var(--brand);
+			margin-right: 4px;
+		}
+
+		.helper {
+			color: #9aa0af;
+			font-size: 12px;
+		}
+
+		.inline-fields {
+			flex-wrap: wrap;
+		}
+
+		.inline-fields > * {
+			flex: 1 1 140px;
+		}
+
+		.modal-root,
+		.menu-root,
+		.confirm-root {
+			position: fixed;
+			inset: 0;
+			display: none;
+			z-index: 20;
+		}
+
+		.modal-root.open,
+		.menu-root.open,
+		.confirm-root.open {
+			display: block;
+		}
+
+		.overlay {
+			position: absolute;
+			inset: 0;
+			background: rgba(16, 20, 32, 0.38);
+			backdrop-filter: blur(2px);
+		}
+
+		.modal,
+		.confirm,
+		.menu-panel {
+			position: relative;
+			background: #fff;
+			border-radius: 22px;
+			box-shadow: 0 24px 80px rgba(25, 29, 43, 0.22);
+		}
+
+		.modal {
+			width: min(760px, calc(100vw - 32px));
+			max-height: calc(100vh - 40px);
+			margin: 20px auto;
+			overflow: auto;
+			padding: 22px;
+		}
+
+		.menu-panel {
+			position: absolute;
+			min-width: 144px;
+			padding: 8px;
+			border: 1px solid var(--line);
+		}
+
+		.menu-panel button {
+			width: 100%;
+			min-height: 34px;
+			text-align: left;
+			padding: 0 10px;
+			border-radius: 10px;
+			color: #475066;
+		}
+
+		.menu-panel button:hover {
+			background: #f7f8fb;
+		}
+
+		.menu-panel button:disabled {
+			opacity: 0.45;
+			cursor: not-allowed;
+		}
+
+		.confirm {
+			width: min(420px, calc(100vw - 32px));
+			margin: 25vh auto 0;
+			padding: 22px;
+		}
+
+		.modal-head {
+			display: flex;
+			justify-content: space-between;
+			align-items: flex-start;
+			gap: 12px;
+			margin-bottom: 20px;
+		}
+
+		.modal-title {
+			font-size: 22px;
+			font-weight: 600;
+		}
+
+		.modal-subtitle {
+			margin-top: 6px;
+			color: var(--muted);
+			font-size: 13px;
+			line-height: 1.5;
+		}
+
+		.modal-footer {
+			justify-content: flex-end;
+			margin-top: 20px;
+			flex-wrap: wrap;
+		}
+
+		.ab-layout {
+			grid-template-columns: 1.2fr 0.8fr;
+			align-items: start;
+		}
+
+		.ab-preview {
+			background: linear-gradient(180deg, #fff9fc, #fff);
+			border: 1px solid #f2d9e6;
+			border-radius: 18px;
+			padding: 16px;
+		}
+
+		.ab-preview h4 {
+			margin: 0 0 10px;
+			font-size: 16px;
+		}
+
+		.ab-badge {
+			display: inline-flex;
+			align-items: center;
+			padding: 0 10px;
+			height: 28px;
+			border-radius: 999px;
+			background: rgba(226, 75, 141, 0.12);
+			color: var(--brand);
+			font-size: 13px;
+			margin-bottom: 10px;
+		}
+
+		.toast-stack {
+			position: fixed;
+			right: 18px;
+			bottom: 18px;
+			z-index: 40;
+			flex-direction: column;
+			align-items: stretch;
+		}
+
+		.toast {
+			min-width: 220px;
+			padding: 12px 14px;
+			border-radius: 14px;
+			color: #fff;
+			background: rgba(31, 36, 48, 0.92);
+			box-shadow: 0 18px 40px rgba(18, 22, 34, 0.22);
+		}
+
+		.toast.success {
+			background: rgba(46, 182, 125, 0.96);
+		}
+
+		.toast.error {
+			background: rgba(239, 83, 80, 0.96);
+		}
+
+		.empty-state {
+			padding: 36px 20px;
+			text-align: center;
+			color: #8b92a5;
+		}
+
+		.footer-note {
+			color: #9ba2b2;
+			font-size: 12px;
+			text-align: right;
+			padding: 0 8px;
+		}
+
+		@media (max-width: 1100px) {
+			.app-shell {
+				grid-template-columns: 72px 1fr;
+			}
+
+			.brand span,
+			.nav-label,
+			.nav-arrow,
+			.nav-sublist {
+				display: none;
+			}
+
+			.brand {
+				justify-content: center;
+			}
+
+			.nav-item,
+			.nav-subitem {
+				justify-content: center;
+			}
+
+			.nav-item.active::before,
+			.nav-subitem.active::before {
+				left: 6px;
+			}
+		}
+
+		@media (max-width: 820px) {
+			.app-shell {
+				grid-template-columns: 1fr;
+			}
+
+			.sidebar {
+				display: none;
+			}
+
+			.page {
+				padding: 16px;
+			}
+
+			.form-grid,
+			.ab-layout {
+				grid-template-columns: 1fr;
+			}
+
+			.group-row,
+			.card-header {
+				align-items: flex-start;
+			}
+
+			.topbar {
+				padding: 0 16px;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="app-shell">
+		<aside class="sidebar">
+			<div class="brand"><span class="brand-badge">⌂</span><span>广告投放运营后台</span></div>
+			<div class="nav-list">
+				<button class="nav-item"><span class="nav-main"><span class="nav-icon"></span><span class="nav-label">广告交互管理</span></span></button>
+				<button class="nav-item"><span class="nav-main"><span class="nav-icon"></span><span class="nav-label">品牌管理</span></span></button>
+				<button class="nav-item"><span class="nav-main"><span class="nav-icon"></span><span class="nav-label">品牌小工具</span></span></button>
+				<button class="nav-item"><span class="nav-main"><span class="nav-icon"></span><span class="nav-label">柚+管理</span></span></button>
+				<button class="nav-item"><span class="nav-main"><span class="nav-icon"></span><span class="nav-label">女人通管理</span></span></button>
+				<button class="nav-item"><span class="nav-main"><span class="nav-icon"></span><span class="nav-label">女人通消费管理</span></span></button>
+				<button class="nav-item"><span class="nav-main"><span class="nav-icon"></span><span class="nav-label">女人通数据管理</span></span></button>
+				<button class="nav-item"><span class="nav-main"><span class="nav-icon"></span><span class="nav-label">媒体数据管理</span></span></button>
+				<button class="nav-item"><span class="nav-main"><span class="nav-icon"></span><span class="nav-label">DSP数据管理</span></span></button>
+				<button class="nav-item"><span class="nav-main"><span class="nav-icon"></span><span class="nav-label">MARKETING API管理</span></span></button>
+				<button class="nav-item"><span class="nav-main"><span class="nav-icon"></span><span class="nav-label">第三方DMP管理</span></span></button>
+				<button class="nav-item"><span class="nav-main"><span class="nav-icon"></span><span class="nav-label">小工具</span></span></button>
+				<div class="nav-group open">
+					<button class="nav-item active"><span class="nav-main"><span class="nav-icon"></span><span class="nav-label">ADX流量工具</span></span><span class="nav-arrow">⌃</span></button>
+					<div class="nav-sublist">
+						<button class="nav-subitem active"><span class="nav-main"><span class="nav-label">流量分组管理</span></span></button>
+					</div>
+				</div>
+			</div>
+		</aside>
+
+		<main class="content">
+			<div class="topbar">
+				<div class="breadcrumbs">
+					<span>ADX流量工具</span>
+					<span class="crumb-sep"></span>
+					<strong>流量分组管理</strong>
+				</div>
+			</div>
+
+			<section class="page">
+				<div class="filter-bar">
+					<div class="filter-item">
+						<span>广告场景：</span>
+						<div class="select-wrap">
+							<select id="sceneSelect"></select>
+						</div>
+					</div>
+					<div class="filter-item">
+						<span>平台：</span>
+						<div class="select-wrap select-chip">
+							<span class="chip-dot"></span>
+							<select id="platformSelect" style="border:none; padding:0 18px 0 0; min-width:68px; box-shadow:none;"></select>
+						</div>
+					</div>
+				</div>
+
+				<section class="card">
+					<div class="card-header tight">
+						<button class="outline-button" id="addGroupButton"><span class="plus">＋</span>添加分组</button>
+					</div>
+					<div class="group-tabs" id="groupTabs"></div>
+					<div class="group-body">
+						<div class="group-row">
+							<div class="field-inline"><span>广告位：</span><span class="tag" id="groupSlotTag"></span></div>
+							<button class="outline-button" id="createAbButton">创建A/B测试</button>
+						</div>
+						<div class="group-row">
+							<div class="field-inline">
+								<span>分组开关</span>
+								<button class="switch" id="groupSwitch" aria-label="分组开关"></button>
+							</div>
+							<div class="footer-note" id="groupMeta"></div>
+						</div>
+						<div class="rules-list" id="rulesList"></div>
+					</div>
+				</section>
+
+				<section class="card">
+					<div class="card-header">
+						<button class="outline-button" id="addPidButton"><span class="plus">＋</span>添加PID</button>
+						<div class="footer-note">当前分组的汇总指标会随状态、价格和排序即时变化</div>
+					</div>
+					<div class="table-wrap">
+						<table>
+							<thead>
+								<tr id="tableHeadRow"></tr>
+							</thead>
+							<tbody id="tableBody"></tbody>
+						</table>
+					</div>
+				</section>
+			</section>
+		</main>
+	</div>
+
+	<div class="modal-root" id="modalRoot">
+		<div class="overlay" data-close-modal="true"></div>
+		<div class="modal" id="modalPanel"></div>
+	</div>
+
+	<div class="menu-root" id="menuRoot">
+		<div class="overlay" data-close-menu="true"></div>
+		<div class="menu-panel" id="menuPanel"></div>
+	</div>
+
+	<div class="confirm-root" id="confirmRoot">
+		<div class="overlay" data-close-confirm="true"></div>
+		<div class="confirm" id="confirmPanel"></div>
+	</div>
+
+	<div class="toast-stack" id="toastStack"></div>
+
+	<script>
+		const STORAGE_KEY = "adx-traffic-group-demo";
+		const metricColumns = [
+			{ key: "price", label: "价格", type: "currency", sortable: true, info: true },
+			{ key: "estimatedRevenue", label: "预估收入", type: "number", sortable: true, info: true },
+			{ key: "profitPerMille", label: "千人均收益", type: "currency", sortable: true, info: true },
+			{ key: "ecpm", label: "eCPM", type: "currency", sortable: true, info: true },
+			{ key: "requestValue", label: "千次请求价值", type: "currency", sortable: true, info: true },
+			{ key: "requestVolume", label: "请求量", type: "volume", sortable: true },
+			{ key: "returnRate", label: "返回率", type: "percent", sortable: true, info: true },
+			{ key: "bidSuccessCount", label: "竞价成功数", type: "volume", sortable: true },
+			{ key: "bidSuccessRate", label: "竞价成功率", type: "percent", sortable: true, info: true },
+			{ key: "impressionCount", label: "展示量", type: "volume", sortable: true, info: true },
+			{ key: "winRate", label: "竞胜展示率", type: "percent", sortable: true, info: true },
+			{ key: "clickRate", label: "点击率", type: "percent", sortable: true, info: true },
+			{ key: "cpc", label: "cpc", type: "currency", sortable: true, info: true }
+		];
+
+		const baseMatrix = {
+			"开屏|iOS": {
+				slots: ["1000 - 美柚--开屏", "1001 - 美柚--开屏兜底", "1002 - 美柚--开屏实验位"],
+				groups: [
+					{
+						id: uid(),
+						name: "默认分组",
+						priority: 1,
+						scene: "开屏",
+						platform: "iOS",
+						slot: "1000 - 美柚--开屏",
+						enabled: true,
+						isAbTest: false,
+						note: "基础放量组",
+						rules: [
+							{ field: "用户活跃度", operator: "高于", value: "近7日活跃 >= 3" },
+							{ field: "系统版本", operator: "包含", value: "iOS 17" }
+						],
+						pids: [
+							createPid({ name: "穿山甲-开屏iOS", price: 18.5, statusColor: "green", requestVolume: 168000, returnRate: 56.7, bidSuccessCount: 42000, bidSuccessRate: 44.2, impressionCount: 65000, winRate: 100, clickRate: 5, cpc: 1.85 }),
+							createPid({ name: "快手-开屏iOS", price: 15.2, statusColor: "orange", requestVolume: 88000, returnRate: 57.2, bidSuccessCount: 18000, bidSuccessRate: 36.2, impressionCount: 38000, winRate: 100, clickRate: 4, cpc: 1.02 })
+						]
+					}
+				]
+			},
+			"开屏|Android": {
+				slots: ["2000 - 美柚--开屏Android", "2001 - 美柚--开屏Android兜底"],
+				groups: [
+					{
+						id: uid(),
+						name: "默认分组",
+						priority: 1,
+						scene: "开屏",
+						platform: "Android",
+						slot: "2000 - 美柚--开屏Android",
+						enabled: true,
+						isAbTest: false,
+						note: "Android基线组",
+						rules: [
+							{ field: "机型等级", operator: "属于", value: "中高端" }
+						],
+						pids: [
+							createPid({ name: "广点通-开屏Android", price: 12.6, statusColor: "green", requestVolume: 152000, returnRate: 59.8, bidSuccessCount: 53000, bidSuccessRate: 40.3, impressionCount: 72000, winRate: 82, clickRate: 3.7, cpc: 0.92 }),
+							createPid({ name: "百度-开屏Android", price: 10.8, statusColor: "gray", requestVolume: 92000, returnRate: 49.2, bidSuccessCount: 21000, bidSuccessRate: 28.4, impressionCount: 35000, winRate: 73, clickRate: 2.9, cpc: 0.88, enabled: false })
+						]
+					}
+				]
+			},
+			"信息流|iOS": {
+				slots: ["3000 - 美柚--信息流首刷", "3001 - 美柚--信息流下滑"],
+				groups: [
+					{
+						id: uid(),
+						name: "默认分组",
+						priority: 1,
+						scene: "信息流",
+						platform: "iOS",
+						slot: "3000 - 美柚--信息流首刷",
+						enabled: true,
+						isAbTest: false,
+						note: "信息流首刷测试中",
+						rules: [
+							{ field: "访问深度", operator: "高于", value: "3页" }
+						],
+						pids: [
+							createPid({ name: "穿山甲-信息流iOS", price: 9.8, statusColor: "green", requestVolume: 245000, returnRate: 66.5, bidSuccessCount: 102000, bidSuccessRate: 51.5, impressionCount: 86000, winRate: 74, clickRate: 2.6, cpc: 0.76 }),
+							createPid({ name: "快手-信息流iOS", price: 8.4, statusColor: "orange", requestVolume: 198000, returnRate: 58.1, bidSuccessCount: 74000, bidSuccessRate: 46.8, impressionCount: 63000, winRate: 69, clickRate: 2.2, cpc: 0.64 })
+						]
+					}
+				]
+			},
+			"信息流|Android": {
+				slots: ["4000 - 美柚--信息流Android", "4001 - 美柚--信息流Android补量"],
+				groups: [
+					{
+						id: uid(),
+						name: "默认分组",
+						priority: 1,
+						scene: "信息流",
+						platform: "Android",
+						slot: "4000 - 美柚--信息流Android",
+						enabled: true,
+						isAbTest: false,
+						note: "Android信息流补量",
+						rules: [
+							{ field: "新用户", operator: "等于", value: "是" },
+							{ field: "频道", operator: "属于", value: "备孕/母婴" }
+						],
+						pids: [
+							createPid({ name: "优量汇-信息流Android", price: 7.3, statusColor: "green", requestVolume: 176000, returnRate: 61.2, bidSuccessCount: 58000, bidSuccessRate: 43.7, impressionCount: 54000, winRate: 68, clickRate: 1.9, cpc: 0.51 }),
+							createPid({ name: "百度-信息流Android", price: 6.2, statusColor: "orange", requestVolume: 129000, returnRate: 54.6, bidSuccessCount: 34000, bidSuccessRate: 38.2, impressionCount: 42000, winRate: 63, clickRate: 1.6, cpc: 0.48 })
+						]
+					}
+				]
+			}
+		};
+
+		const appState = loadState();
+
+		const sceneSelect = document.getElementById("sceneSelect");
+		const platformSelect = document.getElementById("platformSelect");
+		const groupTabs = document.getElementById("groupTabs");
+		const groupSlotTag = document.getElementById("groupSlotTag");
+		const groupSwitch = document.getElementById("groupSwitch");
+		const groupMeta = document.getElementById("groupMeta");
+		const rulesList = document.getElementById("rulesList");
+		const tableHeadRow = document.getElementById("tableHeadRow");
+		const tableBody = document.getElementById("tableBody");
+		const modalRoot = document.getElementById("modalRoot");
+		const modalPanel = document.getElementById("modalPanel");
+		const menuRoot = document.getElementById("menuRoot");
+		const menuPanel = document.getElementById("menuPanel");
+		const confirmRoot = document.getElementById("confirmRoot");
+		const confirmPanel = document.getElementById("confirmPanel");
+		const toastStack = document.getElementById("toastStack");
+
+		sceneSelect.addEventListener("change", event => {
+			appState.filters.scene = event.target.value;
+			appState.currentGroupId = ensureCurrentGroup().id;
+			saveState();
+			render();
+		});
+
+		platformSelect.addEventListener("change", event => {
+			appState.filters.platform = event.target.value;
+			appState.currentGroupId = ensureCurrentGroup().id;
+			saveState();
+			render();
+		});
+
+		document.getElementById("groupSwitch").addEventListener("click", () => {
+			const group = currentGroup();
+			group.enabled = !group.enabled;
+			saveState();
+			render();
+			toast(group.enabled ? "分组已启用" : "分组已停用", group.enabled ? "success" : "error");
+		});
+
+		document.getElementById("addGroupButton").addEventListener("click", () => openGroupModal());
+		document.getElementById("createAbButton").addEventListener("click", () => openAbModal());
+		document.getElementById("addPidButton").addEventListener("click", () => openPidModal());
+
+		modalRoot.addEventListener("click", event => {
+			if (event.target.dataset.closeModal === "true") {
+				closeModal();
+			}
+		});
+
+		menuRoot.addEventListener("click", event => {
+			if (event.target.dataset.closeMenu === "true") {
+				closeMenu();
+			}
+		});
+
+		confirmRoot.addEventListener("click", event => {
+			if (event.target.dataset.closeConfirm === "true") {
+				closeConfirm();
+			}
+		});
+
+		document.addEventListener("keydown", event => {
+			if (event.key === "Escape") {
+				closeModal();
+				closeMenu();
+				closeConfirm();
+			}
+		});
+
+		render();
+
+		function render() {
+			renderFilters();
+			renderGroupTabs();
+			renderGroupPanel();
+			renderTableHead();
+			renderTableBody();
+		}
+
+		function renderFilters() {
+			sceneSelect.innerHTML = ["开屏", "信息流"].map(scene => optionHtml(scene, appState.filters.scene)).join("");
+			platformSelect.innerHTML = ["iOS", "Android"].map(platform => optionHtml(platform, appState.filters.platform)).join("");
+		}
+
+		function renderGroupTabs() {
+			const groups = currentGroups();
+			const activeGroup = currentGroup();
+			groupTabs.innerHTML = groups.map(group => {
+				const active = group.id === activeGroup.id ? "active" : "";
+				const abBadge = group.isAbTest ? '<span class="ab-badge" style="margin:0; height:22px; font-size:12px;">A/B</span>' : "";
+				return `
+					<button class="group-tab ${active}" data-action="switch-group" data-group-id="${group.id}">
+						<span>${escapeHtml(group.name)}</span>
+						${abBadge}
+						<span class="tiny-button" data-action="group-menu" data-group-id="${group.id}">···</span>
+					</button>
+				`;
+			}).join("");
+
+			groupTabs.querySelectorAll('[data-action="switch-group"]').forEach(button => {
+				button.addEventListener("click", event => {
+					appState.currentGroupId = event.currentTarget.dataset.groupId;
+					saveState();
+					render();
+				});
+			});
+
+			groupTabs.querySelectorAll('[data-action="group-menu"]').forEach(button => {
+				button.addEventListener("click", event => {
+					event.stopPropagation();
+					const rect = event.currentTarget.getBoundingClientRect();
+					openGroupMenu(event.currentTarget.dataset.groupId, rect);
+				});
+			});
+		}
+
+		function renderGroupPanel() {
+			const group = currentGroup();
+			groupSlotTag.textContent = group.slot;
+			groupSwitch.className = `switch ${group.enabled ? "on" : ""}`;
+			const enabledCount = group.pids.filter(pid => pid.enabled).length;
+			groupMeta.textContent = `优先级 ${group.priority} · ${enabledCount}/${group.pids.length} 个DSP来源启用 · ${group.note || "未填写备注"}`;
+			if (!group.rules.length) {
+				rulesList.innerHTML = '<div class="empty-state">当前分组未设置规则，默认全量命中</div>';
+				return;
+			}
+			rulesList.innerHTML = group.rules.map(rule => `
+				<div class="rule-item">
+					<span>${escapeHtml(rule.field)}</span>
+					<span>${escapeHtml(rule.operator)}</span>
+					<span>${escapeHtml(rule.value)}</span>
+				</div>
+			`).join("");
+		}
+
+		function renderTableHead() {
+			const sort = appState.sort;
+			tableHeadRow.innerHTML = `
+				<th>操作</th>
+				<th>DSP来源</th>
+				<th>状态</th>
+				${metricColumns.map(column => {
+					const active = sort.key === column.key;
+					const arrow = active ? (sort.direction === "asc" ? "▲" : "▼") : "▲";
+					return `
+						<th>
+							<button class="sortable ${active ? "active" : ""}" data-sort-key="${column.key}">
+								<span>${column.label}</span>
+								${column.info ? '<span class="metric-tip">i</span>' : ""}
+								<span class="sort-arrow ${active ? "active" : ""}">${arrow}</span>
+							</button>
+						</th>
+					`;
+				}).join("")}
+			`;
+			tableHeadRow.querySelectorAll("[data-sort-key]").forEach(button => {
+				button.addEventListener("click", () => {
+					const key = button.dataset.sortKey;
+					if (appState.sort.key === key) {
+						appState.sort.direction = appState.sort.direction === "asc" ? "desc" : "asc";
+					} else {
+						appState.sort.key = key;
+						appState.sort.direction = "desc";
+					}
+					saveState();
+					renderTableHead();
+					renderTableBody();
+				});
+			});
+		}
+
+		function renderTableBody() {
+			const group = currentGroup();
+			const rows = sortedPids(group.pids);
+			if (!rows.length) {
+				tableBody.innerHTML = '<tr><td colspan="16"><div class="empty-state">当前分组还没有PID，点击“添加PID”开始创建</div></td></tr>';
+				return;
+			}
+			const summary = computeSummary(group.pids);
+			tableBody.innerHTML = `
+				<tr class="summary-row">
+					<td></td>
+					<td>${group.pids.filter(pid => pid.enabled).length}个DSP来源已启用</td>
+					<td></td>
+					${metricColumns.map(column => `<td>${formatMetric(summary[column.key], column.type)}</td>`).join("")}
+				</tr>
+				${rows.map(pid => renderPidRow(pid)).join("")}
+			`;
+			tableBody.querySelectorAll('[data-action="edit-pid"]').forEach(button => {
+				button.addEventListener("click", () => openPidModal(button.dataset.pidId));
+			});
+			tableBody.querySelectorAll('[data-action="toggle-pid"]').forEach(button => {
+				button.addEventListener("click", () => {
+					const pid = findPid(button.dataset.pidId);
+					pid.enabled = !pid.enabled;
+					saveState();
+					renderGroupPanel();
+					renderTableBody();
+					toast(pid.enabled ? `${pid.name} 已启用` : `${pid.name} 已停用`, pid.enabled ? "success" : "error");
+				});
+			});
+			tableBody.querySelectorAll('[data-action="edit-price"]').forEach(button => {
+				button.addEventListener("click", () => openPriceModal(button.dataset.pidId));
+			});
+		}
+
+		function renderPidRow(pid) {
+			return `
+				<tr>
+					<td><button class="edit-link" data-action="edit-pid" data-pid-id="${pid.id}">编辑</button></td>
+					<td><span class="status-dot ${pid.statusColor}"></span>${escapeHtml(pid.name)}</td>
+					<td><button class="switch ${pid.enabled ? "on" : ""}" data-action="toggle-pid" data-pid-id="${pid.id}"></button></td>
+					${metricColumns.map(column => {
+						const content = formatMetric(pid[column.key], column.type);
+						if (column.key === "price") {
+							return `<td><span class="editable-cell">${content}<button class="icon-button" data-action="edit-price" data-pid-id="${pid.id}"><span class="edit-icon">✎</span></button></span></td>`;
+						}
+						return `<td>${content}</td>`;
+					}).join("")}
+				</tr>
+			`;
+		}
+
+		function openGroupMenu(groupId, rect) {
+			const group = currentGroups().find(item => item.id === groupId);
+			if (!group) {
+				return;
+			}
+			menuPanel.style.top = `${rect.bottom + 8}px`;
+			menuPanel.style.left = `${Math.max(12, rect.left - 90)}px`;
+			menuPanel.innerHTML = `
+				<button data-menu-action="edit">编辑分组</button>
+				<button data-menu-action="duplicate">复制分组</button>
+				<button data-menu-action="delete" ${currentGroups().length === 1 ? "disabled" : ""}>删除分组</button>
+			`;
+			menuRoot.classList.add("open");
+			menuPanel.querySelector('[data-menu-action="edit"]').addEventListener("click", () => {
+				closeMenu();
+				openGroupModal(groupId);
+			});
+			menuPanel.querySelector('[data-menu-action="duplicate"]').addEventListener("click", () => {
+				closeMenu();
+				duplicateGroup(groupId);
+			});
+			const deleteButton = menuPanel.querySelector('[data-menu-action="delete"]');
+			if (!deleteButton.disabled) {
+				deleteButton.addEventListener("click", () => {
+					closeMenu();
+					confirmDeleteGroup(groupId);
+				});
+			}
+		}
+
+		function openGroupModal(groupId = "") {
+			const editing = groupId ? currentGroups().find(group => group.id === groupId) : null;
+			const slots = currentDataset().slots;
+			const rules = editing ? editing.rules : [{ field: "用户标签", operator: "等于", value: "全部用户" }];
+			modalPanel.innerHTML = `
+				<div class="modal-head">
+					<div>
+						<div class="modal-title">${editing ? "编辑分组" : "添加分组"}</div>
+						<div class="modal-subtitle">支持维护分组名称、优先级、广告位和命中规则。提交后会立即刷新当前表格。</div>
+					</div>
+					<button class="icon-button" data-close-modal-button="true">✕</button>
+				</div>
+				<form id="groupForm">
+					<div class="form-grid">
+						<div class="form-block">
+							<label class="form-label"><span class="required">分组名称</span><span class="helper" id="groupNameCounter">0/20</span></label>
+							<input class="text-input" name="name" maxlength="20" value="${escapeAttr(editing ? editing.name : "")}" placeholder="请输入分组名称" required />
+						</div>
+						<div class="form-block">
+							<label class="form-label"><span class="required">优先级</span></label>
+							<input class="number-input" type="number" min="1" max="99" name="priority" value="${editing ? editing.priority : currentGroups().length + 1}" required />
+						</div>
+						<div class="form-block">
+							<label class="form-label"><span>广告场景</span></label>
+							<input class="text-input" value="${appState.filters.scene}" disabled />
+						</div>
+						<div class="form-block">
+							<label class="form-label"><span>平台</span></label>
+							<input class="text-input" value="${appState.filters.platform}" disabled />
+						</div>
+						<div class="form-block full">
+							<label class="form-label"><span class="required">广告位</span></label>
+							<div class="select-wrap">
+								<select name="slot">${slots.map(slot => optionHtml(slot, editing ? editing.slot : slots[0])).join("")}</select>
+							</div>
+						</div>
+						<div class="form-block full">
+							<label class="form-label"><span>备注</span><span class="helper">可选</span></label>
+							<textarea name="note" placeholder="例如：命中高活跃 / 大盘回收 / 品牌优先">${escapeHtml(editing ? editing.note || "" : "")}</textarea>
+						</div>
+						<div class="form-block full">
+							<label class="form-label"><span>分组规则</span><button type="button" class="outline-button" id="appendRuleButton">添加规则</button></label>
+							<div id="ruleEditor">${rules.map(rule => renderRuleEditor(rule)).join("")}</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="ghost-button" data-close-modal-button="true">取消</button>
+						<button type="submit" class="brand-button">提交</button>
+					</div>
+				</form>
+			`;
+			modalRoot.classList.add("open");
+			bindModalCloseButtons();
+			bindGroupFormEditors();
+			document.getElementById("groupForm").addEventListener("submit", event => {
+				event.preventDefault();
+				const data = new FormData(event.currentTarget);
+				const name = String(data.get("name") || "").trim();
+				const priority = Number(data.get("priority")) || 1;
+				const slot = String(data.get("slot") || "").trim();
+				const note = String(data.get("note") || "").trim();
+				const rulesValue = collectRuleValues();
+				if (!name) {
+					toast("请先填写分组名称", "error");
+					return;
+				}
+				const group = editing || { id: uid(), enabled: true, isAbTest: false, pids: [] };
+				group.name = name;
+				group.priority = priority;
+				group.scene = appState.filters.scene;
+				group.platform = appState.filters.platform;
+				group.slot = slot;
+				group.note = note;
+				group.rules = rulesValue;
+				if (!editing) {
+					currentGroups().push(group);
+					appState.currentGroupId = group.id;
+				}
+				currentGroups().sort((left, right) => left.priority - right.priority);
+				saveState();
+				closeModal();
+				render();
+				toast(editing ? "分组已更新" : "分组已创建", "success");
+			});
+		}
+
+		function openAbModal() {
+			const group = currentGroup();
+			modalPanel.innerHTML = `
+				<div class="modal-head">
+					<div>
+						<div class="modal-title">创建A/B测试</div>
+						<div class="modal-subtitle">基于当前分组快速生成一个实验分组，用于价格、规则或流量占比验证。</div>
+					</div>
+					<button class="icon-button" data-close-modal-button="true">✕</button>
+				</div>
+				<form id="abForm">
+					<div class="ab-layout">
+						<div class="form-grid" style="grid-template-columns: 1fr;">
+							<div class="form-block">
+								<label class="form-label"><span class="required">实验名称</span></label>
+								<input class="text-input" name="name" maxlength="20" value="${escapeAttr(group.name + "-AB测试")}" required />
+							</div>
+							<div class="inline-fields">
+								<div class="form-block">
+									<label class="form-label"><span class="required">实验流量占比</span></label>
+									<input class="number-input" type="number" min="1" max="90" name="traffic" value="30" required />
+								</div>
+								<div class="form-block">
+									<label class="form-label"><span class="required">优先级</span></label>
+									<input class="number-input" type="number" min="1" max="99" name="priority" value="${group.priority + 1}" required />
+								</div>
+							</div>
+							<div class="form-block">
+								<label class="form-label"><span>实验说明</span></label>
+								<textarea name="note">基于 ${escapeHtml(group.name)} 复制，保留原有PID并支持后续单独编辑。</textarea>
+							</div>
+						</div>
+						<div class="ab-preview">
+							<div class="ab-badge">实验预览</div>
+							<h4>${escapeHtml(group.name)}</h4>
+							<div class="helper">当前广告位：${escapeHtml(group.slot)}</div>
+							<div class="stats-panel">
+								<div class="stats-card"><div class="label">当前PID数</div><strong>${group.pids.length}</strong></div>
+								<div class="stats-card"><div class="label">启用PID数</div><strong>${group.pids.filter(pid => pid.enabled).length}</strong></div>
+								<div class="stats-card"><div class="label">当前优先级</div><strong>${group.priority}</strong></div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="ghost-button" data-close-modal-button="true">取消</button>
+						<button type="submit" class="brand-button">生成实验组</button>
+					</div>
+				</form>
+			`;
+			modalRoot.classList.add("open");
+			bindModalCloseButtons();
+			document.getElementById("abForm").addEventListener("submit", event => {
+				event.preventDefault();
+				const data = new FormData(event.currentTarget);
+				const name = String(data.get("name") || "").trim();
+				const traffic = Number(data.get("traffic")) || 30;
+				const priority = Number(data.get("priority")) || group.priority + 1;
+				const note = String(data.get("note") || "").trim();
+				if (!name) {
+					toast("请填写实验名称", "error");
+					return;
+				}
+				const clone = deepCopy(group);
+				clone.id = uid();
+				clone.name = name;
+				clone.priority = priority;
+				clone.note = `A/B流量 ${traffic}% · ${note}`;
+				clone.isAbTest = true;
+				clone.pids = clone.pids.map(pid => ({ ...pid, id: uid(), price: round(pid.price * (1 + traffic / 500), 2) }));
+				currentGroups().push(clone);
+				currentGroups().sort((left, right) => left.priority - right.priority);
+				appState.currentGroupId = clone.id;
+				saveState();
+				closeModal();
+				render();
+				toast("A/B测试分组已创建", "success");
+			});
+		}
+
+		function openPidModal(pidId = "") {
+			const group = currentGroup();
+			const editing = pidId ? findPid(pidId) : null;
+			modalPanel.innerHTML = `
+				<div class="modal-head">
+					<div>
+						<div class="modal-title">${editing ? "编辑PID" : "添加PID"}</div>
+						<div class="modal-subtitle">维护 DSP 来源、价格与核心指标，汇总数据会即时联动。</div>
+					</div>
+					<button class="icon-button" data-close-modal-button="true">✕</button>
+				</div>
+				<form id="pidForm">
+					<div class="form-grid">
+						<div class="form-block">
+							<label class="form-label"><span class="required">DSP来源</span></label>
+							<input class="text-input" name="name" value="${escapeAttr(editing ? editing.name : "")}" placeholder="例如：穿山甲-开屏iOS" required />
+						</div>
+						<div class="form-block">
+							<label class="form-label"><span class="required">价格</span></label>
+							<input class="number-input" type="number" step="0.01" min="0" name="price" value="${editing ? editing.price : 12.5}" required />
+						</div>
+						<div class="form-block">
+							<label class="form-label"><span>状态颜色</span></label>
+							<div class="select-wrap">
+								<select name="statusColor">${["green", "orange", "gray"].map(color => optionHtml(color, editing ? editing.statusColor : "green")).join("")}</select>
+							</div>
+						</div>
+						<div class="form-block">
+							<label class="form-label"><span>启用状态</span></label>
+							<div class="select-wrap">
+								<select name="enabled">
+									<option value="true" ${!editing || editing.enabled ? "selected" : ""}>启用</option>
+									<option value="false" ${editing && !editing.enabled ? "selected" : ""}>停用</option>
+								</select>
+							</div>
+						</div>
+						${renderMetricEditors(editing)}
+					</div>
+					<div class="modal-footer">
+						${editing ? '<button type="button" class="danger-button" id="removePidButton">删除PID</button>' : ""}
+						<button type="button" class="ghost-button" data-close-modal-button="true">取消</button>
+						<button type="submit" class="brand-button">提交</button>
+					</div>
+				</form>
+			`;
+			modalRoot.classList.add("open");
+			bindModalCloseButtons();
+			if (editing) {
+				document.getElementById("removePidButton").addEventListener("click", () => confirmRemovePid(editing.id));
+			}
+			document.getElementById("pidForm").addEventListener("submit", event => {
+				event.preventDefault();
+				const data = new FormData(event.currentTarget);
+				const name = String(data.get("name") || "").trim();
+				if (!name) {
+					toast("请填写DSP来源", "error");
+					return;
+				}
+				const pid = editing || createPid({ name, price: Number(data.get("price")) || 0 });
+				pid.name = name;
+				pid.price = Number(data.get("price")) || 0;
+				pid.statusColor = String(data.get("statusColor") || "green");
+				pid.enabled = String(data.get("enabled")) === "true";
+				pid.estimatedRevenue = Number(data.get("estimatedRevenue")) || 0;
+				pid.profitPerMille = Number(data.get("profitPerMille")) || 0;
+				pid.ecpm = Number(data.get("ecpm")) || 0;
+				pid.requestValue = Number(data.get("requestValue")) || 0;
+				pid.requestVolume = Number(data.get("requestVolume")) || 0;
+				pid.returnRate = Number(data.get("returnRate")) || 0;
+				pid.bidSuccessCount = Number(data.get("bidSuccessCount")) || 0;
+				pid.bidSuccessRate = Number(data.get("bidSuccessRate")) || 0;
+				pid.impressionCount = Number(data.get("impressionCount")) || 0;
+				pid.winRate = Number(data.get("winRate")) || 0;
+				pid.clickRate = Number(data.get("clickRate")) || 0;
+				pid.cpc = Number(data.get("cpc")) || 0;
+				if (!editing) {
+					group.pids.push(pid);
+				}
+				saveState();
+				closeModal();
+				render();
+				toast(editing ? "PID已更新" : "PID已添加", "success");
+			});
+		}
+
+		function openPriceModal(pidId) {
+			const pid = findPid(pidId);
+			modalPanel.innerHTML = `
+				<div class="modal-head">
+					<div>
+						<div class="modal-title">修改价格</div>
+						<div class="modal-subtitle">${escapeHtml(pid.name)}</div>
+					</div>
+					<button class="icon-button" data-close-modal-button="true">✕</button>
+				</div>
+				<form id="priceForm">
+					<div class="form-block">
+						<label class="form-label"><span class="required">价格</span></label>
+						<input class="number-input" type="number" name="price" step="0.01" min="0" value="${pid.price}" required />
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="ghost-button" data-close-modal-button="true">取消</button>
+						<button type="submit" class="brand-button">保存</button>
+					</div>
+				</form>
+			`;
+			modalRoot.classList.add("open");
+			bindModalCloseButtons();
+			document.getElementById("priceForm").addEventListener("submit", event => {
+				event.preventDefault();
+				pid.price = Number(new FormData(event.currentTarget).get("price")) || 0;
+				saveState();
+				closeModal();
+				render();
+				toast("价格已更新", "success");
+			});
+		}
+
+		function confirmDeleteGroup(groupId) {
+			const group = currentGroups().find(item => item.id === groupId);
+			openConfirm({
+				title: "删除分组",
+				content: `确认删除“${escapeHtml(group.name)}”吗？此操作会移除该分组下所有PID。`,
+				confirmText: "删除",
+				danger: true,
+				onConfirm() {
+					const groups = currentGroups();
+					groups.splice(groups.findIndex(item => item.id === groupId), 1);
+					appState.currentGroupId = groups[0].id;
+					saveState();
+					render();
+					toast("分组已删除", "success");
+				}
+			});
+		}
+
+		function confirmRemovePid(pidId) {
+			const pid = findPid(pidId);
+			openConfirm({
+				title: "删除PID",
+				content: `确认删除“${escapeHtml(pid.name)}”吗？`,
+				confirmText: "删除",
+				danger: true,
+				onConfirm() {
+					currentGroup().pids = currentGroup().pids.filter(item => item.id !== pidId);
+					saveState();
+					closeModal();
+					render();
+					toast("PID已删除", "success");
+				}
+			});
+		}
+
+		function openConfirm({ title, content, confirmText, danger, onConfirm }) {
+			confirmPanel.innerHTML = `
+				<div class="modal-head" style="margin-bottom: 10px;">
+					<div>
+						<div class="modal-title" style="font-size: 20px;">${title}</div>
+						<div class="modal-subtitle">${content}</div>
+					</div>
+					<button class="icon-button" data-close-confirm-button="true">✕</button>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ghost-button" data-close-confirm-button="true">取消</button>
+					<button type="button" class="${danger ? "danger-button" : "brand-button"}" id="confirmActionButton">${confirmText}</button>
+				</div>
+			`;
+			confirmRoot.classList.add("open");
+			confirmPanel.querySelectorAll('[data-close-confirm-button="true"]').forEach(button => button.addEventListener("click", closeConfirm));
+			document.getElementById("confirmActionButton").addEventListener("click", () => {
+				closeConfirm();
+				onConfirm();
+			});
+		}
+
+		function duplicateGroup(groupId) {
+			const source = currentGroups().find(group => group.id === groupId);
+			const clone = deepCopy(source);
+			clone.id = uid();
+			clone.name = `${source.name}-复制`;
+			clone.priority = Math.max(...currentGroups().map(group => group.priority)) + 1;
+			clone.isAbTest = false;
+			clone.pids = clone.pids.map(pid => ({ ...pid, id: uid() }));
+			currentGroups().push(clone);
+			currentGroups().sort((left, right) => left.priority - right.priority);
+			appState.currentGroupId = clone.id;
+			saveState();
+			render();
+			toast("分组已复制", "success");
+		}
+
+		function bindModalCloseButtons() {
+			modalPanel.querySelectorAll('[data-close-modal-button="true"]').forEach(button => button.addEventListener("click", closeModal));
+		}
+
+		function bindGroupFormEditors() {
+			const nameInput = modalPanel.querySelector('input[name="name"]');
+			const counter = modalPanel.querySelector("#groupNameCounter");
+			const updateCount = () => {
+				counter.textContent = `${nameInput.value.length}/20`;
+			};
+			updateCount();
+			nameInput.addEventListener("input", updateCount);
+			modalPanel.querySelector("#appendRuleButton").addEventListener("click", () => {
+				modalPanel.querySelector("#ruleEditor").insertAdjacentHTML("beforeend", renderRuleEditor({ field: "用户标签", operator: "等于", value: "全部用户" }));
+				bindRuleDeleteButtons();
+			});
+			bindRuleDeleteButtons();
+		}
+
+		function bindRuleDeleteButtons() {
+			modalPanel.querySelectorAll('[data-action="remove-rule"]').forEach(button => {
+				button.onclick = () => button.closest(".rule-item").remove();
+			});
+		}
+
+		function collectRuleValues() {
+			return Array.from(modalPanel.querySelectorAll(".rule-item")).map(editor => ({
+				field: editor.querySelector('[name="rule-field"]').value.trim() || "用户标签",
+				operator: editor.querySelector('[name="rule-operator"]').value.trim() || "等于",
+				value: editor.querySelector('[name="rule-value"]').value.trim() || "全部用户"
+			}));
+		}
+
+		function renderRuleEditor(rule) {
+			return `
+				<div class="rule-item">
+					<input class="text-input" name="rule-field" value="${escapeAttr(rule.field)}" placeholder="规则字段" />
+					<input class="text-input" name="rule-operator" value="${escapeAttr(rule.operator)}" placeholder="运算符" />
+					<input class="text-input" name="rule-value" value="${escapeAttr(rule.value)}" placeholder="规则值" />
+					<button type="button" class="danger-button" data-action="remove-rule">删除</button>
+				</div>
+			`;
+		}
+
+		function renderMetricEditors(editing) {
+			return metricColumns.slice(1).map(column => {
+				const value = editing ? editing[column.key] : defaultMetricValue(column.key);
+				return `
+					<div class="form-block">
+						<label class="form-label"><span>${column.label}</span></label>
+						<input class="number-input" type="number" step="0.01" min="0" name="${column.key}" value="${value}" />
+					</div>
+				`;
+			}).join("");
+		}
+
+		function currentKey() {
+			return `${appState.filters.scene}|${appState.filters.platform}`;
+		}
+
+		function currentDataset() {
+			return appState.datasets[currentKey()];
+		}
+
+		function currentGroups() {
+			return currentDataset().groups;
+		}
+
+		function ensureCurrentGroup() {
+			const groups = currentGroups();
+			const found = groups.find(group => group.id === appState.currentGroupId);
+			if (found) {
+				return found;
+			}
+			appState.currentGroupId = groups[0].id;
+			return groups[0];
+		}
+
+		function currentGroup() {
+			return ensureCurrentGroup();
+		}
+
+		function findPid(pidId) {
+			return currentGroup().pids.find(pid => pid.id === pidId);
+		}
+
+		function sortedPids(pids) {
+			const factor = appState.sort.direction === "asc" ? 1 : -1;
+			const key = appState.sort.key;
+			return [...pids].sort((left, right) => {
+				if (left[key] === right[key]) {
+					return left.name.localeCompare(right.name, "zh-CN") * factor;
+				}
+				return (left[key] - right[key]) * factor;
+			});
+		}
+
+		function computeSummary(pids) {
+			const enabled = pids.filter(pid => pid.enabled);
+			const source = enabled.length ? enabled : pids;
+			const summary = {};
+			metricColumns.forEach(column => {
+				if (["requestVolume", "bidSuccessCount", "impressionCount"].includes(column.key)) {
+					summary[column.key] = source.reduce((sum, pid) => sum + pid[column.key], 0);
+				} else {
+					summary[column.key] = round(source.reduce((sum, pid) => sum + pid[column.key], 0) / Math.max(source.length, 1), 2);
+				}
+			});
+			return summary;
+		}
+
+		function formatMetric(value, type) {
+			if (type === "currency") {
+				return `¥${Number(value).toFixed(2)}`;
+			}
+			if (type === "percent") {
+				return `${Number(value).toFixed(1)}%`;
+			}
+			if (type === "volume") {
+				return formatVolume(value);
+			}
+			return Number(value).toLocaleString("zh-CN", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+		}
+
+		function formatVolume(value) {
+			const num = Number(value) || 0;
+			if (num >= 10000) {
+				return `${round(num / 10000, 1)}万`;
+			}
+			return num.toLocaleString("zh-CN");
+		}
+
+		function defaultMetricValue(key) {
+			const defaults = {
+				estimatedRevenue: 8200,
+				profitPerMille: 0.08,
+				ecpm: 16.4,
+				requestValue: 0.61,
+				requestVolume: 64000,
+				returnRate: 52.4,
+				bidSuccessCount: 16000,
+				bidSuccessRate: 38.5,
+				impressionCount: 31000,
+				winRate: 74.2,
+				clickRate: 2.8,
+				cpc: 0.86
+			};
+			return defaults[key] || 0;
+		}
+
+		function optionHtml(value, selectedValue) {
+			return `<option value="${escapeAttr(value)}" ${value === selectedValue ? "selected" : ""}>${escapeHtml(value)}</option>`;
+		}
+
+		function createPid({ name, price, statusColor = "green", estimatedRevenue, profitPerMille, ecpm, requestValue, requestVolume, returnRate, bidSuccessCount, bidSuccessRate, impressionCount, winRate, clickRate, cpc, enabled = true }) {
+			return {
+				id: uid(),
+				name,
+				enabled,
+				statusColor,
+				price,
+				estimatedRevenue: estimatedRevenue != null ? estimatedRevenue : round(requestVolume * price / 206, 1),
+				profitPerMille: profitPerMille != null ? profitPerMille : round(price / 205, 2),
+				ecpm: ecpm != null ? ecpm : round(price * 1.2, 2),
+				requestValue: requestValue != null ? requestValue : round(price / 18, 2),
+				requestVolume,
+				returnRate,
+				bidSuccessCount,
+				bidSuccessRate,
+				impressionCount,
+				winRate,
+				clickRate,
+				cpc
+			};
+		}
+
+		function uid() {
+			return Math.random().toString(36).slice(2, 10);
+		}
+
+		function closeModal() {
+			modalRoot.classList.remove("open");
+			modalPanel.innerHTML = "";
+		}
+
+		function closeMenu() {
+			menuRoot.classList.remove("open");
+			menuPanel.innerHTML = "";
+		}
+
+		function closeConfirm() {
+			confirmRoot.classList.remove("open");
+			confirmPanel.innerHTML = "";
+		}
+
+		function toast(message, type = "success") {
+			const element = document.createElement("div");
+			element.className = `toast ${type}`;
+			element.textContent = message;
+			toastStack.appendChild(element);
+			setTimeout(() => element.remove(), 2200);
+		}
+
+		function loadState() {
+			try {
+				const stored = localStorage.getItem(STORAGE_KEY);
+				if (stored) {
+					const parsed = JSON.parse(stored);
+					if (parsed && parsed.datasets) {
+						return parsed;
+					}
+				}
+			} catch (error) {
+				console.warn("loadState failed", error);
+			}
+			const datasets = deepCopy(baseMatrix);
+			return {
+				filters: { scene: "开屏", platform: "iOS" },
+				currentGroupId: datasets["开屏|iOS"].groups[0].id,
+				sort: { key: "estimatedRevenue", direction: "desc" },
+				datasets
+			};
+		}
+
+		function saveState() {
+			localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+		}
+
+		function deepCopy(value) {
+			return JSON.parse(JSON.stringify(value));
+		}
+
+		function round(value, digits = 2) {
+			const factor = 10 ** digits;
+			return Math.round(Number(value) * factor) / factor;
+		}
+
+		function escapeHtml(value) {
+			return String(value)
+				.replace(/&/g, "&amp;")
+				.replace(/</g, "&lt;")
+				.replace(/>/g, "&gt;")
+				.replace(/\"/g, "&quot;")
+				.replace(/'/g, "&#39;");
+		}
+
+		function escapeAttr(value) {
+			return escapeHtml(value).replace(/\n/g, " &#10; ");
+		}
+	</script>
+</body>
+</html>

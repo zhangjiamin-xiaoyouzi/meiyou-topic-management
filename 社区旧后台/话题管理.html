@@ -1,0 +1,3554 @@
+<!DOCTYPE html><html><head>
+<meta http-equiv="X-UA-Compatible" content="IE=9,Chrome=1">
+<meta http-equiv="X-UA-Compatible" content="IE=9">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="shortcut icon" href="https://sc.seeyouyima.com/image/favicon.ico" type="image/x-icon">
+<link href="https://admin.seeyouyima.com/front/css/bootstrap/bootstrap.min.css" rel="stylesheet">
+<link href="https://admin.seeyouyima.com/front/css/common.css" rel="stylesheet">
+<link href="https://admin.seeyouyima.com/front/css/add_base.css" rel="stylesheet">
+<title>美柚后台管理系统 - 运营系统</title>
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+  <script src="http://cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+  <script src="http://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"></script>
+
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/jquery-1.7.2.min.js"></script>
+
+<script id="__local_mock__">
+/* ===== 本地演示模式 ===== */
+(function () {
+  var LOCAL_MAP = {
+    '/topic/subject_list':             '话题管理.html',
+    '/topic/edit_subject?is_new=1':    '添加热议话题.html',
+    '/topic/edit_subject?act_type=ad': '添加热议话题_广告.html'
+  };
+
+  function isLocalFile(u) {
+    if (!u) return false;
+    return ['话题管理.html', '添加热议话题.html', '编辑话题.html', '添加热议话题_广告.html']
+      .some(function (p) { return u.indexOf(p) >= 0; });
+  }
+
+  function showTip() {
+    if (document.getElementById('__tip__')) return;
+    var d = document.createElement('div');
+    d.id = '__tip__';
+    d.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);'
+      + 'background:#fff;border:1px solid #e8e8ed;border-radius:8px;padding:18px 40px;'
+      + 'box-shadow:0 8px 24px rgba(0,0,0,.18);z-index:999999;font-size:15px;color:#666;'
+      + 'text-align:center;pointer-events:none';
+    d.textContent = '暂无功能';
+    document.body.appendChild(d);
+    setTimeout(function () { var e = document.getElementById('__tip__'); if (e) e.remove(); }, 1500);
+  }
+
+  function resolveHref(href) {
+    /* 支持相对路径和完整 URL（含域名） */
+    for (var k in LOCAL_MAP) {
+      if (href.indexOf(k) >= 0) return LOCAL_MAP[k];
+    }
+    /* 编辑链接：包含 edit_subject?id= */
+    if (href.indexOf('edit_subject?id=') >= 0) {
+      var qs = href.split('?')[1] || '';
+      return '编辑话题.html' + (qs ? '?' + qs : '');
+    }
+    return null;
+  }
+
+  /* --- 拦截 window.open：本地页面在当前标签打开 --- */
+  window.open = function (url) {
+    if (!url) { showTip(); return; }
+    if (isLocalFile(url)) { location.href = url; return; }
+    var local = resolveHref(url);
+    if (local) { location.href = local; return; }
+    showTip();
+  };
+
+  /* --- Hook jQuery AJAX（防止初始加载弹窗卡住） --- */
+  function hookJQ() {
+    if (window.jQuery) {
+      var _d = function () {
+        var d = {
+          done:   function () { return d; },
+          fail:   function (f) { try { f({}); } catch (e) {} return d; },
+          always: function (f) { try { f(); } catch (e) {} return d; },
+          then:   function (a, b) { return d.done(a).fail(b || function () {}); }
+        };
+        return d;
+      };
+      jQuery.ajax = jQuery.get = jQuery.post = function () { return _d(); };
+      jQuery.fn.load = function () { return this; };
+    } else {
+      setTimeout(hookJQ, 30);
+    }
+  }
+  hookJQ();
+
+  /* --- DOM Ready --- */
+  function onReady() {
+    /* 关闭初始加载弹窗 */
+    setTimeout(function () {
+      try {
+        document.querySelectorAll('.aui_dialog').forEach(function (el) {
+          var btn = el.querySelector('.aui_close'); if (btn) btn.click();
+        });
+      } catch (e) {}
+    }, 500);
+
+    /* 拦截 <a> 点击 */
+    document.addEventListener('click', function (e) {
+      var el = e.target;
+      while (el && el.tagName !== 'A') el = el.parentElement;
+      if (!el) return;
+      var href = el.getAttribute('href') || '';
+      if (!href || href === '#' || href.indexOf('javascript:') === 0) return;
+      if (isLocalFile(href)) return;   /* 本地文件，放行 */
+
+      e.preventDefault(); e.stopPropagation();
+      var local = resolveHref(href);
+      if (local) { location.href = local; return; }
+      showTip();
+    }, true);
+
+    /* 拦截表单提交 */
+    document.addEventListener('submit', function (e) {
+      e.preventDefault(); e.stopPropagation();
+      showTip();
+    }, true);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', onReady);
+  } else {
+    onReady();
+  }
+})();
+</script>
+
+
+
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/index.js"></script>
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/bootstrap-datetimepicker.min.js"></script>
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/bootstrap-datetimepicker.zh-CN.js"></script>
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/artDialog/jquery.artDialog.js"></script>
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/WdatePicker.js"></script>
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/jquery.multiselect.js"></script>
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/jquery.base64.js"></script>
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/tips.js"></script>
+
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/zh-cn.js"></script>
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/common.js"></script>
+
+    <!-- layui组件 -->
+<script src="https://admin.seeyouyima.com/front/layui/layui.js" charset="utf-8"></script>
+<script>
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();
+
+	//iframe自适应
+	$("#tab_frame").load(function(){
+		 
+		 $(this).height($('body',window.frames["tab_frame"].document).height() + 50);
+	});
+	
+	if(top != self)
+	{
+		$('#tab_frame',window.parent.document).height($(this).height());
+	}
+	
+		
+	$('#sort_box a').click(function(){
+		
+		//没有排序默认点击ASC
+		if($(this).attr('sort_type') == 'none')
+		{
+			$(this).attr('class','sort_desc');
+			$(this).attr('sort_type','desc');
+			$('#_sort_type').html('<input type="hidden" name="sort_col" value="'+$(this).attr('sort_col')+'"/><input type="hidden" name="sort_type" value="'+$(this).attr('sort_type')+'"/>');
+			$('#fom').submit();
+		}
+		else if($(this).attr('sort_type') == 'asc')
+		{
+			$(this).attr('class','sort_desc');
+			$(this).attr('sort_type','desc');
+			$('#_sort_type').html('<input type="hidden" name="sort_col" value="'+$(this).attr('sort_col')+'"/><input type="hidden" name="sort_type" value="'+$(this).attr('sort_type')+'"/>');
+			$('#fom').submit();
+		}
+		else if($(this).attr('sort_type') == 'desc')
+		{
+			$(this).attr('class','sort_asc');
+			$(this).attr('sort_type','asc');
+			$('#_sort_type').html('<input type="hidden" name="sort_col" value="'+$(this).attr('sort_col')+'"/><input type="hidden" name="sort_type" value="'+$(this).attr('sort_type')+'"/>');
+			$('#fom').submit();
+		}
+	});
+
+});
+</script>
+
+<link id="layuicss-laydatecss" rel="stylesheet" href="https://admin.seeyouyima.com/front/js/layui/css/modules/laydate/laydate.css" media="all"><link id="layuicss-skinlayercss" rel="stylesheet" href="https://admin.seeyouyima.com/front/js/layui/css/modules/layer/default/layer.css?v=3.0.11110" media="all"><link id="layuicss-skincodecss" rel="stylesheet" href="https://admin.seeyouyima.com/front/js/layui/css/modules/code.css" media="all"><style id="__req_tip_style2__">
+.req-anno-btn{display:inline-block;background:#e67e00;color:#fff;border:none;border-radius:3px;padding:1px 7px;font-size:11px;line-height:18px;cursor:pointer;margin-right:8px;vertical-align:middle;font-weight:600;opacity:.9}
+.req-anno-btn:hover{background:#cf6c00;opacity:1}
+.req-anno-box{display:none}
+#__req_modal__ *{box-sizing:border-box}
+</style>
+<script>
+function toggleReqAnno(btn){
+  var box=btn.parentElement.querySelector('.req-anno-box');
+  if(!box)return;
+  if(document.getElementById('__req_modal__'))return;
+  var ov=document.createElement('div');
+  ov.id='__req_modal__';
+  ov.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);z-index:999998;display:flex;align-items:center;justify-content:center';
+  var card=document.createElement('div');
+  card.style.cssText='background:#fff;border-radius:8px;padding:24px 28px 20px;max-width:420px;width:92%;box-shadow:0 8px 32px rgba(0,0,0,.22);position:relative;border-top:4px solid #e67e00';
+  var cls=document.createElement('button');
+  cls.innerHTML='&times;';
+  cls.style.cssText='position:absolute;top:10px;right:14px;background:none;border:none;font-size:22px;line-height:1;cursor:pointer;color:#aaa;padding:0';
+  cls.onclick=function(){ov.remove();};
+  var ttl=document.createElement('div');
+  ttl.style.cssText='font-size:13px;font-weight:700;color:#e67e00;margin-bottom:12px;letter-spacing:.5px';
+  ttl.textContent='📋 需求说明';
+  var body=document.createElement('div');
+  body.style.cssText='font-size:12px;color:#5a4000;line-height:1.9;white-space:pre-line;background:#fffbe6;padding:12px 14px;border-radius:6px;border-left:3px solid #e67e00;max-height:60vh;overflow-y:auto';
+  body.textContent=box.textContent.trim();
+  card.appendChild(cls);card.appendChild(ttl);card.appendChild(body);
+  ov.appendChild(card);
+  ov.onclick=function(e){if(e.target===ov)ov.remove();};
+  document.body.appendChild(ov);
+}
+</script>
+
+<style id="__promotion_style__">
+.promotion-progress { text-align: center; font-size: 12px; color: #666; }
+.promotion-progress .progress-bar { transition: width 0.3s; }
+.promote-btn { color: #ff4d88; font-weight: 600; cursor: pointer; }
+.promote-btn:hover { color: #e63b73; text-decoration: underline; }
+#__promote_modal__ * { box-sizing: border-box; }
+</style>
+
+<script id="__promotion_script__">
+window._TOPIC_PROMOTION = {
+    postCounts: {},
+    
+    getThreshold: function() {
+        var input = document.getElementById('promotion_threshold');
+        return input ? parseInt(input.value) || 50 : 50;
+    },
+    
+    updateAllRows: function() {
+        // 此函数已不需要更新晋升按钮的显示状态
+        // 保留以备后用
+    },
+    
+    init: function() {
+        var self = this;
+        
+        // 初始化所有行
+        self.updateAllRows();
+        
+        // 绑定晋升按钮点击事件（已移除晋升按钮，保留此代码以备后用）
+        // 原晋升功能已被移除
+        
+        // 表格复选框变化时更新批量操作UI
+        document.addEventListener('change', function(e) {
+            if (e.target.name === 'id[]') {
+                self.updateBatchOperationUI();
+            }
+        });
+        
+        // 快速筛选（按发帖数）
+        var quickFilterCheckbox = document.getElementById('quick_filter');
+        if (quickFilterCheckbox) {
+            quickFilterCheckbox.addEventListener('change', function() {
+                self.applyFilters();
+                self.updateBatchOperationUI();
+            });
+        }
+        
+        // 发帖数阈值输入框改变时更新筛选
+        var thresholdInput = document.getElementById('post_count_threshold');
+        if (thresholdInput) {
+            thresholdInput.addEventListener('change', function() {
+                self.applyFilters();
+                self.updateBatchOperationUI();
+            });
+            // 实时更新（每输入一个数字就更新）
+            thresholdInput.addEventListener('input', function() {
+                self.applyFilters();
+            });
+        }
+    },
+    
+    filterByPostCount: function(checked) {
+        this.applyFilters();
+    },
+    
+    // 应用筛选条件（仅按发帖数）
+    applyFilters: function() {
+        var rows = document.querySelectorAll('#table tbody tr');
+        var postCountFilterEnabled = document.getElementById('quick_filter')?.checked || false;
+        var postCountThreshold = parseInt(document.getElementById('post_count_threshold')?.value) || 50;
+        
+        rows.forEach(function(row) {
+            var cells = row.querySelectorAll('td');
+            var shouldDisplay = true;
+            
+            // 检查发帖数筛选
+            if (postCountFilterEnabled && cells.length > 7) {
+                var postCountText = cells[7]?.textContent?.trim() || '0';
+                var postCount = parseInt(postCountText) || 0;
+                if (postCount < postCountThreshold) {
+                    shouldDisplay = false;
+                }
+            }
+            
+            row.style.display = shouldDisplay ? '' : 'none';
+        });
+    },
+    
+    showPromoteModal: function(topicId, topicName, postCount) {
+        if (document.getElementById('__promote_modal__')) return;
+        
+        var ov = document.createElement('div');
+        ov.id = '__promote_modal__';
+        ov.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);z-index:999998;display:flex;align-items:center;justify-content:center';
+        
+        var card = document.createElement('div');
+        card.style.cssText = 'background:#fff;border-radius:8px;padding:24px 28px 20px;max-width:450px;width:92%;box-shadow:0 8px 32px rgba(0,0,0,.22);position:relative;border-top:4px solid #ff4d88';
+        
+        var cls = document.createElement('button');
+        cls.innerHTML = '&times;';
+        cls.style.cssText = 'position:absolute;top:10px;right:14px;background:none;border:none;font-size:22px;line-height:1;cursor:pointer;color:#aaa;padding:0';
+        cls.onclick = function() { ov.remove(); };
+        
+        var ttl = document.createElement('div');
+        ttl.style.cssText = 'font-size:14px;font-weight:700;color:#333;margin-bottom:16px';
+        ttl.innerHTML = '✨ 确认晋升为官方话题？';
+        
+        var info = document.createElement('div');
+        info.style.cssText = 'font-size:12px;color:#666;line-height:1.8;margin-bottom:20px;background:#f9f9f9;padding:14px;border-radius:6px;border-left:3px solid #ff4d88';
+        var threshold = this.getThreshold();
+        info.innerHTML = '<p><strong>话题名称：</strong>' + topicName + '</p>' +
+                         '<p><strong>当前发帖数：</strong>' + postCount + '</p>' +
+                         '<p><strong>阈值：</strong>' + threshold + '</p>' +
+                         '<p style="color:#ff4d88;margin-top:8px;font-size:11px;">✓ 已满足晋升条件，确认后将升级为官方标签</p>';
+        
+        var actions = document.createElement('div');
+        actions.style.cssText = 'display:flex;gap:10px;justify-content:flex-end';
+        
+        var btnCancel = document.createElement('button');
+        btnCancel.textContent = '取消';
+        btnCancel.style.cssText = 'padding:8px 16px;border:1px solid #ddd;background:#fff;border-radius:4px;cursor:pointer;color:#666;font-size:13px';
+        btnCancel.onclick = function() { ov.remove(); };
+        
+        var btnConfirm = document.createElement('button');
+        btnConfirm.textContent = '确认晋升';
+        btnConfirm.style.cssText = 'padding:8px 16px;background:#ff4d88;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:600;font-size:13px';
+        btnConfirm.onclick = function() {
+            window._TOPIC_PROMOTION.performPromotion(topicId, topicName);
+            ov.remove();
+        };
+        
+        card.appendChild(cls);
+        card.appendChild(ttl);
+        card.appendChild(info);
+        actions.appendChild(btnCancel);
+        actions.appendChild(btnConfirm);
+        card.appendChild(actions);
+        ov.appendChild(card);
+        
+        ov.onclick = function(e) { if (e.target === ov) ov.remove(); };
+        document.body.appendChild(ov);
+    },
+    
+    performPromotion: function(topicId, topicName) {
+        alert('✓ 已将 "' + topicName + '" 晋升为官方话题\n\n（演示模式，暂无后端功能）');
+        
+        var row = document.querySelector('tr[data-id="' + topicId + '"]');
+        if (row) {
+            var promoteBtn = row.querySelector('.promote-btn');
+            if (promoteBtn) promoteBtn.style.display = 'none';
+            
+            // 更新话题标签显示
+            var tagCell = row.querySelector('td:nth-last-child(3)');
+            
+            // 取消选中该行
+            var checkbox = row.querySelector('input[name="id[]"]');
+            if (checkbox) checkbox.checked = false;
+            
+            // 更新批量操作UI
+            this.updateBatchOperationUI();
+        }
+    },
+    
+    // ===== 批量操作相关函数 =====
+    getSelectedRows: function() {
+        var checkboxes = document.querySelectorAll('#table input[name="id[]"]:checked');
+        return Array.from(checkboxes).map(function(cb) {
+            return cb.closest('tr');
+        });
+    },
+    
+    updateBatchOperationUI: function() {
+        var selectedRows = this.getSelectedRows();
+        var panel = document.getElementById('batch-operation-panel');
+        
+        if (!panel) return;
+        
+        if (selectedRows.length > 0) {
+            panel.style.display = '';
+            document.getElementById('batch-selected-count').textContent = selectedRows.length;
+        } else {
+            panel.style.display = 'none';
+        }
+    },
+    
+    batchToggleSelect: function(selectAll) {
+        var table = document.getElementById('table');
+        var rows = table.querySelectorAll('tbody tr');
+        
+        rows.forEach(function(row) {
+            if (row.style.display !== 'none') { // 只操作可见的行
+                var checkbox = row.querySelector('input[name="id[]"]');
+                if (checkbox) checkbox.checked = selectAll;
+            }
+        });
+        
+        this.updateBatchOperationUI();
+    },
+    
+    
+    // ===== 批量修改标签 =====
+    batchModifyTags: function() {
+        var selectedRows = this.getSelectedRows();
+        
+        if (selectedRows.length === 0) {
+            alert('请先选择要操作的话题');
+            return;
+        }
+        
+        // 获取用户选择的新标签
+        var popularity = document.getElementById('batch-label-popularity').value;    // 特色/非特色
+        var period = document.getElementById('batch-label-period').value;            // 长期/短期
+        var frequency = document.getElementById('batch-label-frequency').value;      // 高频/低频
+        var attribute = document.getElementById('batch-label-attribute').value;      // 官方/非官方
+        
+        // 检查是否至少选择了一个标签
+        if (!popularity && !period && !frequency && !attribute) {
+            alert('请至少选择一个要修改的标签');
+            return;
+        }
+        
+        // 定义标签对应的相对标签（要改为X，话题必须当前有Y标签）
+        var oppositeTagMap = {
+            '特色': '非特色',
+            '非特色': '特色',
+            '长期': '短期',
+            '短期': '长期',
+            '高频': '低频',
+            '低频': '高频',
+            '官方': '非官方',
+            '非官方': '官方'
+        };
+        
+        // 筛选符合条件的行（拥有相对标签）
+        var validRows = [];
+        var skippedTopics = [];
+        
+        selectedRows.forEach(function(row) {
+            var cells = row.querySelectorAll('td');
+            if (cells.length <= 18) return;
+            
+            var tagCell = cells[18];
+            var currentTags = tagCell.textContent.trim();
+            var currentTagList = currentTags && currentTags !== '-' ? currentTags.split('·').map(function(t) { return t.trim(); }) : [];
+            
+            // 检查是否拥有必需的相对标签
+            var isValid = true;
+            
+            if (popularity && !currentTagList.includes(oppositeTagMap[popularity])) {
+                isValid = false;
+            }
+            if (period && !currentTagList.includes(oppositeTagMap[period])) {
+                isValid = false;
+            }
+            if (frequency && !currentTagList.includes(oppositeTagMap[frequency])) {
+                isValid = false;
+            }
+            if (attribute && !currentTagList.includes(oppositeTagMap[attribute])) {
+                isValid = false;
+            }
+            
+            if (isValid) {
+                validRows.push(row);
+            } else {
+                var topicName = row.querySelector('a[href*="topic_subject_info_list"]').textContent.trim();
+                skippedTopics.push(topicName);
+            }
+        });
+        
+        // 如果没有符合条件的行，提示用户
+        if (validRows.length === 0) {
+            var skipMessage = '选中的 ' + selectedRows.length + ' 个话题都不符合修改条件\n\n';
+            skipMessage += '修改条件如下：\n';
+            if (popularity) skipMessage += '- 改为"' + popularity + '"需要拥有"' + oppositeTagMap[popularity] + '"标签\n';
+            if (period) skipMessage += '- 改为"' + period + '"需要拥有"' + oppositeTagMap[period] + '"标签\n';
+            if (frequency) skipMessage += '- 改为"' + frequency + '"需要拥有"' + oppositeTagMap[frequency] + '"标签\n';
+            if (attribute) skipMessage += '- 改为"' + attribute + '"需要拥有"' + oppositeTagMap[attribute] + '"标签\n';
+            alert(skipMessage);
+            return;
+        }
+        
+        var topicNames = validRows.slice(0, 5).map(function(row) {
+            return row.querySelector('a[href*="topic_subject_info_list"]').textContent.trim();
+        });
+        
+        var message = '确认为以下 ' + validRows.length + ' 个话题批量修改标签？\n\n';
+        message += '新标签组合：';
+        var newTags = [];
+        if (popularity) newTags.push(popularity);
+        if (period) newTags.push(period);
+        if (frequency) newTags.push(frequency);
+        if (attribute) newTags.push(attribute);
+        message += newTags.join('·') + '\n\n';
+        message += '话题列表：\n';
+        message += topicNames.join('\n');
+        if (validRows.length > 5) {
+            message += '\n... 等 ' + (validRows.length - 5) + ' 个';
+        }
+        if (skippedTopics.length > 0) {
+            message += '\n\n（' + skippedTopics.length + ' 个话题不符合修改条件，已跳过）';
+        }
+        
+        if (confirm(message)) {
+            var modifiedCount = 0;
+            validRows.forEach(function(row) {
+                var cells = row.querySelectorAll('td');
+                if (cells.length > 18) {
+                    var tagCell = cells[18];
+                    var currentTags = tagCell.textContent.trim();
+                    
+                    // 解析当前标签，保留用户没有修改的标签
+                    var existingTags = currentTags && currentTags !== '-' ? currentTags.split('·') : [];
+                    var finalTags = [];
+                    
+                    // 保留用户没有修改的现有标签
+                    existingTags.forEach(function(tag) {
+                        tag = tag.trim();
+                        // 如果用户选择了该类别的新标签，则移除旧的
+                        if (popularity && (tag === '特色' || tag === '非特色')) return;
+                        if (period && (tag === '长期' || tag === '短期')) return;
+                        if (frequency && (tag === '高频' || tag === '低频')) return;
+                        if (attribute && (tag === '官方' || tag === '非官方')) return;
+                        
+                        finalTags.push(tag);
+                    });
+                    
+                    // 添加新的标签
+                    if (popularity) finalTags.push(popularity);
+                    if (period) finalTags.push(period);
+                    if (frequency) finalTags.push(frequency);
+                    if (attribute) finalTags.push(attribute);
+                    
+                    // 更新显示
+                    var displayText = finalTags.length > 0 ? finalTags.join('·') : '-';
+                    tagCell.textContent = displayText;
+                    
+                    modifiedCount++;
+                }
+            });
+            
+            alert('✓ 已批量修改 ' + modifiedCount + ' 个话题的标签\n\n（演示模式，暂无后端功能）');
+            
+            // 重置标签选择器
+            document.getElementById('batch-label-popularity').value = '';
+            document.getElementById('batch-label-period').value = '';
+            document.getElementById('batch-label-frequency').value = '';
+            document.getElementById('batch-label-attribute').value = '';
+            
+            this.updateBatchOperationUI();
+        }
+    },
+    
+    // ===== 批量下线 =====
+    batchOffline: function() {
+        var selectedRows = this.getSelectedRows();
+        
+        if (selectedRows.length === 0) {
+            alert('请先选择要操作的话题');
+            return;
+        }
+        
+        var message = '确认批量下线以下 ' + selectedRows.length + ' 个话题？\n\n';
+        var topicNames = selectedRows.slice(0, 5).map(function(row) {
+            return row.querySelector('a[href*="topic_subject_info_list"]').textContent.trim();
+        });
+        message += topicNames.join('\n');
+        if (selectedRows.length > 5) {
+            message += '\n... 等 ' + (selectedRows.length - 5) + ' 个';
+        }
+        
+        if (confirm(message)) {
+            selectedRows.forEach(function(row) {
+                var checkbox = row.querySelector('input[name="id[]"]');
+                if (checkbox) checkbox.checked = false;
+            });
+            
+            alert('✓ 已批量下线 ' + selectedRows.length + ' 个话题\n\n（演示模式，暂无后端功能）');
+            this.updateBatchOperationUI();
+        }
+    }
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    window._TOPIC_PROMOTION.init();
+});
+</script>
+<style id="__req_tip_style2__">
+.req-anno-btn{display:inline-block;background:#e67e00;color:#fff;border:none;border-radius:3px;
+  padding:1px 7px;font-size:11px;line-height:18px;cursor:pointer;margin-right:8px;
+  vertical-align:middle;font-weight:600;opacity:.9}
+.req-anno-btn:hover{background:#cf6c00;opacity:1}
+.req-anno-box{display:none}
+#__req_modal__ *{box-sizing:border-box}
+</style>
+<script>
+function toggleReqAnno(btn) {
+  var box = btn.parentElement.querySelector('.req-anno-box');
+  if (!box) return;
+  if (document.getElementById('__req_modal__')) return;
+  var ov = document.createElement('div');
+  ov.id = '__req_modal__';
+  ov.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);'
+    + 'z-index:999998;display:flex;align-items:center;justify-content:center';
+  var card = document.createElement('div');
+  card.style.cssText = 'background:#fff;border-radius:8px;padding:24px 28px 20px;max-width:420px;'
+    + 'width:92%;box-shadow:0 8px 32px rgba(0,0,0,.22);position:relative;border-top:4px solid #e67e00';
+  var cls = document.createElement('button');
+  cls.innerHTML = '&times;';
+  cls.style.cssText = 'position:absolute;top:10px;right:14px;background:none;border:none;'
+    + 'font-size:22px;line-height:1;cursor:pointer;color:#aaa;padding:0';
+  cls.onclick = function () { ov.remove(); };
+  var ttl = document.createElement('div');
+  ttl.style.cssText = 'font-size:13px;font-weight:700;color:#e67e00;margin-bottom:12px;letter-spacing:.5px';
+  ttl.textContent = '📋 需求说明';
+  var body = document.createElement('div');
+  body.style.cssText = 'font-size:12px;color:#5a4000;line-height:1.9;white-space:pre-line;'
+    + 'background:#fffbe6;padding:12px 14px;border-radius:6px;border-left:3px solid #e67e00;'
+    + 'max-height:60vh;overflow-y:auto';
+  body.textContent = box.textContent.trim();
+  card.appendChild(cls); card.appendChild(ttl); card.appendChild(body);
+  ov.appendChild(card);
+  ov.onclick = function (e) { if (e.target === ov) ov.remove(); };
+  document.body.appendChild(ov);
+}
+</script>
+</head>
+<body><div class="" style="display: none; position: absolute;"><div class="aui_outer"><table class="aui_border"><tbody><tbody><tr><td class="aui_nw"></td><td class="aui_n"></td><td class="aui_ne"></td></tr><tr><td class="aui_w"></td><td class="aui_c"><div class="aui_inner"><table class="aui_dialog"><tbody><tr><td colspan="2" class="aui_header"><div class="aui_titleBar"><div class="aui_title" style="cursor: move; display: block;"></div><a class="aui_close" href="javascript:/*artDialog*/;" style="display: block;">×</a></div></td></tr><tr><td class="aui_icon" style="display: none;"><div class="aui_iconBg" style="background: none;"></div></td><td class="aui_main" style="width: auto; height: auto;"><div class="aui_content" style="padding: 20px 25px;"></div></td></tr><tr><td colspan="2" class="aui_footer"><div class="aui_buttons" style="display: none;"></div></td></tr></tbody></tbody></table></div></td><td class="aui_e"></td></tr><tr><td class="aui_sw"></td><td class="aui_s"></td><td class="aui_se" style="cursor: se-resize;"></td></tr></tbody></table></div></div>
+		<div id="top" class="tops"><div class="top_menu">
+	<nav class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <a class="navbar-brand" href="/">运营系统</a>
+          </div>
+          <div id="navbar" class="navbar-collapse collapse">
+		   <ul class="nav navbar-nav navbar-nav-top">
+
+		                                                                                                                                            <li><a href="http://admin.seeyouyima.com/topic/topic_list">帖子管理</a></li>
+                                                                                            <li><a href="http://admin.seeyouyima.com/topic/review_list">评论管理</a></li>
+                                                                                            <li><a href="http://admin.seeyouyima.com/circle/circle_list">圈子管理</a></li>
+                                                                                            <li class="active"><a href="http://admin.seeyouyima.com/topic/subject_list">话题管理</a></li>
+                                                                                            <li><a href="http://admin.seeyouyima.com/circle_main/circle_main_list">圈主管理</a></li>
+                                                                                            <li><a href="http://admin.seeyouyima.com/qa_star/audit_page">问答之星</a></li>
+                                                                                            <li><a href="http://admin.seeyouyima.com/warm_star/warm_star_list">潜在暖评之星列表</a></li>
+                                                                                            <li><a href="http://admin.seeyouyima.com/topic/topic_new_user_list">用户管理</a></li>
+                                                                                            <li><a href="http://admin.seeyouyima.com/complaint/topic_listview">审核管理</a></li>
+                                                                                                                                                                                                                                                                                            <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"> 更多 <span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <li><a href="http://admin.seeyouyima.com/config_manage/aliyun_image_config">配置管理</a></li>
+                                                                                                                                <li><a href="http://admin.seeyouyima.com/circle/home_recommend_circle">她她圈首页配置</a></li>
+                                                                                                                                <li><a href="http://admin.seeyouyima.com/ttq_contribute/task_user_page">贡献榜任务管理</a></li>
+                                                                                                                                <li><a href="http://admin.seeyouyima.com/systemlog/forum_master_log">统计管理</a></li>
+                                                                                                                                <li><a href="http://admin.seeyouyima.com/warm_star/warm_star_list">潜在暖评之星</a></li>
+                                                                                    </ul>
+                    </li>
+                		    
+           </ul>
+
+
+            <ul class="nav navbar-nav navbar-right">
+            <li id="hasmsg" class="topinfo" style="display:none" onclick="this.style.display=&quot;none&quot;;location.href=&quot;/topic/fakeuser_message&quot;;"><img src="../front/img/email.png" class="topinfo-img"></li>
+            <li class="navbar-nav-login"><a href="#">张家敏</a></li>
+              <li class="dropdown">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> 系统操作 <span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+	                             				  <li><a href="http://auth.seeyouyima.com/index"><span class="glyphicon glyphicon-plus"></span> 选择系统</a></li>
+				  <li><a href="http://auth.seeyouyima.com/login/change_password"><span class="glyphicon glyphicon-repeat"></span> 修改密码</a></li>
+                                  <li><a href="http://auth.seeyouyima.com/login/logout"><span class="glyphicon glyphicon-log-out"></span> 退出登录</a></li>
+                </ul>
+              </li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div><!--/.container-fluid -->
+      </nav>
+</div>
+
+</div>
+		<div id="desc" class="warp">
+		<div id="left" class="warpleft" style="background:#f8f8f8;z-index:1;"><div id="bars" class="bars">
+	<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+	<ul class="nav nav-list nav-left-list">
+			<li class="liselected"><a href="http://admin.seeyouyima.com/topic/subject_list">热议话题列表</a></li>
+			<li><a href="http://admin.seeyouyima.com/subject_rss/subject_rss_list">热议话题关联管理</a></li>
+			<li><a href="http://admin.seeyouyima.com/subject_category/subject_category_list">话题推荐列表管理</a></li>
+			<li><a href="http://admin.seeyouyima.com/subject/subject_experience_subtitle_list">经验锦囊小标题</a></li>
+		</ul>
+	</div>
+</div></div>
+		<div id="right" class="warpright">
+		<style type="text/css">
+    a.visited:visited{color:#82006e;}
+    .badge {
+        margin: 4px;
+    }
+    .aui_content {
+        width: 90%;
+    }
+    #start_time, #end_time {
+        display: inline-block;
+    }
+    .tip{
+        position: relative;
+        margin: 10px;
+        z-index: 1000;
+    }
+    .tip.la svg{
+        width: 20px;
+        height: 20px;
+    }
+    .tip ul{
+        display: none;
+        position: absolute;
+    }
+    .tip:hover ul {
+        display: block;
+        left: -400px;
+        padding: 10px;
+        width: 400px;
+        background: #fff;
+        -webkit-box-shadow: 0 1px 15px 1px rgba(69,65,78,.1);
+        -moz-box-shadow: 0 1px 15px 1px rgba(69,65,78,.1);
+        box-shadow: 0 1px 15px 1px rgba(69,65,78,.1);
+    }
+    .tip ul li {
+        list-style: none;
+        font-size: 14px;
+        color: #6f727d;
+        margin-bottom: 10px;
+    }
+    .tip ul li:last-child{
+        margin-bottom: 0;
+    }
+</style>
+<link href="https://admin.seeyouyima.com/front/css/bootstrap/bootstrap-multiselect.css" rel="stylesheet">
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/bootstrap-multiselect.js"></script>
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/jquery.shiftcheckbox.js"></script>
+<link href="https://admin.seeyouyima.com/front/css/lightbox.css" rel="stylesheet">
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/lightbox.js"></script>
+    <h4 class="page-header page-header-title pdbtm0">
+        <p>话题管理 &gt; 热议话题列表</p>
+    </h4>
+
+    <div class="cicles">
+        <ul class="nav nav-pills">
+                        <li class="show-data active">
+                <a href="/topic/subject_list">全部</a>
+            </li>
+                        <li class="show-data ">
+                <a href="/topic/subject_list?search_mode=4">
+                    未成年                </a>
+            </li>
+                        <li class="show-data ">
+                <a href="/topic/subject_list?search_mode=0">
+                    经期                </a>
+            </li>
+                        <li class="show-data ">
+                <a href="/topic/subject_list?search_mode=1">
+                    怀孕                </a>
+            </li>
+                        <li class="show-data ">
+                <a href="/topic/subject_list?search_mode=2">
+                    备孕                </a>
+            </li>
+                        <li class="show-data ">
+                <a href="/topic/subject_list?search_mode=3">
+                    辣妈                </a>
+            </li>
+            
+            <div class="pull-right">
+                <i class="tip la">
+                    <svg t="1524020932751" class="icon" style="" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="577" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><defs><style type="text/css"></style></defs><path d="M513.022283 310.881446m-67.039859 0a67.039859 67.039859 0 1 0 134.079718 0 67.039859 67.039859 0 1 0-134.079718 0Z" p-id="578" fill="#333333"></path><path d="M468.329385 467.306078h89.385796v312.850288h-89.385796z" p-id="579" fill="#333333"></path><path d="M513.022283 65.069995c-246.831688 0-446.928982 200.097294-446.928982 446.928982s200.097294 446.928982 446.928982 446.928982 446.928982-200.097294 446.928982-446.928982-200.096271-446.928982-446.928982-446.928982z m0 849.165066c-222.148519 0-402.236084-180.087565-402.236084-402.236084S290.873764 109.762893 513.022283 109.762893s402.236084 180.087565 402.236084 402.236084S735.171826 914.235061 513.022283 914.235061z" p-id="580" fill="#333333"></path></svg>
+                    <ul>
+                        <li>计算规则：话题数据只增不减</li>
+                        <li>1、话题曝光：话题本身的曝光量，统计位置：首页feeds流左上角小粉的曝光、发布器的曝光（不含分类）、任务中心-每日任务曝光、任务中心-发帖灵感曝光</li>
+                        <li>2、话题点击：话题本身的点击，统计位置：首页feeds流左上角小粉的点击、发布器的点击（不含分类）、任务中心-每日任务点击、任务中心-发帖灵感点击</li>
+                        <li>3、总曝光：带话题帖子曝光量之和 </li>
+                        <li>4、总阅读：同前端展示：总阅读=真实阅读量+虚拟阅读量</li>
+                        <li>5、总讨论：同前端展示：总讨论=真实发帖量 + 真实评论数+虚拟讨论量</li>
+                        <li>6、总点赞：带话题帖子点赞量之和</li>
+                        <li>7、总评论： 带话题帖子评论量之和</li>
+                        <li>8、总收藏：带话题帖子收藏量之和</li>
+                        <li>9、总抱抱：带话题帖子抱抱数之和</li>
+                        <li>10、总互动：总点赞量+总评论量+总收藏量+总抱抱数，之和</li>
+                        <li>11、总互动率：总互动量/总阅读量</li>
+                    </ul>
+                </i>
+            </div>
+        </ul>
+    </div>
+
+    <div class="row" style="margin: 5px;">
+        <div class="col-xs-12">
+            <form id="fom" class="form-inline">
+                <!-- <div class="form-group">
+                    <label>圈子：</label>
+                    <div class="form-group searchbox">
+                        <select id="forum_ids" name="forum_ids[]" multiple="multiple">
+                                                            <option value="20" >穿衣搭配社</option>
+                                                            <option value="23" >减肥瘦身馆</option>
+                                                            <option value="24" >职场小白记</option>
+                                                            <option value="27" >我是大学生</option>
+                                                            <option value="29" >我是追剧王</option>
+                                                            <option value="30" >美妆进行时</option>
+                                                            <option value="35" >娱乐大爆炸</option>
+                                                            <option value="39" >护肤养颜馆</option>
+                                                            <option value="41" >我们爱自拍</option>
+                                                            <option value="48" >美丽微整形</option>
+                                                            <option value="49" >产后调理区</option>
+                                                            <option value="74" >健身塑形馆</option>
+                                                            <option value="79" >饰品搭配帮</option>
+                                                            <option value="97" >综艺大爆炸</option>
+                                                            <option value="98" >电影集结号</option>
+                                                            <option value="3301" >轻奢日记</option>
+                                                            <option value="5659" >热点先锋队</option>
+                                                            <option value="5763" >丑爆了的穿搭秀</option>
+                                                            <option value="5764" >纹身酷女孩</option>
+                                                            <option value="5776" >美妆评测圈</option>
+                                                            <option value="5784" >古风汉服圈</option>
+                                                            <option value="5791" >幸福小瞬间</option>
+                                                            <option value="5792" >种草与拔草</option>
+                                                            <option value="5796" >产后瘦身馆</option>
+                                                            <option value="5799" >视频爱好者</option>
+                                                            <option value="5814" >小视频挑战</option>
+                                                            <option value="5816" >试用报告圈</option>
+                                                            <option value="5823" >女生安全圈</option>
+                                                            <option value="5827" >向上吧姑娘</option>
+                                                            <option value="5832" >医美吃瓜组</option>
+                                                            <option value="5833" >审美大师班</option>
+                                                            <option value="5835" >励志高中生</option>
+                                                            <option value="5836" >萌新初中生</option>
+                                                            <option value="5839" >全职妈妈圈</option>
+                                                            <option value="5845" >姐姐来帮忙</option>
+                                                            <option value="5914" >我的买金小心得</option>
+                                                            <option value="5916" >产后减肥姐妹圈</option>
+                                                            <option value="13" >婚后生活圈</option>
+                                                            <option value="26" >爱情碎碎念</option>
+                                                            <option value="34" >婚嫁进行时</option>
+                                                            <option value="36" >失恋少女收容所</option>
+                                                            <option value="37" >单身大联盟</option>
+                                                            <option value="82" >婆媳麻辣烫</option>
+                                                            <option value="94" >技术测试</option>
+                                                            <option value="204" >测试测试</option>
+                                                            <option value="206" >测试圈4</option>
+                                                            <option value="5647" >闺蜜小日常</option>
+                                                            <option value="5650" >亲情讨论区</option>
+                                                            <option value="5750" >爱之初体验</option>
+                                                            <option value="5768" >家暴互助联盟</option>
+                                                            <option value="5783" >深夜卧谈会</option>
+                                                            <option value="15" >孕早期妈咪</option>
+                                                            <option value="32" >孕中期妈咪</option>
+                                                            <option value="33" >孕晚期妈咪</option>
+                                                            <option value="69" >男女都是宝</option>
+                                                            <option value="87" >宝宝取名字</option>
+                                                            <option value="109" >待产包攻略</option>
+                                                            <option value="167" >孕期营养圈</option>
+                                                            <option value="5646" >17年1月同龄圈</option>
+                                                            <option value="5653" >17年2月同龄圈</option>
+                                                            <option value="5654" >17年3月同龄圈</option>
+                                                            <option value="5657" >17年4月同龄圈</option>
+                                                            <option value="5658" >17年5月同龄圈</option>
+                                                            <option value="5662" >17年6月同龄圈</option>
+                                                            <option value="5663" >17年7月同龄圈</option>
+                                                            <option value="5684" >17年8月同龄圈</option>
+                                                            <option value="5686" >17年9月同龄圈</option>
+                                                            <option value="5687" >17年10月同龄圈</option>
+                                                            <option value="5715" >17年11月同龄圈</option>
+                                                            <option value="5717" >17年12月同龄圈</option>
+                                                            <option value="5718" >18年1月同龄圈</option>
+                                                            <option value="5719" >18年2月同龄圈</option>
+                                                            <option value="5721" >18年3月同龄圈</option>
+                                                            <option value="5722" >18年4月同龄圈</option>
+                                                            <option value="5724" >18年5月同龄圈</option>
+                                                            <option value="5725" >18年6月同龄圈</option>
+                                                            <option value="5727" >18年7月同龄圈</option>
+                                                            <option value="5729" >18年8月同龄圈</option>
+                                                            <option value="5730" >18年9月同龄圈</option>
+                                                            <option value="5734" >18年10月同龄圈</option>
+                                                            <option value="5735" >18年11月同龄圈</option>
+                                                            <option value="5737" >18年12月同龄圈</option>
+                                                            <option value="5745" >幸福孕照圈</option>
+                                                            <option value="5746" >我要生了</option>
+                                                            <option value="5747" >消灭妊娠纹</option>
+                                                            <option value="5774" >19年1月同龄圈</option>
+                                                            <option value="5780" >19年2月同龄圈</option>
+                                                            <option value="5781" >19年3月同龄圈</option>
+                                                            <option value="5788" >19年4月同龄圈</option>
+                                                            <option value="5795" >孕期美美哒</option>
+                                                            <option value="5807" >19年5月同龄圈</option>
+                                                            <option value="5808" >19年7月同龄圈</option>
+                                                            <option value="5809" >19年6月同龄圈</option>
+                                                            <option value="5812" >19年8月同龄圈</option>
+                                                            <option value="5815" >19年9月同龄圈</option>
+                                                            <option value="5817" >19年10月同龄圈</option>
+                                                            <option value="5819" >19年11月同龄圈</option>
+                                                            <option value="5820" >19年12月同龄圈</option>
+                                                            <option value="5821" >20年1月同龄圈</option>
+                                                            <option value="5822" >20年2月同龄圈</option>
+                                                            <option value="5824" >20年3月同龄圈</option>
+                                                            <option value="5825" >20年4月同龄圈</option>
+                                                            <option value="5828" >20年5月同龄圈</option>
+                                                            <option value="5829" >20年6月同龄圈</option>
+                                                            <option value="5830" >20年7月同龄圈</option>
+                                                            <option value="5831" >20年8月同龄圈</option>
+                                                            <option value="5837" >20年9月同龄圈</option>
+                                                            <option value="5838" >20年10月同龄圈</option>
+                                                            <option value="5840" >20年11月同龄圈</option>
+                                                            <option value="5842" >20年12月同龄圈</option>
+                                                            <option value="5843" >21年1月同龄圈</option>
+                                                            <option value="5844" >21年2月同龄圈</option>
+                                                            <option value="5846" >21年3月同龄圈</option>
+                                                            <option value="5847" >21年4月同龄圈</option>
+                                                            <option value="5848" >21年5月同龄圈</option>
+                                                            <option value="5849" >21年6月同龄圈</option>
+                                                            <option value="5850" >21年7月同龄圈</option>
+                                                            <option value="5851" >21年8月同龄圈</option>
+                                                            <option value="5852" >21年9月同龄圈</option>
+                                                            <option value="5853" >21年10月同龄圈</option>
+                                                            <option value="5855" >21年11月同龄圈</option>
+                                                            <option value="5856" >21年12月同龄圈</option>
+                                                            <option value="5857" >22年1月同龄圈</option>
+                                                            <option value="5858" >22年2月同龄圈</option>
+                                                            <option value="5859" >22年3月同龄圈</option>
+                                                            <option value="5860" >22年4月同龄圈</option>
+                                                            <option value="5861" >22年5月同龄圈</option>
+                                                            <option value="5862" >22年6月同龄圈</option>
+                                                            <option value="5863" >22年7月同龄圈</option>
+                                                            <option value="5864" >22年8月同龄圈</option>
+                                                            <option value="5865" >22年9月同龄圈</option>
+                                                            <option value="5866" >22年10月同龄圈</option>
+                                                            <option value="5867" >22年11月同龄圈</option>
+                                                            <option value="5868" >22年12月同龄圈</option>
+                                                            <option value="5869" >23年1月同龄圈</option>
+                                                            <option value="5870" >23年2月同龄圈</option>
+                                                            <option value="5871" >23年3月同龄圈</option>
+                                                            <option value="5872" >23年4月同龄圈</option>
+                                                            <option value="5873" >23年5月同龄圈</option>
+                                                            <option value="5874" >23年6月同龄圈</option>
+                                                            <option value="5875" >23年7月同龄圈</option>
+                                                            <option value="5876" >23年8月同龄圈</option>
+                                                            <option value="5877" >23年9月同龄圈</option>
+                                                            <option value="5878" >23年10月同龄圈</option>
+                                                            <option value="5879" >23年11月同龄圈</option>
+                                                            <option value="5880" >23年12月同龄圈</option>
+                                                            <option value="5881" >24年1月同龄圈</option>
+                                                            <option value="5882" >24年2月同龄圈</option>
+                                                            <option value="5883" >24年3月同龄圈</option>
+                                                            <option value="5884" >24年4月同龄圈</option>
+                                                            <option value="5885" >24年5月同龄圈</option>
+                                                            <option value="5886" >24年6月同龄圈</option>
+                                                            <option value="5887" >24年7月同龄圈</option>
+                                                            <option value="5888" >24年8月同龄圈</option>
+                                                            <option value="5889" >24年9月同龄圈</option>
+                                                            <option value="5890" >24年10月同龄圈</option>
+                                                            <option value="5891" >24年11月预产圈</option>
+                                                            <option value="5892" >24年12月预产圈</option>
+                                                            <option value="5893" >25年1月预产圈</option>
+                                                            <option value="5902" >25年2月预产圈</option>
+                                                            <option value="5903" >25年3月预产圈</option>
+                                                            <option value="5904" >25年4月预产圈</option>
+                                                            <option value="5905" >25年5月预产圈</option>
+                                                            <option value="5906" >25年6月预产圈</option>
+                                                            <option value="5907" >25年7月预产圈</option>
+                                                            <option value="5908" >25年8月预产圈</option>
+                                                            <option value="5909" >25年9月预产圈</option>
+                                                            <option value="5910" >25年10月预产圈</option>
+                                                            <option value="5911" >25年11月预产圈</option>
+                                                            <option value="5912" >25年12月预产圈</option>
+                                                            <option value="5913" >26年1月预产圈</option>
+                                                            <option value="5915" >怀孕每天吃什么</option>
+                                                            <option value="5917" >26年2月预产圈</option>
+                                                            <option value="5918" >26年3月预产圈</option>
+                                                            <option value="5919" >26年4月预产圈</option>
+                                                            <option value="5921" >26年5月预产圈</option>
+                                                            <option value="5922" >26年6月预产圈</option>
+                                                            <option value="5923" >26年7月预产圈</option>
+                                                            <option value="5924" >26年8月预产圈</option>
+                                                            <option value="5925" >26年9月预产圈</option>
+                                                            <option value="5926" >26年10月预产圈</option>
+                                                            <option value="5927" >26年11月预产圈</option>
+                                                            <option value="5928" >26年12月预产圈</option>
+                                                            <option value="5929" >27年1月预产圈</option>
+                                                            <option value="25" >萌宝大秀场</option>
+                                                            <option value="45" >7-12月宝宝</option>
+                                                            <option value="46" >1-3岁宝宝</option>
+                                                            <option value="47" >0-6月宝宝</option>
+                                                            <option value="50" >宝宝教育圈</option>
+                                                            <option value="51" >宝宝营养圈</option>
+                                                            <option value="52" >母婴用品汇</option>
+                                                            <option value="91" >母乳喂养圈</option>
+                                                            <option value="171" >闲置交易圈</option>
+                                                            <option value="219" >两宝圈</option>
+                                                            <option value="5652" >单亲妈妈说</option>
+                                                            <option value="5664" >营养辅食圈</option>
+                                                            <option value="5666" >幼儿园宝宝</option>
+                                                            <option value="5713" >家有两宝圈</option>
+                                                            <option value="5714" >宝宝常见病</option>
+                                                            <option value="5749" >疫苗时间表</option>
+                                                            <option value="5805" >亲子教育圈</option>
+                                                            <option value="5854" >早产儿护理</option>
+                                                            <option value="19" >试纸观察站</option>
+                                                            <option value="22" >健康养生馆</option>
+                                                            <option value="28" >经期讨论区</option>
+                                                            <option value="67" >孕前检查站</option>
+                                                            <option value="68" >难孕交流区</option>
+                                                            <option value="70" >备孕交流区</option>
+                                                            <option value="75" >妇科讨论区</option>
+                                                            <option value="116" >女生用品区</option>
+                                                            <option value="153" >胎停再战区</option>
+                                                            <option value="189" >乳房保健区</option>
+                                                            <option value="215" >试管婴儿圈</option>
+                                                            <option value="220" >避孕私房话</option>
+                                                            <option value="5712" >我要生二胎</option>
+                                                            <option value="5920" >互医病例交流圈</option>
+                                                            <option value="159" >美腿秘籍站</option>
+                                                            <option value="161" >我要小蛮腰</option>
+                                                            <option value="5786" > 每天一点正能量</option>
+                                                            <option value="16" >美食厨房厅</option>
+                                                            <option value="17" >星座测试圈</option>
+                                                            <option value="40" >异次元萌妹</option>
+                                                            <option value="42" >居家生活馆</option>
+                                                            <option value="43" >就是爱旅行</option>
+                                                            <option value="53" >小说阅读室</option>
+                                                            <option value="54" >园艺植物控</option>
+                                                            <option value="76" >手工爱好者</option>
+                                                            <option value="229" >一起闲扯淡</option>
+                                                            <option value="3302" >女司机上路</option>
+                                                            <option value="5772" >萌宠爱好者</option>
+                                                            <option value="5777" >欢乐搞笑菌</option>
+                                                            <option value="5811" >好物种草圈</option>
+                                                            <option value="5834" >游戏少女社</option>
+                                                            <option value="5797" >直男</option>
+                                                            <option value="84" >福建同城汇</option>
+                                                            <option value="5667" >厦门同城圈</option>
+                                                            <option value="5668" >郑州同城圈</option>
+                                                            <option value="5669" >广州同城圈</option>
+                                                            <option value="5670" >深圳同城圈</option>
+                                                            <option value="5671" >内江同城圈</option>
+                                                            <option value="5672" >杭州同城圈</option>
+                                                            <option value="5673" >石家庄同城圈</option>
+                                                            <option value="5674" >西安同城圈</option>
+                                                            <option value="5675" >上海同城圈</option>
+                                                            <option value="5676" >北京同城圈</option>
+                                                            <option value="5677" >广东同城汇</option>
+                                                            <option value="5678" >河南同城汇</option>
+                                                            <option value="5679" >浙江同城汇</option>
+                                                            <option value="5680" >江苏同城汇</option>
+                                                            <option value="5681" >山东同城汇</option>
+                                                            <option value="5682" >四川同城汇</option>
+                                                            <option value="5683" >河北同城汇</option>
+                                                            <option value="5894" >苏州同城圈</option>
+                                                            <option value="5895" >重庆同城圈</option>
+                                                            <option value="5896" >成都同城圈</option>
+                                                            <option value="5897" >云南同城汇</option>
+                                                            <option value="5898" >安徽同城汇</option>
+                                                            <option value="5899" >湖北同城汇</option>
+                                                            <option value="5900" >湖南同城汇</option>
+                                                            <option value="5901" >陕西同城汇</option>
+                                                            <option value="85" >广州玩乐购</option>
+                                                            <option value="89" >北京玩乐购</option>
+                                                            <option value="90" >上海玩乐购</option>
+                                                            <option value="205" >测试圈3</option>
+                                                            <option value="207" >测试5</option>
+                                                            <option value="208" >测圈子3</option>
+                                                            <option value="212" >测试圈3454</option>
+                                                            <option value="224" >她她服务圈</option>
+                                                            <option value="233" >新闻资讯</option>
+                                                            <option value="5649" >志愿者联盟</option>
+                                                            <option value="5688" >活动与互动</option>
+                                                            <option value="5716" >社区内部圈</option>
+                                                            <option value="5723" >圈务办公区</option>
+                                                            <option value="5841" >祈福护佑圈</option>
+                                                    </select>
+                    </div>
+                </div> -->
+                <div class="form-group">
+                    <label>热议话题名称或ID：</label>
+                    <div class="form-group">
+                        <input name="search_name" type="text" class="form-control w150" value="" placeholder="名称或ID">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>状态：</label>
+                    <div class="form-group searchbox">
+                        <select class="form-control" name="search_status">
+                            <option value="">不限</option>
+                            <option value="1">上线</option>
+                            <option value="2">下线</option>
+                            <option value="10">待审核</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>卡片模式：</label>
+                    <div class="form-group searchbox">
+                        <select class="form-control" name="search_card_mode">
+                            <option value="">不限</option>
+                            <option value="0">关闭</option>
+                            <option value="1">排行</option>
+                            <option value="2">配置</option>
+                            <option value="3">品牌定制（H5）</option>
+                            <option value="4">柚任务（广告）</option>
+                            <option value="5">经验锦囊</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>来源：</label>
+                    <div class="form-group searchbox">
+                        <select class="form-control" name="search_source">
+                            <option value="">不限</option>
+                            <option value="1">用户</option>
+                            <option value="2">运营</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>【热】标识：</label>
+                    <div class="form-group searchbox">
+                        <select class="form-control" name="is_show_hot">
+                            <option value="">不限</option>
+                            <option value="1">展示</option>
+                            <option value="2">不展示</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>是否在首页透出：</label>
+                    <div class="form-group searchbox">
+                        <select class="form-control" name="show_in_feeds">
+                            <option value="">全部</option>
+                            <option value="0">否</option>
+                            <option value="1">是</option>
+                        </select>
+                    </div>
+                </div>
+                <br><br>
+                <div class="form-group">
+                    <label>责任编辑：</label>
+                    <div class="form-group">
+                        <input name="admin_name" type="text" class="form-control w150" placeholder="责任编辑" value="">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>创建时间：</label>
+                    <div class="form-group">
+                        <input name="cd_start" type="text" class="form-control w150" style="display:inline-block;" placeholder="开始时间" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',  startDate:'%y-%M-%d 00:00:00', alwaysUseStartDate:true})" value="">--
+                        <input name="cd_end" type="text" class="form-control w150" style="display:inline-block;" placeholder="结束时间" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',  startDate:'%y-%M-%d 00:00:00', alwaysUseStartDate:true})" value="">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>是否达人：</label>
+                    <div class="form-group searchbox">
+                        <select class="form-control" name="user_role">
+                            <option value="">不限</option>
+                            <option value="1">普通用户</option>
+                            <option value="2">达人</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>是否有副标题：</label>
+                    <div class="form-group searchbox">
+                        <select class="form-control" name="contain_sub_title">
+                            <option value="">不限</option>
+                            <option value="1">是</option>
+                            <option value="2">否</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>快速筛选：</label>
+                    <div class="form-group searchbox">
+                        <label style="margin-right:20px;">
+                            <input type="checkbox" name="quick_filter" id="quick_filter" value="1">
+                            <button type="button" class="req-anno-btn" onclick="toggleReqAnno(this)" style="margin-left:4px">需求说明</button>
+                            发帖数≥
+                            <input type="number" id="post_count_threshold" value="50" min="1" max="9999" style="width:45px;padding:2px 4px;border:1px solid #ddd;border-radius:3px;font-size:12px">
+                            <div class="req-anno-box">【快速筛选-发帖数】
+
+用于快速筛选发帖数达到阈值的话题。
+
+- 启用后，将只显示发帖数≥阈值的话题
+- 默认阈值：50
+- 支持自定义阈值（1-9999）</div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 批量操作工具栏 -->
+                <div id="batch-operation-panel" class="form-group" style="display:none;background:#f5f5f5;padding:12px 15px;border-radius:4px;margin:10px 0;border-left:3px solid #ff4d88">
+                    <span style="margin-right:20px;font-weight:600;color:#333">
+                        ✓ 已选择 <span id="batch-selected-count" style="color:#ff4d88">0</span> 个话题
+                    </span>
+                    <button type="button" class="btn btn-sm" onclick="window._TOPIC_PROMOTION.batchToggleSelect(true)" style="background:#fff;border:1px solid #ddd;padding:4px 12px;margin-right:8px;cursor:pointer;font-size:12px">全选当前页</button>
+                    <button type="button" class="btn btn-sm" onclick="window._TOPIC_PROMOTION.batchToggleSelect(false)" style="background:#fff;border:1px solid #ddd;padding:4px 12px;margin-right:15px;cursor:pointer;font-size:12px">取消选择</button>
+                    
+                    <!-- 批量修改标签 -->
+                    <div style="margin-top:15px;padding-top:15px;border-top:1px solid #ddd">
+                        <label style="font-weight:600;color:#333;display:block;margin-bottom:10px">批量修改话题标签：</label>
+                        <div style="display:flex;gap:15px;flex-wrap:wrap">
+                            <div>
+                                <label style="font-size:12px;color:#666">热度：</label>
+                                <select id="batch-label-popularity" class="form-control" style="width:100px;display:inline-block;padding:4px 8px;font-size:12px">
+                                    <option value="">-- 不修改 --</option>
+                                    <option value="特色">特色</option>
+                                    <option value="非特色">非特色</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="font-size:12px;color:#666">周期：</label>
+                                <select id="batch-label-period" class="form-control" style="width:100px;display:inline-block;padding:4px 8px;font-size:12px">
+                                    <option value="">-- 不修改 --</option>
+                                    <option value="长期">长期</option>
+                                    <option value="短期">短期</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="font-size:12px;color:#666">频率：</label>
+                                <select id="batch-label-frequency" class="form-control" style="width:100px;display:inline-block;padding:4px 8px;font-size:12px">
+                                    <option value="">-- 不修改 --</option>
+                                    <option value="高频">高频</option>
+                                    <option value="低频">低频</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="font-size:12px;color:#666">属性：</label>
+                                <select id="batch-label-attribute" class="form-control" style="width:100px;display:inline-block;padding:4px 8px;font-size:12px">
+                                    <option value="">-- 不修改 --</option>
+                                    <option value="官方">官方</option>
+                                    <option value="非官方">非官方</option>
+                                </select>
+                            </div>
+                            <button type="button" class="btn btn-sm" onclick="window._TOPIC_PROMOTION.batchModifyTags()" style="background:#ff9900;color:#fff;border:none;padding:4px 12px;cursor:pointer;font-weight:600;font-size:12px;align-self:flex-end">
+                                ✎ 批量修改标签
+                            </button>
+                            <button type="button" class="btn btn-sm" onclick="window._TOPIC_PROMOTION.batchOffline()" style="background:#666;color:#fff;border:none;padding:4px 12px;cursor:pointer;font-weight:600;font-size:12px;align-self:flex-end">
+                                ⬇️ 批量下线
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <button type="button" class="req-anno-btn" onclick="toggleReqAnno(this)">需求说明</button><label>话题标签：</label>
+                    <div class="form-group searchbox">
+                        <select class="form-control" name="topic_tags[]" id="search_topic_tags" multiple>
+                            <option value="1">特色</option>
+                            <option value="2">非特色</option>
+                            <option value="3">长期</option>
+                            <option value="4">短期</option>
+                            <option value="5">高频</option>
+                            <option value="6">低频</option>
+                            <option value="7">官方</option>
+                            <option value="8">非官方</option>
+                        </select>
+                    
+                    <div class="req-anno-box">【筛选：话题标签】
+可多选，按话题的特色/频率/周期/官方属性组合筛选；
+不选默认不限。各标签含义见表单页字段说明。</div>
+                </div>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="pull-right right-btn">搜索</button>
+                </div>
+                <div class="form-group">
+                    <button type="button" class="pull-right right-btn preview">预览</button>
+                </div>
+                <div class="form-group">
+                    <button type="button" class="pull-right right-btn export">导出</button>
+                </div>
+                <label>
+                *单次导出最多1w条
+                </label>
+                <div class="form-group pull-right" style="margin-left: 10px;">
+                    <button type="button" class="right-btn" onclick="window.open('添加热议话题_广告.html?act_type=ad')">添加热议话题（广告使用）</button>
+                </div>
+                <div class="form-group pull-right">
+                    <button type="button" class="right-btn" onclick="window.open('添加热议话题.html?is_new=1')">添加热议话题</button>
+                </div>
+                <input type="hidden" id="order" name="sort_col" value="`id`">
+                <input type="hidden" id="sort" name="sort_type" value="desc">
+                <input type="hidden" id="page_no" name="page_no" value="1">
+                <input type="hidden" id="subject_ids" value="470881,470880,470879,470878,470877,470876,470875,470874,470873,470872,470871,470870,470869,470868,470867,470866,470865,470864,470863,470862,470861,470860,470859,470858,470857,470856,470855,470854,470853,470852,470851,470850,470849,470848,470847,470846,470845,470844,470843,470842,470841,470840,470839,470838,470837,470836,470835,470834,470833,470832">
+                <input type="hidden" name="search_mode" value="">
+            </form>
+        </div>
+    </div>
+
+    <table id="table" class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>名称</th>
+                <th>状态</th>
+                <th>分类</th>
+                <th>话题来源</th>
+                                    <th>适用身份</th>
+                                <th>是否在首页透出</th>
+                <th>发帖</th>
+                <th>话题曝光</th>
+                <th>话题点击</th>
+                <th>总曝光</th>
+                <th>总阅读</th>
+                <th>总讨论</th>
+                <th>总点赞</th>
+                <th>总评论</th>
+                <th>总收藏</th>
+                <th>虚拟阅读</th>
+                <th>虚拟讨论</th>
+                <th style="position:relative"><button type="button" class="req-anno-btn" onclick="toggleReqAnno(this)" style="display:block;margin-bottom:3px;font-size:10px;padding:1px 5px">需求说明</button>话题标签<div class="req-anno-box" style="position:absolute;z-index:9999;left:0;top:100%;width:280px">【话题标签列】
+展示该话题已配置的综合标签，
+格式：特色·高频·长期·官方（按配置显示对应值）；
+"-"表示尚未配置话题标签。</div></th>
+                <th>操作人</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+                        <tr data-id="470881"><td><input class="item" type="checkbox" name="id[]" value="470881" style="margin-left:17px">470881</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470881">豆包真的超准</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>待审核</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">备孕</span>                    </td>
+                <td>否</td>
+                <td>5</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>187</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>186</td>
+                <td>0</td>
+                <td>-</td>
+                <td></td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="豆包真的超准" class="set-status action" data-status="2" data-id="470881">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470881&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470881" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470880"><td><input class="item" type="checkbox" name="id[]" value="470880" style="margin-left:17px">470880</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470880">更换鼻托</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>待审核</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">经期</span>                    </td>
+                <td>否</td>
+                <td>12</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>110</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>109</td>
+                <td>0</td>
+                <td>-</td>
+                <td></td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="更换鼻托" class="set-status action" data-status="2" data-id="470880">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470880&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470880" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470879"><td><input class="item" type="checkbox" name="id[]" value="470879" style="margin-left:17px">470879</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470879">怎么缓解肠胀气</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>待审核</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">辣妈</span>                    </td>
+                <td>否</td>
+                <td>8</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>278</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>278</td>
+                <td>0</td>
+                <td>-</td>
+                <td></td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="怎么缓解肠胀气" class="set-status action" data-status="2" data-id="470879">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470879&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470879" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470878"><td><input class="item" type="checkbox" name="id[]" value="470878" style="margin-left:17px">470878</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470878">求好用的卫生巾和安睡裤</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>待审核</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">未成年</span>                    </td>
+                <td>否</td>
+                <td>15</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>191</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>181</td>
+                <td>0</td>
+                <td>-</td>
+                <td></td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="求好用的卫生巾和安睡裤" class="set-status action" data-status="2" data-id="470878">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470878&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470878" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470877"><td><input class="item" type="checkbox" name="id[]" value="470877" style="margin-left:17px">470877</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470877">治愈自</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">备孕</span>                    </td>
+                <td>否</td>
+                <td>25</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>266</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>265</td>
+                <td>0</td>
+                <td>-</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="治愈自" class="set-status action" data-status="2" data-id="470877">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470877&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470877" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470876"><td><input class="item" type="checkbox" name="id[]" value="470876" style="margin-left:17px">470876</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470876">坐月子的日常饮食</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">辣妈</span>                    </td>
+                <td>否</td>
+                <td>45</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>268</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>267</td>
+                <td>0</td>
+                <td>-</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="坐月子的日常饮食" class="set-status action" data-status="2" data-id="470876">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470876&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470876" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470875"><td><input class="item" type="checkbox" name="id[]" value="470875" style="margin-left:17px">470875</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470875">老一辈带娃那些事</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">辣妈</span>                    </td>
+                <td>否</td>
+                <td>50</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>105</td>
+                <td>1</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>104</td>
+                <td>0</td>
+                <td>非官方</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="老一辈带娃那些事" class="set-status action" data-status="2" data-id="470875">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470875&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470875" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470874"><td><input class="item" type="checkbox" name="id[]" value="470874" style="margin-left:17px">470874</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470874">血脂管理</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">辣妈</span>                    </td>
+                <td>否</td>
+                <td>52</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>254</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>253</td>
+                <td>0</td>
+                <td>非官方</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="血脂管理" class="set-status action" data-status="2" data-id="470874">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470874&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470874" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470873"><td><input class="item" type="checkbox" name="id[]" value="470873" style="margin-left:17px">470873</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470873">胆固醇管理</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">辣妈</span>                    </td>
+                <td>否</td>
+                <td>75</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>191</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>190</td>
+                <td>0</td>
+                <td>非官方</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="胆固醇管理" class="set-status action" data-status="2" data-id="470873">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470873&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470873" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470872"><td><input class="item" type="checkbox" name="id[]" value="470872" style="margin-left:17px">470872</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470872">婴幼儿爽身粉选购心得</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">辣妈</span>                    </td>
+                <td>否</td>
+                <td>100</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>159</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>158</td>
+                <td>0</td>
+                <td>非官方</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="婴幼儿爽身粉选购心得" class="set-status action" data-status="2" data-id="470872">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470872&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470872" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470871"><td><input class="item" type="checkbox" name="id[]" value="470871" style="margin-left:17px">470871</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470871">白鹿出道十周年</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">未成年</span>                    </td>
+                <td>否</td>
+                <td>120</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>130</td>
+                <td>1</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>117</td>
+                <td>0</td>
+                <td>非官方</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="白鹿出道十周年" class="set-status action" data-status="2" data-id="470871">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470871&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470871" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470870"><td><input class="item" type="checkbox" name="id[]" value="470870" style="margin-left:17px">470870</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470870">羊毛群主在线等集美们</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">辣妈</span>                    </td>
+                <td>否</td>
+                <td>88</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>173</td>
+                <td>2</td>
+                <td>0</td>
+                <td>1</td>
+                <td>0</td>
+                <td>171</td>
+                <td>0</td>
+                <td>非官方</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="羊毛群主在线等集美们" class="set-status action" data-status="2" data-id="470870">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470870&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470870" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470869"><td><input class="item" type="checkbox" name="id[]" value="470869" style="margin-left:17px">470869</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470869">睡觉觉要两只小手抱着妈妈的奶奶</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">辣妈</span>                    </td>
+                <td>否</td>
+                <td>65</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>215</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>185</td>
+                <td>0</td>
+                <td>非官方</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="睡觉觉要两只小手抱着妈妈的奶奶" class="set-status action" data-status="2" data-id="470869">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470869&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470869" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470868"><td><input class="item" type="checkbox" name="id[]" value="470868" style="margin-left:17px">470868</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470868">大学生薅羊毛</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">辣妈</span>                    </td>
+                <td>否</td>
+                <td>48</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>293</td>
+                <td>3</td>
+                <td>0</td>
+                <td>1</td>
+                <td>0</td>
+                <td>291</td>
+                <td>0</td>
+                <td>-</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="大学生薅羊毛" class="set-status action" data-status="2" data-id="470868">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470868&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470868" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470867"><td><input class="item" type="checkbox" name="id[]" value="470867" style="margin-left:17px">470867</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470867">宝宝抓周纪念</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">辣妈</span>                    </td>
+                <td>否</td>
+                <td>55</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>150</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>149</td>
+                <td>0</td>
+                <td>非官方</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="宝宝抓周纪念" class="set-status action" data-status="2" data-id="470867">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470867&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470867" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470866"><td><input class="item" type="checkbox" name="id[]" value="470866" style="margin-left:17px">470866</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470866">带着四个月的宝宝结婚啦</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">怀孕</span>                    </td>
+                <td>否</td>
+                <td>110</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>203</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>202</td>
+                <td>0</td>
+                <td>非官方</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="带着四个月的宝宝结婚啦" class="set-status action" data-status="2" data-id="470866">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470866&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470866" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470865"><td><input class="item" type="checkbox" name="id[]" value="470865" style="margin-left:17px">470865</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470865">小孩哥日常</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">怀孕</span>                    </td>
+                <td>否</td>
+                <td>42</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>212</td>
+                <td>2</td>
+                <td>1</td>
+                <td>1</td>
+                <td>0</td>
+                <td>192</td>
+                <td>0</td>
+                <td>-</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="小孩哥日常" class="set-status action" data-status="2" data-id="470865">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470865&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470865" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470864"><td><input class="item" type="checkbox" name="id[]" value="470864" style="margin-left:17px">470864</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470864">最美脚丫</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">辣妈</span>                    </td>
+                <td>否</td>
+                <td>67</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>199</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>179</td>
+                <td>0</td>
+                <td>非官方</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="最美脚丫" class="set-status action" data-status="2" data-id="470864">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470864&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470864" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470863"><td><input class="item" type="checkbox" name="id[]" value="470863" style="margin-left:17px">470863</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470863">高龄妈妈的压力</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">怀孕</span>                    </td>
+                <td>否</td>
+                <td>30</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>328</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>289</td>
+                <td>0</td>
+                <td>-</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="高龄妈妈的压力" class="set-status action" data-status="2" data-id="470863">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470863&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470863" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470862"><td><input class="item" type="checkbox" name="id[]" value="470862" style="margin-left:17px">470862</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470862">巴布豆爱动不漏</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">辣妈</span>                    </td>
+                <td>否</td>
+                <td>95</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>182</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>181</td>
+                <td>0</td>
+                <td>非官方</td>
+                <td>Ashenhe005</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="巴布豆爱动不漏" class="set-status action" data-status="2" data-id="470862">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470862&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470862" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470861"><td><input class="item" type="checkbox" name="id[]" value="470861" style="margin-left:17px">470861</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470861">分享我的NT</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">怀孕</span>                    </td>
+                <td>否</td>
+                <td>58</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>290</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>289</td>
+                <td>0</td>
+                <td>非官方</td>
+                <td>Ashenhe005</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="分享我的NT" class="set-status action" data-status="2" data-id="470861">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470861&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470861" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470860"><td><input class="item" type="checkbox" name="id[]" value="470860" style="margin-left:17px">470860</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470860">始终保不住了</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">怀孕</span>                    </td>
+                <td>否</td>
+                <td>72</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>277</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>276</td>
+                <td>0</td>
+                <td>非官方</td>
+                <td>Ashenhe005</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="始终保不住了" class="set-status action" data-status="2" data-id="470860">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470860&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470860" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470859"><td><input class="item" type="checkbox" name="id[]" value="470859" style="margin-left:17px">470859</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470859">例假推迟了5天</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">备孕</span>                    </td>
+                <td>否</td>
+                <td>18</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>283</td>
+                <td>2</td>
+                <td>1</td>
+                <td>1</td>
+                <td>0</td>
+                <td>283</td>
+                <td>0</td>
+                <td>-</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="例假推迟了5天" class="set-status action" data-status="2" data-id="470859">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470859&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470859" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470858"><td><input class="item" type="checkbox" name="id[]" value="470858" style="margin-left:17px">470858</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470858">接姨妈新鲜热乎的姨妈</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">经期</span>                    </td>
+                <td>否</td>
+                <td>35</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>25</td>
+                <td>3</td>
+                <td>1</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>-</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="接姨妈新鲜热乎的姨妈" class="set-status action" data-status="2" data-id="470858">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470858&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470858" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470857"><td><input class="item" type="checkbox" name="id[]" value="470857" style="margin-left:17px">470857</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470857">小帅男孩</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">怀孕</span>                    </td>
+                <td>否</td>
+                <td>99</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>314</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>286</td>
+                <td>0</td>
+                <td>非官方</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="小帅男孩" class="set-status action" data-status="2" data-id="470857">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470857&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470857" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470856"><td><input class="item" type="checkbox" name="id[]" value="470856" style="margin-left:17px">470856</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470856">真的没踩雷</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">辣妈</span>                    </td>
+                <td>否</td>
+                <td>61</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>268</td>
+                <td>1</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>267</td>
+                <td>0</td>
+                <td>非官方</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="真的没踩雷" class="set-status action" data-status="2" data-id="470856">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470856&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470856" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470855"><td><input class="item" type="checkbox" name="id[]" value="470855" style="margin-left:17px">470855</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470855">美柚记录孕期时光</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">经期</span>                    </td>
+                <td>否</td>
+                <td>37</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>300</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>299</td>
+                <td>0</td>
+                <td>-</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="美柚记录孕期时光" class="set-status action" data-status="2" data-id="470855">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470855&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470855" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470854"><td><input class="item" type="checkbox" name="id[]" value="470854" style="margin-left:17px">470854</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470854">13周了才74斤</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">怀孕</span>                    </td>
+                <td>否</td>
+                <td>82</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>124</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>112</td>
+                <td>0</td>
+                <td>非官方</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="13周了才74斤" class="set-status action" data-status="2" data-id="470854">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470854&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470854" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470853"><td><input class="item" type="checkbox" name="id[]" value="470853" style="margin-left:17px">470853</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470853">驼域益生菌配方驼乳粉</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">备孕</span>                    </td>
+                <td>否</td>
+                <td>15</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>263</td>
+                <td>2</td>
+                <td>0</td>
+                <td>1</td>
+                <td>0</td>
+                <td>261</td>
+                <td>0</td>
+                <td>-</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="驼域益生菌配方驼乳粉" class="set-status action" data-status="2" data-id="470853">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470853&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470853" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470852"><td><input class="item" type="checkbox" name="id[]" value="470852" style="margin-left:17px">470852</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470852">婴儿跳跳椅</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">辣妈</span>                    </td>
+                <td>否</td>
+                <td>51</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>120</td>
+                <td>1</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td>119</td>
+                <td>0</td>
+                <td>非官方</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="婴儿跳跳椅" class="set-status action" data-status="2" data-id="470852">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470852&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470852" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470851"><td><input class="item" type="checkbox" name="id[]" value="470851" style="margin-left:17px">470851</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470851">婴幼儿玩玩具</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">辣妈</span>                    </td>
+                <td>否</td>
+                <td>28</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>166</td>
+                <td>1</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td>165</td>
+                <td>0</td>
+                <td>-</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="婴幼儿玩玩具" class="set-status action" data-status="2" data-id="470851">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470851&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470851" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470850"><td><input class="item" type="checkbox" name="id[]" value="470850" style="margin-left:17px">470850</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470850">五个月大的宝宝</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">辣妈</span>                    </td>
+                <td>否</td>
+                <td>78</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>288</td>
+                <td>1</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td>287</td>
+                <td>0</td>
+                <td>非官方</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="五个月大的宝宝" class="set-status action" data-status="2" data-id="470850">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470850&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470850" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470849"><td><input class="item" type="checkbox" name="id[]" value="470849" style="margin-left:17px">470849</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470849">暑假没作业</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">未成年</span>                    </td>
+                <td>否</td>
+                <td>44</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>146</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>145</td>
+                <td>0</td>
+                <td>-</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="暑假没作业" class="set-status action" data-status="2" data-id="470849">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470849&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470849" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470848"><td><input class="item" type="checkbox" name="id[]" value="470848" style="margin-left:17px">470848</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470848">假期生活碎片</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">未成年</span>                    </td>
+                <td>否</td>
+                <td>68</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>192</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>180</td>
+                <td>0</td>
+                <td>非官方</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="假期生活碎片" class="set-status action" data-status="2" data-id="470848">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470848&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470848" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470847"><td><input class="item" type="checkbox" name="id[]" value="470847" style="margin-left:17px">470847</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470847">多囊月经不规律</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">备孕</span>                    </td>
+                <td>否</td>
+                <td>7</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>173</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>172</td>
+                <td>0</td>
+                <td>-</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="多囊月经不规律" class="set-status action" data-status="2" data-id="470847">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470847&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470847" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470846"><td><input class="item" type="checkbox" name="id[]" value="470846" style="margin-left:17px">470846</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470846">期待宝宝健康</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">怀孕</span>                    </td>
+                <td>否</td>
+                <td>105</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>199</td>
+                <td>1</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>198</td>
+                <td>0</td>
+                <td>非官方</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="期待宝宝健康" class="set-status action" data-status="2" data-id="470846">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470846&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470846" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470845"><td><input class="item" type="checkbox" name="id[]" value="470845" style="margin-left:17px">470845</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470845">回外婆家吃饭宝宝发动啦</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">怀孕</span>                    </td>
+                <td>否</td>
+                <td>22</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>229</td>
+                <td>1</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>228</td>
+                <td>0</td>
+                <td>-</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="回外婆家吃饭宝宝发动啦" class="set-status action" data-status="2" data-id="470845">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470845&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470845" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470844"><td><input class="item" type="checkbox" name="id[]" value="470844" style="margin-left:17px">470844</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470844">吃个蛋糕</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">怀孕</span>                    </td>
+                <td>否</td>
+                <td>91</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>120</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>120</td>
+                <td>0</td>
+                <td>非官方</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="吃个蛋糕" class="set-status action" data-status="2" data-id="470844">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470844&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470844" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470843"><td><input class="item" type="checkbox" name="id[]" value="470843" style="margin-left:17px">470843</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470843">又又又怀孕了</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">辣妈</span>                    </td>
+                <td>否</td>
+                <td>40</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>295</td>
+                <td>2</td>
+                <td>0</td>
+                <td>1</td>
+                <td>0</td>
+                <td>293</td>
+                <td>0</td>
+                <td>-</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="又又又怀孕了" class="set-status action" data-status="2" data-id="470843">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470843&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470843" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470842"><td><input class="item" type="checkbox" name="id[]" value="470842" style="margin-left:17px">470842</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470842">祝大家都顺利过关</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">怀孕</span>                    </td>
+                <td>否</td>
+                <td>73</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>190</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>189</td>
+                <td>0</td>
+                <td>非官方</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="祝大家都顺利过关" class="set-status action" data-status="2" data-id="470842">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470842&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470842" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470841"><td><input class="item" type="checkbox" name="id[]" value="470841" style="margin-left:17px">470841</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470841">npd婆婆</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">辣妈</span>                    </td>
+                <td>否</td>
+                <td>60</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>38</td>
+                <td>1</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>非官方</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="npd婆婆" class="set-status action" data-status="2" data-id="470841">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470841&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470841" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470840"><td><input class="item" type="checkbox" name="id[]" value="470840" style="margin-left:17px">470840</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470840">孕期称体重</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">辣妈</span>                    </td>
+                <td>否</td>
+                <td>32</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>247</td>
+                <td>1</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>246</td>
+                <td>0</td>
+                <td>-</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="孕期称体重" class="set-status action" data-status="2" data-id="470840">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470840&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470840" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470839"><td><input class="item" type="checkbox" name="id[]" value="470839" style="margin-left:17px">470839</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470839">带娃去产检</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">怀孕</span>                    </td>
+                <td>否</td>
+                <td>77</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>164</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>163</td>
+                <td>0</td>
+                <td>非官方</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="带娃去产检" class="set-status action" data-status="2" data-id="470839">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470839&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470839" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470838"><td><input class="item" type="checkbox" name="id[]" value="470838" style="margin-left:17px">470838</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470838">儿子青春期</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">经期</span>                    </td>
+                <td>否</td>
+                <td>19</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>288</td>
+                <td>5</td>
+                <td>0</td>
+                <td>4</td>
+                <td>0</td>
+                <td>285</td>
+                <td>0</td>
+                <td>-</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="儿子青春期" class="set-status action" data-status="2" data-id="470838">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470838&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470838" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470837"><td><input class="item" type="checkbox" name="id[]" value="470837" style="margin-left:17px">470837</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470837">阅读习惯</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">经期</span>                    </td>
+                <td>否</td>
+                <td>84</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>297</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>296</td>
+                <td>0</td>
+                <td>非官方</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="阅读习惯" class="set-status action" data-status="2" data-id="470837">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470837&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470837" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470836"><td><input class="item" type="checkbox" name="id[]" value="470836" style="margin-left:17px">470836</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470836">经典好玩</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">辣妈</span>                    </td>
+                <td>否</td>
+                <td>47</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>214</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>212</td>
+                <td>0</td>
+                <td>-</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="经典好玩" class="set-status action" data-status="2" data-id="470836">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470836&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470836" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470835"><td><input class="item" type="checkbox" name="id[]" value="470835" style="margin-left:17px">470835</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470835">创造力</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">辣妈</span>                    </td>
+                <td>否</td>
+                <td>63</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>204</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>202</td>
+                <td>0</td>
+                <td>非官方</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="创造力" class="set-status action" data-status="2" data-id="470835">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470835&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470835" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470834"><td><input class="item" type="checkbox" name="id[]" value="470834" style="margin-left:17px">470834</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470834">沙盒游戏</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">辣妈</span>                    </td>
+                <td>否</td>
+                <td>11</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>217</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>215</td>
+                <td>0</td>
+                <td>-</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="沙盒游戏" class="set-status action" data-status="2" data-id="470834">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470834&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470834" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470833"><td><input class="item" type="checkbox" name="id[]" value="470833" style="margin-left:17px">470833</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470833">婆婆买给宝宝吃的</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">辣妈</span>                    </td>
+                <td>否</td>
+                <td>39</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>141</td>
+                <td>2</td>
+                <td>0</td>
+                <td>1</td>
+                <td>0</td>
+                <td>141</td>
+                <td>0</td>
+                <td>-</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="婆婆买给宝宝吃的" class="set-status action" data-status="2" data-id="470833">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470833&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470833" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                        <tr data-id="470832"><td><input class="item" type="checkbox" name="id[]" value="470832" style="margin-left:17px">470832</td>
+                <td>
+                    <span style="color: red;"></span>
+                    <a href="/topic/topic_subject_info_list?subject_id=470832">中韩情侣</a>
+                    <span style="color: red;"></span>
+                </td>
+                <td>上线</td>
+                <td></td>
+                <td>用户</td>
+                
+                <td>
+                    <span class="badge">经期</span>                    </td>
+                <td>否</td>
+                <td>87</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>183</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>183</td>
+                <td>0</td>
+                <td>非官方</td>
+                <td>Ashenhe055</td>
+                <td>
+                                            <a href="javascript:void(0);" data-name="中韩情侣" class="set-status action" data-status="2" data-id="470832">下线</a><br>
+                    
+                                            <a href='编辑话题.html?id=470832&amp;search_mode=' class="edit-btn action">编辑</a><br>
+                                        <a href="/topic/topic_subject_info_list?subject_id=470832" class="edit-btn action">内容列表</a>
+                </td>
+                </tr>
+                    </tbody></table>
+        <div class="action border-b">
+		    <input style="margin-left: 0.5%;display:none" type="checkbox" class="check_all">
+		    <input id="offline" class="btn-sumbit" type="button" value="批量下线" style="display:none">
+		    <div id="table_bottom" class="pages">
+    	<div class="page_jump">
+		跳到第 <input id="to_page" type="text" name="to_page" class="form-control" value="1"> 页
+	</div>
+		<div class="page_tp">
+    						                        1            									                        <a href="#" onclick="setSearchForm('order','`id`','sort','desc','2')">2</a>
+												                        <a href="#" onclick="setSearchForm('order','`id`','sort','desc','3')">3</a>
+												                        <a href="#" onclick="setSearchForm('order','`id`','sort','desc','4')">4</a>
+												                        <a href="#" onclick="setSearchForm('order','`id`','sort','desc','5')">5</a>
+															        		<a href="#" onclick="setSearchForm('order','`id`','sort','desc','2')">下一页</a>
+			</div>
+	<div class="page_count">
+		共229938条 <!--第1/4599页-->
+	</div>
+</div>
+<script>
+$(document).ready(function(){
+	$('#to_page').keydown(function(e){
+		if(e.keyCode==13){
+			to_page = $('#to_page').val();
+			if(to_page > 0)
+				setSearchForm('order','`id`','sort','desc',to_page)
+		}
+	});
+
+});
+	
+</script>
+	    </div>
+        
+
+</div>
+<div class="hide" id="set_position_content_html">
+    <form class="form-horizontal">
+        <div class="form-group">
+            <label class="col-sm-2 control-label">清除排序</label>
+            <div class="col-sm-10">
+                <input type="checkbox" value="" class="clear_topic_ordianl">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">排序</label>
+            <div class="col-sm-10">
+                <input type="text" value="" class="form-control w50" id="set_topic_ordianl">
+                <label style="display:none;" class="error">请填写正确的数值(1 ~ 20)</label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">推荐时间</label>
+            <div class="col-sm-10">
+                <input type="text" id="start_time" name="recommend_start_time" class="form-control w150" value="" limit="60">
+                -
+                <input type="text" id="end_time" name="recommend_end_time" class="form-control w150" value="" limit="60">
+            </div>
+        </div>
+        <p class="red">*：在推荐时间内，推荐位置才能生效。</p>
+    </form>
+</div>
+<script type="text/javascript" src="https://admin.seeyouyima.com/front/js/layui/lay/dest/layui.all.js"></script>
+<script>
+
+    $(function(){
+        //互动率数据异步获取并填充，加快页面加载速度
+        fill_in_subject_user_stats();
+
+        $('span.field-show.glyphicon').click(function(event) {
+            $(this).parent().children('.field-show').hide();
+            $(this).parent().children('.field-edit').show();
+        });
+        $('a.field-edit.field-ordinal').click(function(event){
+            var sort_num = $(this).parent().children('input.field-edit').val();
+            sort_num = parseInt(sort_num);
+            if (isNaN(sort_num)) {
+                _alert('请输入数字');
+                return false;
+            }
+            if(sort_num < 1){
+                _alert("最小从1开始~");
+                return;
+            }
+            var id = $(this).parent().parent().data('id');
+
+            // 若前后相同，则不做修改
+            if (sort_num == $(this).parent().children('span').html()) {
+                $(this).parent().children('.field-show').show();
+                $(this).parent().children('.field-edit').hide();
+                return;
+            }
+
+            var _this = $(this);
+            //var subject_id = $('#subject_id').val();
+
+            if (window.isOnUpdateTopicSubjectInfo) {
+                return false;
+            }
+            window.isOnUpdateTopicSubjectInfo = 1;
+            $.ajax({
+                url : '/topic/update_topic_subject_rank',
+                type : 'POST',
+                data : {
+                    id : id,
+                    rank: sort_num
+                },
+                dataType : 'JSON',
+                success : function (data) {
+                    window.isOnUpdateTopicSubjectInfo = 0;
+                    if (data.code == 0) {
+                        _this.parent().children('span.field-show:first').html(sort_num);
+                        _this.parent().children('.field-show').show();
+                        _this.parent().children('.field-edit').hide();
+                        _alert('更新成功');
+                        window.location.reload();
+                    } else {
+                        _alert(data.error);
+                    }
+                },
+                error : function () {
+                    window.isOnUpdateTopicSubjectInfo = 0;
+                },
+                beforeSend : function () {
+                    $('body').append('<img id="global_loading_img" src="https://admin.seeyouyima.com/front/img/loading2.gif" style="position:fixed;top:49%;left:49%;" />');
+                },
+                complete : function () {
+                    $('#global_loading_img').remove();
+                }
+            });
+        });
+
+        $('#search_category_ids').multiselect({
+            includeSelectAllOption: true,
+            enableCaseInsensitiveFiltering: true,
+            buttonText: function(options, select) {
+                if (options.length == 0) {
+                    return '请选择数据 <b class="caret"></b>';
+                }else if(options.length > 1){
+
+                    if(options.length !=($('#search_category_ids').siblings('div').find('li').length-1) && $('#search_category_ids').siblings('div').find('li').eq(0).hasClass('active')){
+                        $('#search_category_ids').siblings('div').find('li').eq(0).removeClass('active');
+                        $('#search_category_ids').siblings('div').find('li').eq(0).find('input').attr('checked',false);
+                    }else if(options.length ==($('#search_category_ids').siblings('div').find('li').length-1) && !$('#search_category_ids').siblings('div').find('li').eq(0).hasClass('active')){
+                        $('#search_category_ids').siblings('div').find('li').eq(0).addClass('active');
+                        $('#search_category_ids').siblings('div').find('li').eq(0).find('input').attr('checked',true);
+                    }
+
+                    return  ' 已选择'+options.length+'个  <b class="caret"></b>';
+                }
+                else {
+                    if($('#search_category_ids').siblings('div').length > 0){
+                        return $('#search_category_ids').siblings('div').find('button').attr('title') + ' <b class="caret"></b>';
+                    }else{
+                        var html = '';
+                        for(var i = 0 ; i < $('#search_category_ids').find('option').length ; i++)
+                        {
+                            if($('#search_category_ids').find('option').eq(i).attr('selected') == 'selected'){
+                                if(html==''){
+                                    html+=$('#search_category_ids').find('option').eq(i).html();
+                                }else{
+                                    html+=','+$('#search_category_ids').find('option').eq(i).html();
+                                }
+                            }
+                        }
+                        return html+' <b class="caret"></b>';
+                    }
+
+
+                }
+            },
+            selectAllText: '全部',
+            selectAllValue: '',
+            maxHeight: 190,
+            buttonWidth: 100
+        });
+
+        $('#search_topic_tags').multiselect({
+            includeSelectAllOption: true,
+            selectAllText: '全部',
+            buttonText: function(options) {
+                if (options.length === 0) return '不限 <b class="caret"></b>';
+                if (options.length > 1) return '已选择' + options.length + '个 <b class="caret"></b>';
+                return options.first().text() + ' <b class="caret"></b>';
+            },
+            maxHeight: 200,
+            buttonWidth: 120
+        });
+
+                $('#forum_ids').multiselect({
+            includeSelectAllOption: true,
+            enableCaseInsensitiveFiltering: true,
+            buttonText: function(options, select) {
+                if (options.length == 0) {
+                    return '请选择数据 <b class="caret"></b>';
+                }else if(options.length > 1){
+
+                    if(options.length !=($('#forum_ids').siblings('div').find('li').length-1) && $('#forum_ids').siblings('div').find('li').eq(0).hasClass('active')){
+                        $('#forum_ids').siblings('div').find('li').eq(0).removeClass('active');
+                        $('#forum_ids').siblings('div').find('li').eq(0).find('input').attr('checked',false);
+                    }else if(options.length ==($('#forum_ids').siblings('div').find('li').length-1) && !$('#forum_ids').siblings('div').find('li').eq(0).hasClass('active')){
+                        $('#forum_ids').siblings('div').find('li').eq(0).addClass('active');
+                        $('#forum_ids').siblings('div').find('li').eq(0).find('input').attr('checked',true);
+                    }
+
+                    return  ' 已选择'+options.length+'个  <b class="caret"></b>';
+                }
+                else{
+                    if($('#forum_ids').siblings('div').length > 0){
+                        return $('#forum_ids').siblings('div').find('button').attr('title') + ' <b class="caret"></b>';
+                    }else{
+                        var html = '';
+                        for(var i = 0 ; i < $('#forum_ids').find('option').length ; i++)
+                        {
+                            if($('#forum_ids').find('option').eq(i).attr('selected') == 'selected'){
+                                if(html==''){
+                                    html+=$('#forum_ids').find('option').eq(i).html();
+                                }else{
+                                    html+=','+$('#forum_ids').find('option').eq(i).html();
+                                }
+                            }
+                        }
+                        return html+' <b class="caret"></b>';
+                    }
+
+
+                }
+            },
+            selectAllText: '全部',
+            selectAllValue: '',
+            maxHeight: 190,
+            buttonWidth: 100
+        });
+
+        category_circles = {"31":[{"forum_id":"20","name":"\u7a7f\u8863\u642d\u914d\u793e"},{"forum_id":"23","name":"\u51cf\u80a5\u7626\u8eab\u9986"},{"forum_id":"30","name":"\u7f8e\u5986\u8fdb\u884c\u65f6"},{"forum_id":"39","name":"\u62a4\u80a4\u517b\u989c\u9986"},{"forum_id":"41","name":"\u6211\u4eec\u7231\u81ea\u62cd"},{"forum_id":"48","name":"\u7f8e\u4e3d\u5fae\u6574\u5f62"},{"forum_id":"74","name":"\u5065\u8eab\u5851\u5f62\u9986"},{"forum_id":"79","name":"\u9970\u54c1\u642d\u914d\u5e2e"},{"forum_id":"5776","name":"\u7f8e\u5986\u8bc4\u6d4b\u5708"},{"forum_id":"5832","name":"\u533b\u7f8e\u5403\u74dc\u7ec4"},{"forum_id":"5833","name":"\u5ba1\u7f8e\u5927\u5e08\u73ed"},{"forum_id":"5914","name":"\u6211\u7684\u4e70\u91d1\u5c0f\u5fc3\u5f97"}],"30":[{"forum_id":"24","name":"\u804c\u573a\u5c0f\u767d\u8bb0"},{"forum_id":"27","name":"\u6211\u662f\u5927\u5b66\u751f"},{"forum_id":"5823","name":"\u5973\u751f\u5b89\u5168\u5708"},{"forum_id":"5827","name":"\u5411\u4e0a\u5427\u59d1\u5a18"},{"forum_id":"5835","name":"\u52b1\u5fd7\u9ad8\u4e2d\u751f"},{"forum_id":"5836","name":"\u840c\u65b0\u521d\u4e2d\u751f"},{"forum_id":"5845","name":"\u59d0\u59d0\u6765\u5e2e\u5fd9"}],"29":[{"forum_id":"29","name":"\u6211\u662f\u8ffd\u5267\u738b"},{"forum_id":"35","name":"\u5a31\u4e50\u5927\u7206\u70b8"},{"forum_id":"97","name":"\u7efc\u827a\u5927\u7206\u70b8"},{"forum_id":"98","name":"\u7535\u5f71\u96c6\u7ed3\u53f7"},{"forum_id":"5659","name":"\u70ed\u70b9\u5148\u950b\u961f"},{"forum_id":"5799","name":"\u89c6\u9891\u7231\u597d\u8005"},{"forum_id":"5814","name":"\u5c0f\u89c6\u9891\u6311\u6218"}],"36":[{"forum_id":"49","name":"\u4ea7\u540e\u8c03\u7406\u533a"},{"forum_id":"5796","name":"\u4ea7\u540e\u7626\u8eab\u9986"},{"forum_id":"5839","name":"\u5168\u804c\u5988\u5988\u5708"},{"forum_id":"5916","name":"\u4ea7\u540e\u51cf\u80a5\u59d0\u59b9\u5708"}],"35":[{"forum_id":"3301","name":"\u8f7b\u5962\u65e5\u8bb0"},{"forum_id":"5763","name":"\u4e11\u7206\u4e86\u7684\u7a7f\u642d\u79c0"},{"forum_id":"5764","name":"\u7eb9\u8eab\u9177\u5973\u5b69"},{"forum_id":"5784","name":"\u53e4\u98ce\u6c49\u670d\u5708"},{"forum_id":"5791","name":"\u5e78\u798f\u5c0f\u77ac\u95f4"},{"forum_id":"5792","name":"\u79cd\u8349\u4e0e\u62d4\u8349"}],"34":[{"forum_id":"5816","name":"\u8bd5\u7528\u62a5\u544a\u5708"}],"6":[{"forum_id":"13","name":"\u5a5a\u540e\u751f\u6d3b\u5708"},{"forum_id":"26","name":"\u7231\u60c5\u788e\u788e\u5ff5"},{"forum_id":"34","name":"\u5a5a\u5ac1\u8fdb\u884c\u65f6"},{"forum_id":"36","name":"\u5931\u604b\u5c11\u5973\u6536\u5bb9\u6240"},{"forum_id":"37","name":"\u5355\u8eab\u5927\u8054\u76df"},{"forum_id":"82","name":"\u5a46\u5ab3\u9ebb\u8fa3\u70eb"},{"forum_id":"5647","name":"\u95fa\u871c\u5c0f\u65e5\u5e38"},{"forum_id":"5650","name":"\u4eb2\u60c5\u8ba8\u8bba\u533a"},{"forum_id":"5750","name":"\u7231\u4e4b\u521d\u4f53\u9a8c"},{"forum_id":"5768","name":"\u5bb6\u66b4\u4e92\u52a9\u8054\u76df"},{"forum_id":"5783","name":"\u6df1\u591c\u5367\u8c08\u4f1a"}],"2":[{"forum_id":"94","name":"\u6280\u672f\u6d4b\u8bd5"}],"17":[{"forum_id":"204","name":"\u6d4b\u8bd5\u6d4b\u8bd5"},{"forum_id":"206","name":"\u6d4b\u8bd5\u57084"}],"8":[{"forum_id":"15","name":"\u5b55\u65e9\u671f\u5988\u54aa"},{"forum_id":"32","name":"\u5b55\u4e2d\u671f\u5988\u54aa"},{"forum_id":"33","name":"\u5b55\u665a\u671f\u5988\u54aa"},{"forum_id":"69","name":"\u7537\u5973\u90fd\u662f\u5b9d"},{"forum_id":"87","name":"\u5b9d\u5b9d\u53d6\u540d\u5b57"},{"forum_id":"109","name":"\u5f85\u4ea7\u5305\u653b\u7565"},{"forum_id":"167","name":"\u5b55\u671f\u8425\u517b\u5708"},{"forum_id":"5745","name":"\u5e78\u798f\u5b55\u7167\u5708"},{"forum_id":"5746","name":"\u6211\u8981\u751f\u4e86"},{"forum_id":"5747","name":"\u6d88\u706d\u598a\u5a20\u7eb9"},{"forum_id":"5795","name":"\u5b55\u671f\u7f8e\u7f8e\u54d2"},{"forum_id":"5891","name":"24\u5e7411\u6708\u9884\u4ea7\u5708"},{"forum_id":"5892","name":"24\u5e7412\u6708\u9884\u4ea7\u5708"},{"forum_id":"5893","name":"25\u5e741\u6708\u9884\u4ea7\u5708"},{"forum_id":"5902","name":"25\u5e742\u6708\u9884\u4ea7\u5708"},{"forum_id":"5903","name":"25\u5e743\u6708\u9884\u4ea7\u5708"},{"forum_id":"5904","name":"25\u5e744\u6708\u9884\u4ea7\u5708"},{"forum_id":"5905","name":"25\u5e745\u6708\u9884\u4ea7\u5708"},{"forum_id":"5906","name":"25\u5e746\u6708\u9884\u4ea7\u5708"},{"forum_id":"5907","name":"25\u5e747\u6708\u9884\u4ea7\u5708"},{"forum_id":"5908","name":"25\u5e748\u6708\u9884\u4ea7\u5708"},{"forum_id":"5909","name":"25\u5e749\u6708\u9884\u4ea7\u5708"},{"forum_id":"5910","name":"25\u5e7410\u6708\u9884\u4ea7\u5708"},{"forum_id":"5911","name":"25\u5e7411\u6708\u9884\u4ea7\u5708"},{"forum_id":"5912","name":"25\u5e7412\u6708\u9884\u4ea7\u5708"},{"forum_id":"5913","name":"26\u5e741\u6708\u9884\u4ea7\u5708"},{"forum_id":"5915","name":"\u6000\u5b55\u6bcf\u5929\u5403\u4ec0\u4e48"},{"forum_id":"5917","name":"26\u5e742\u6708\u9884\u4ea7\u5708"},{"forum_id":"5918","name":"26\u5e743\u6708\u9884\u4ea7\u5708"},{"forum_id":"5919","name":"26\u5e744\u6708\u9884\u4ea7\u5708"},{"forum_id":"5921","name":"26\u5e745\u6708\u9884\u4ea7\u5708"},{"forum_id":"5922","name":"26\u5e746\u6708\u9884\u4ea7\u5708"},{"forum_id":"5923","name":"26\u5e747\u6708\u9884\u4ea7\u5708"},{"forum_id":"5924","name":"26\u5e748\u6708\u9884\u4ea7\u5708"},{"forum_id":"5925","name":"26\u5e749\u6708\u9884\u4ea7\u5708"},{"forum_id":"5926","name":"26\u5e7410\u6708\u9884\u4ea7\u5708"},{"forum_id":"5927","name":"26\u5e7411\u6708\u9884\u4ea7\u5708"},{"forum_id":"5928","name":"26\u5e7412\u6708\u9884\u4ea7\u5708"},{"forum_id":"5929","name":"27\u5e741\u6708\u9884\u4ea7\u5708"}],"25":[{"forum_id":"5646","name":"17\u5e741\u6708\u540c\u9f84\u5708"},{"forum_id":"5653","name":"17\u5e742\u6708\u540c\u9f84\u5708"},{"forum_id":"5654","name":"17\u5e743\u6708\u540c\u9f84\u5708"},{"forum_id":"5657","name":"17\u5e744\u6708\u540c\u9f84\u5708"},{"forum_id":"5658","name":"17\u5e745\u6708\u540c\u9f84\u5708"},{"forum_id":"5662","name":"17\u5e746\u6708\u540c\u9f84\u5708"},{"forum_id":"5663","name":"17\u5e747\u6708\u540c\u9f84\u5708"},{"forum_id":"5684","name":"17\u5e748\u6708\u540c\u9f84\u5708"},{"forum_id":"5686","name":"17\u5e749\u6708\u540c\u9f84\u5708"},{"forum_id":"5687","name":"17\u5e7410\u6708\u540c\u9f84\u5708"},{"forum_id":"5715","name":"17\u5e7411\u6708\u540c\u9f84\u5708"},{"forum_id":"5717","name":"17\u5e7412\u6708\u540c\u9f84\u5708"},{"forum_id":"5718","name":"18\u5e741\u6708\u540c\u9f84\u5708"},{"forum_id":"5719","name":"18\u5e742\u6708\u540c\u9f84\u5708"},{"forum_id":"5721","name":"18\u5e743\u6708\u540c\u9f84\u5708"},{"forum_id":"5722","name":"18\u5e744\u6708\u540c\u9f84\u5708"},{"forum_id":"5724","name":"18\u5e745\u6708\u540c\u9f84\u5708"},{"forum_id":"5725","name":"18\u5e746\u6708\u540c\u9f84\u5708"},{"forum_id":"5727","name":"18\u5e747\u6708\u540c\u9f84\u5708"},{"forum_id":"5729","name":"18\u5e748\u6708\u540c\u9f84\u5708"},{"forum_id":"5730","name":"18\u5e749\u6708\u540c\u9f84\u5708"},{"forum_id":"5734","name":"18\u5e7410\u6708\u540c\u9f84\u5708"},{"forum_id":"5735","name":"18\u5e7411\u6708\u540c\u9f84\u5708"},{"forum_id":"5737","name":"18\u5e7412\u6708\u540c\u9f84\u5708"},{"forum_id":"5774","name":"19\u5e741\u6708\u540c\u9f84\u5708"},{"forum_id":"5780","name":"19\u5e742\u6708\u540c\u9f84\u5708"},{"forum_id":"5781","name":"19\u5e743\u6708\u540c\u9f84\u5708"},{"forum_id":"5788","name":"19\u5e744\u6708\u540c\u9f84\u5708"},{"forum_id":"5807","name":"19\u5e745\u6708\u540c\u9f84\u5708"},{"forum_id":"5808","name":"19\u5e747\u6708\u540c\u9f84\u5708"},{"forum_id":"5809","name":"19\u5e746\u6708\u540c\u9f84\u5708"},{"forum_id":"5812","name":"19\u5e748\u6708\u540c\u9f84\u5708"},{"forum_id":"5815","name":"19\u5e749\u6708\u540c\u9f84\u5708"},{"forum_id":"5817","name":"19\u5e7410\u6708\u540c\u9f84\u5708"},{"forum_id":"5819","name":"19\u5e7411\u6708\u540c\u9f84\u5708"},{"forum_id":"5820","name":"19\u5e7412\u6708\u540c\u9f84\u5708"},{"forum_id":"5821","name":"20\u5e741\u6708\u540c\u9f84\u5708"},{"forum_id":"5822","name":"20\u5e742\u6708\u540c\u9f84\u5708"},{"forum_id":"5824","name":"20\u5e743\u6708\u540c\u9f84\u5708"},{"forum_id":"5825","name":"20\u5e744\u6708\u540c\u9f84\u5708"},{"forum_id":"5828","name":"20\u5e745\u6708\u540c\u9f84\u5708"},{"forum_id":"5829","name":"20\u5e746\u6708\u540c\u9f84\u5708"},{"forum_id":"5830","name":"20\u5e747\u6708\u540c\u9f84\u5708"},{"forum_id":"5831","name":"20\u5e748\u6708\u540c\u9f84\u5708"},{"forum_id":"5837","name":"20\u5e749\u6708\u540c\u9f84\u5708"},{"forum_id":"5838","name":"20\u5e7410\u6708\u540c\u9f84\u5708"},{"forum_id":"5840","name":"20\u5e7411\u6708\u540c\u9f84\u5708"},{"forum_id":"5842","name":"20\u5e7412\u6708\u540c\u9f84\u5708"},{"forum_id":"5843","name":"21\u5e741\u6708\u540c\u9f84\u5708"},{"forum_id":"5844","name":"21\u5e742\u6708\u540c\u9f84\u5708"},{"forum_id":"5846","name":"21\u5e743\u6708\u540c\u9f84\u5708"},{"forum_id":"5847","name":"21\u5e744\u6708\u540c\u9f84\u5708"},{"forum_id":"5848","name":"21\u5e745\u6708\u540c\u9f84\u5708"},{"forum_id":"5849","name":"21\u5e746\u6708\u540c\u9f84\u5708"},{"forum_id":"5850","name":"21\u5e747\u6708\u540c\u9f84\u5708"},{"forum_id":"5851","name":"21\u5e748\u6708\u540c\u9f84\u5708"},{"forum_id":"5852","name":"21\u5e749\u6708\u540c\u9f84\u5708"},{"forum_id":"5853","name":"21\u5e7410\u6708\u540c\u9f84\u5708"},{"forum_id":"5855","name":"21\u5e7411\u6708\u540c\u9f84\u5708"},{"forum_id":"5856","name":"21\u5e7412\u6708\u540c\u9f84\u5708"},{"forum_id":"5857","name":"22\u5e741\u6708\u540c\u9f84\u5708"},{"forum_id":"5858","name":"22\u5e742\u6708\u540c\u9f84\u5708"},{"forum_id":"5859","name":"22\u5e743\u6708\u540c\u9f84\u5708"},{"forum_id":"5860","name":"22\u5e744\u6708\u540c\u9f84\u5708"},{"forum_id":"5861","name":"22\u5e745\u6708\u540c\u9f84\u5708"},{"forum_id":"5862","name":"22\u5e746\u6708\u540c\u9f84\u5708"},{"forum_id":"5863","name":"22\u5e747\u6708\u540c\u9f84\u5708"},{"forum_id":"5864","name":"22\u5e748\u6708\u540c\u9f84\u5708"},{"forum_id":"5865","name":"22\u5e749\u6708\u540c\u9f84\u5708"},{"forum_id":"5866","name":"22\u5e7410\u6708\u540c\u9f84\u5708"},{"forum_id":"5867","name":"22\u5e7411\u6708\u540c\u9f84\u5708"},{"forum_id":"5868","name":"22\u5e7412\u6708\u540c\u9f84\u5708"},{"forum_id":"5869","name":"23\u5e741\u6708\u540c\u9f84\u5708"},{"forum_id":"5870","name":"23\u5e742\u6708\u540c\u9f84\u5708"},{"forum_id":"5871","name":"23\u5e743\u6708\u540c\u9f84\u5708"},{"forum_id":"5872","name":"23\u5e744\u6708\u540c\u9f84\u5708"},{"forum_id":"5873","name":"23\u5e745\u6708\u540c\u9f84\u5708"},{"forum_id":"5874","name":"23\u5e746\u6708\u540c\u9f84\u5708"},{"forum_id":"5875","name":"23\u5e747\u6708\u540c\u9f84\u5708"},{"forum_id":"5876","name":"23\u5e748\u6708\u540c\u9f84\u5708"},{"forum_id":"5877","name":"23\u5e749\u6708\u540c\u9f84\u5708"},{"forum_id":"5878","name":"23\u5e7410\u6708\u540c\u9f84\u5708"},{"forum_id":"5879","name":"23\u5e7411\u6708\u540c\u9f84\u5708"},{"forum_id":"5880","name":"23\u5e7412\u6708\u540c\u9f84\u5708"},{"forum_id":"5881","name":"24\u5e741\u6708\u540c\u9f84\u5708"},{"forum_id":"5882","name":"24\u5e742\u6708\u540c\u9f84\u5708"},{"forum_id":"5883","name":"24\u5e743\u6708\u540c\u9f84\u5708"},{"forum_id":"5884","name":"24\u5e744\u6708\u540c\u9f84\u5708"},{"forum_id":"5885","name":"24\u5e745\u6708\u540c\u9f84\u5708"},{"forum_id":"5886","name":"24\u5e746\u6708\u540c\u9f84\u5708"},{"forum_id":"5887","name":"24\u5e747\u6708\u540c\u9f84\u5708"},{"forum_id":"5888","name":"24\u5e748\u6708\u540c\u9f84\u5708"},{"forum_id":"5889","name":"24\u5e749\u6708\u540c\u9f84\u5708"},{"forum_id":"5890","name":"24\u5e7410\u6708\u540c\u9f84\u5708"}],"3":[{"forum_id":"25","name":"\u840c\u5b9d\u5927\u79c0\u573a"},{"forum_id":"45","name":"7-12\u6708\u5b9d\u5b9d"},{"forum_id":"46","name":"1-3\u5c81\u5b9d\u5b9d"},{"forum_id":"47","name":"0-6\u6708\u5b9d\u5b9d"},{"forum_id":"50","name":"\u5b9d\u5b9d\u6559\u80b2\u5708"},{"forum_id":"51","name":"\u5b9d\u5b9d\u8425\u517b\u5708"},{"forum_id":"52","name":"\u6bcd\u5a74\u7528\u54c1\u6c47"},{"forum_id":"91","name":"\u6bcd\u4e73\u5582\u517b\u5708"},{"forum_id":"171","name":"\u95f2\u7f6e\u4ea4\u6613\u5708"},{"forum_id":"219","name":"\u4e24\u5b9d\u5708"},{"forum_id":"5652","name":"\u5355\u4eb2\u5988\u5988\u8bf4"},{"forum_id":"5664","name":"\u8425\u517b\u8f85\u98df\u5708"},{"forum_id":"5666","name":"\u5e7c\u513f\u56ed\u5b9d\u5b9d"},{"forum_id":"5713","name":"\u5bb6\u6709\u4e24\u5b9d\u5708"},{"forum_id":"5714","name":"\u5b9d\u5b9d\u5e38\u89c1\u75c5"},{"forum_id":"5749","name":"\u75ab\u82d7\u65f6\u95f4\u8868"},{"forum_id":"5805","name":"\u4eb2\u5b50\u6559\u80b2\u5708"},{"forum_id":"5854","name":"\u65e9\u4ea7\u513f\u62a4\u7406"}],"10":[{"forum_id":"19","name":"\u8bd5\u7eb8\u89c2\u5bdf\u7ad9"},{"forum_id":"67","name":"\u5b55\u524d\u68c0\u67e5\u7ad9"},{"forum_id":"68","name":"\u96be\u5b55\u4ea4\u6d41\u533a"},{"forum_id":"70","name":"\u5907\u5b55\u4ea4\u6d41\u533a"},{"forum_id":"153","name":"\u80ce\u505c\u518d\u6218\u533a"},{"forum_id":"215","name":"\u8bd5\u7ba1\u5a74\u513f\u5708"},{"forum_id":"5712","name":"\u6211\u8981\u751f\u4e8c\u80ce"}],"5":[{"forum_id":"22","name":"\u5065\u5eb7\u517b\u751f\u9986"},{"forum_id":"28","name":"\u7ecf\u671f\u8ba8\u8bba\u533a"},{"forum_id":"75","name":"\u5987\u79d1\u8ba8\u8bba\u533a"},{"forum_id":"116","name":"\u5973\u751f\u7528\u54c1\u533a"},{"forum_id":"189","name":"\u4e73\u623f\u4fdd\u5065\u533a"},{"forum_id":"220","name":"\u907f\u5b55\u79c1\u623f\u8bdd"},{"forum_id":"5920","name":"\u4e92\u533b\u75c5\u4f8b\u4ea4\u6d41\u5708"}],"23":[{"forum_id":"159","name":"\u7f8e\u817f\u79d8\u7c4d\u7ad9"},{"forum_id":"161","name":"\u6211\u8981\u5c0f\u86ee\u8170"}],"12":[{"forum_id":"5786","name":" \u6bcf\u5929\u4e00\u70b9\u6b63\u80fd\u91cf"}],"1":[{"forum_id":"16","name":"\u7f8e\u98df\u53a8\u623f\u5385"},{"forum_id":"17","name":"\u661f\u5ea7\u6d4b\u8bd5\u5708"},{"forum_id":"40","name":"\u5f02\u6b21\u5143\u840c\u59b9"},{"forum_id":"42","name":"\u5c45\u5bb6\u751f\u6d3b\u9986"},{"forum_id":"43","name":"\u5c31\u662f\u7231\u65c5\u884c"},{"forum_id":"53","name":"\u5c0f\u8bf4\u9605\u8bfb\u5ba4"},{"forum_id":"54","name":"\u56ed\u827a\u690d\u7269\u63a7"},{"forum_id":"76","name":"\u624b\u5de5\u7231\u597d\u8005"},{"forum_id":"229","name":"\u4e00\u8d77\u95f2\u626f\u6de1"},{"forum_id":"3302","name":"\u5973\u53f8\u673a\u4e0a\u8def"},{"forum_id":"5772","name":"\u840c\u5ba0\u7231\u597d\u8005"},{"forum_id":"5777","name":"\u6b22\u4e50\u641e\u7b11\u83cc"},{"forum_id":"5811","name":"\u597d\u7269\u79cd\u8349\u5708"},{"forum_id":"5834","name":"\u6e38\u620f\u5c11\u5973\u793e"}],"13":[{"forum_id":"5797","name":"\u76f4\u7537"}],"27":[{"forum_id":"84","name":"\u798f\u5efa\u540c\u57ce\u6c47"},{"forum_id":"5667","name":"\u53a6\u95e8\u540c\u57ce\u5708"},{"forum_id":"5668","name":"\u90d1\u5dde\u540c\u57ce\u5708"},{"forum_id":"5669","name":"\u5e7f\u5dde\u540c\u57ce\u5708"},{"forum_id":"5670","name":"\u6df1\u5733\u540c\u57ce\u5708"},{"forum_id":"5671","name":"\u5185\u6c5f\u540c\u57ce\u5708"},{"forum_id":"5672","name":"\u676d\u5dde\u540c\u57ce\u5708"},{"forum_id":"5673","name":"\u77f3\u5bb6\u5e84\u540c\u57ce\u5708"},{"forum_id":"5674","name":"\u897f\u5b89\u540c\u57ce\u5708"},{"forum_id":"5675","name":"\u4e0a\u6d77\u540c\u57ce\u5708"},{"forum_id":"5676","name":"\u5317\u4eac\u540c\u57ce\u5708"},{"forum_id":"5677","name":"\u5e7f\u4e1c\u540c\u57ce\u6c47"},{"forum_id":"5678","name":"\u6cb3\u5357\u540c\u57ce\u6c47"},{"forum_id":"5679","name":"\u6d59\u6c5f\u540c\u57ce\u6c47"},{"forum_id":"5680","name":"\u6c5f\u82cf\u540c\u57ce\u6c47"},{"forum_id":"5681","name":"\u5c71\u4e1c\u540c\u57ce\u6c47"},{"forum_id":"5682","name":"\u56db\u5ddd\u540c\u57ce\u6c47"},{"forum_id":"5683","name":"\u6cb3\u5317\u540c\u57ce\u6c47"},{"forum_id":"5894","name":"\u82cf\u5dde\u540c\u57ce\u5708"},{"forum_id":"5895","name":"\u91cd\u5e86\u540c\u57ce\u5708"},{"forum_id":"5896","name":"\u6210\u90fd\u540c\u57ce\u5708"},{"forum_id":"5897","name":"\u4e91\u5357\u540c\u57ce\u6c47"},{"forum_id":"5898","name":"\u5b89\u5fbd\u540c\u57ce\u6c47"},{"forum_id":"5899","name":"\u6e56\u5317\u540c\u57ce\u6c47"},{"forum_id":"5900","name":"\u6e56\u5357\u540c\u57ce\u6c47"},{"forum_id":"5901","name":"\u9655\u897f\u540c\u57ce\u6c47"}],"15":[{"forum_id":"85","name":"\u5e7f\u5dde\u73a9\u4e50\u8d2d"},{"forum_id":"89","name":"\u5317\u4eac\u73a9\u4e50\u8d2d"},{"forum_id":"90","name":"\u4e0a\u6d77\u73a9\u4e50\u8d2d"},{"forum_id":"205","name":"\u6d4b\u8bd5\u57083"},{"forum_id":"207","name":"\u6d4b\u8bd55"},{"forum_id":"208","name":"\u6d4b\u5708\u5b503"},{"forum_id":"212","name":"\u6d4b\u8bd5\u57083454"},{"forum_id":"224","name":"\u5979\u5979\u670d\u52a1\u5708"},{"forum_id":"233","name":"\u65b0\u95fb\u8d44\u8baf"},{"forum_id":"5649","name":"\u5fd7\u613f\u8005\u8054\u76df"},{"forum_id":"5688","name":"\u6d3b\u52a8\u4e0e\u4e92\u52a8"},{"forum_id":"5716","name":"\u793e\u533a\u5185\u90e8\u5708"},{"forum_id":"5723","name":"\u5708\u52a1\u529e\u516c\u533a"},{"forum_id":"5841","name":"\u7948\u798f\u62a4\u4f51\u5708"}]};
+        $('#search_category_ids').change(function() {
+            var html = '<option value="">全部</option>',
+                curr_category_ids = $('#search_category_ids').val(),
+                curr_circle_ids = $('#forum_ids').val(),
+                category_circle,
+                selected = '';
+
+            if (curr_category_ids) {
+                $.each(curr_category_ids, function(index, value, array) {
+                    category_circle = category_circles[value];
+                    if (category_circle) {
+                        $.each(category_circle, function(index, v, array) {
+                            selected = '';
+                            if(curr_circle_ids && $.inArray(v['forum_id'], curr_circle_ids) !== -1) {
+                                selected = 'selected';
+                            }
+
+                            html += '<option value="' + v['forum_id'] + '" ' + selected + '>' + v['name'] + '</option>';
+                        });
+                    }
+                });
+            } else {
+                $.each(category_circles, function(index, value, array) {
+                    if (value) {
+                        $.each(value, function(index, v, array) {
+                            selected = '';
+                            if(curr_circle_ids && $.inArray(v['forum_id'], curr_circle_ids) !== -1) {
+                                selected = 'selected';
+                            }
+
+                            html += '<option value="' + v['forum_id'] + '" ' + selected + '>' + v['name'] + '</option>';
+                        });
+                    }
+                });
+            }
+
+            $('#forum_ids').html(html).multiselect('rebuild');
+        });
+        $('#search_category_ids').trigger('change');
+
+        $('.review_img').lightBox();
+
+        $(".set-status").click(function () {
+            var id = $(this).data('id'),
+                status = $(this).data('status'),
+                name = $(this).data('name');
+            var opt_name = (status == 1) ? '上线' : '下线';
+            var tip = "确认要对话题“"+ name +"”进行"+opt_name+"操作吗？";
+            art.dialog.confirm(tip, function(){
+                $.get('/subject/set_subject_status', {id: id, status: status}, function(result){
+                    _alert(result.msg, result.code);
+                    if (result.code) {
+                        setTimeout(function () {
+                            location.reload();
+                        }, 1500);
+                    }
+                }, 'json');
+            })
+        })
+
+        //设置排序
+        $(".set-position").click(function () {
+            var id = $(this).data('id'),
+                name = $(this).data('name'),
+                position = $(this).data('position'),
+                recommend_start_time = $(this).data('start-time'),
+                recommend_end_time = $(this).data('end-time'),
+                mode = $(this).data('mode');
+            var dialog = art.dialog({
+                // follow: obj,
+                id: 'set_position',
+                title: '修改排序[ID: <span class="red">' + id + '</span>]',
+                width: '500px',
+                padding: '20px 5px',
+                content: $("#set_position_content_html").html(),
+                drag: true,
+                ok: function () {
+                    var that = this;
+                    var k = 0;
+                    var subject_position = 0;
+                    if ($(".clear_topic_ordianl").prop("checked")) {
+                    } else {
+                        subject_position = parseInt($('#set_topic_ordianl').val());
+
+                        if( subject_position<=0 || isNaN(subject_position) ){
+                            $('#set_topic_ordianl').next().show();
+                            k = 1;
+                        }else{
+                            k = 0;
+                        }
+                        if (subject_position > 20) {
+                            _alert('推荐位置只能设置在1~20之间');
+                            return false;
+                        }
+
+                        recommend_start_time = $('input[name="recommend_start_time"]').val();
+                        recommend_end_time = $('input[name="recommend_end_time"]').val();
+                        if ((new Date(recommend_end_time)) < Date.now() || (new Date(recommend_start_time)) < Date.now()) {
+                            _alert('无法设置过去时间段的排序！');
+                            return false;
+                        }
+                        if (!(recommend_start_time) || !(recommend_end_time)) {
+                            _alert('推荐开始和结束时间必须填写！');
+                            return false;
+                        }
+                        if (!(recommend_start_time < recommend_end_time)) {
+                            _alert('推荐结束时间必须大于开始时间！');
+                            return false;
+                        }
+                    }
+
+                    if(k === 0){
+                        var paramt = { id: id, position: subject_position, mode: mode, start_time: recommend_start_time, end_time: recommend_end_time};
+                        var url = '/subject/set_subject_position';
+                        var title = '确定修改？排序为 ['+subject_position+']？';
+                        if (subject_position == 0) {
+                            title = "确认清除排序？";
+                        }
+                        art.dialog.confirm(title, function(){
+                            $.get( url, paramt, function(result){
+                                if(result.action != undefined) {
+                                    art.dialog.confirm(result.msg +"，确认是否使用该值", function(){
+                                        paramt.action = "force_update";
+                                        $.get( url, paramt, function(result){
+                                            _alert(result.msg, result.code);
+                                            if(result.code) {
+                                                that.close();
+                                            }
+                                        }, 'json');
+                                    });
+                                    return false;
+                                }
+                                _alert(result.msg, result.code);
+                                if(result.code) {
+                                    that.close();
+                                }
+                            }, 'json');
+                        });
+                    }
+                    return false;
+                },
+                okValue: '确定',
+                cancelValue: '取消',
+                cancel: function () {},
+                init: function () {
+                    $("#set_topic_ordianl").val(position);
+                    $("#start_time").val(recommend_start_time);
+                    $("#end_time").val(recommend_end_time);
+                    $(".clear_topic_ordianl").change(function() {
+                        if ($(this).prop("checked")) {
+                            $('#set_topic_ordianl').attr("disabled", "disabled");
+                            $('#start_time').attr("disabled", "disabled");
+                            $('#end_time').attr("disabled", "disabled");
+                        } else {
+                            $('#set_topic_ordianl').removeAttr("disabled");
+                            $('#start_time').removeAttr("disabled");
+                            $('#end_time').removeAttr("disabled");
+                        }
+                    });
+
+                    $("#start_time").click(function(){
+                        init_start_time();
+                    });
+
+                    $("#end_time").click(function(){
+                        init_end_time();
+                    });
+                }
+            });
+        });
+
+        $(".preview").click(function () {
+            var index = parent.layer.open({
+                title: '预览',
+                type: 2,
+                scrollbar: false,
+                content: '/subject/preview_subject?search_mode=0',
+                btn: ['关闭'],
+                area: ['800px', '86%']
+            });
+        });
+
+        $(".export").click(function () {
+            var query = $('#fom').serialize();
+            window.location.href = '/subject/subject_list?&export_data=1&'+query;
+        });
+
+        $(".edit-experience-subtitle").click(function () {
+            var subject_id = $(this).data('id');
+            var index = parent.layer.open({
+                title: '编辑小标题',
+                type: 2,
+                scrollbar: false,
+                shadeClose: false,
+                shade: [0],
+                area: ['640px', '400px'],
+                btn: ['保存', '关闭'],
+                content: '/subject/subject_edit_experience_subtitle?subject_id=' + subject_id,
+                yes: function(){
+                    button = layer.getChildFrame('.save', index);
+                    button.click();
+                }
+            });
+        });
+    });
+
+    function init_start_time(start_obj,end_obj){
+        var start_dt = $(start_obj).val();
+        var end_dt = $(end_obj).val();
+        WdatePicker({
+            dateFmt:'yyyy-MM-dd HH:mm:ss',
+            startDate:'%y-%M-%d 00:00:00',
+            maxDate:end_dt,
+            alwaysUseStartDate:true
+        });
+    }
+
+    function init_end_time(start_obj,end_obj){
+        var start_dt = $(start_obj).val();
+        var end_dt = $(end_obj).val();
+        WdatePicker({
+            dateFmt:'yyyy-MM-dd HH:mm:ss',
+            startDate:'%y-%M-%d 00:00:00',
+            minDate:start_dt,
+            alwaysUseStartDate:true
+        });
+    }
+
+    function setSearchForm(order,order_field,sort,sort_type,page_no){
+        $('#'+order).val(order_field);
+        $('#'+sort).val(sort_type);
+        $("#page_no").val(page_no);
+        $('#fom').submit();
+    }
+
+    //异步填充热议话题互动率数据，加快页面加载速度  by XipMan 2020-2-12
+    function fill_in_subject_user_stats() {
+        var subject_ids = $.trim($('#subject_ids').val());
+        if (subject_ids == '') {
+            return false;
+        }
+        $.ajax({
+            url: '/common/get_subject_user_stats',
+            data: {
+                subject_ids: subject_ids,
+            },
+            dataType: 'json',
+            success: function (backData) {
+                if (backData.code == 0) {
+                    var sUserStatsInteract = backData.data.sUserStatsInteract;
+                    var sUserStatsView = backData.data.sUserStatsView;
+                    var subject_id_list = subject_ids.split(',');
+                    for (var i in subject_id_list) {
+                        var subject_id = subject_id_list[i];
+                        var count_num_interact = 0;
+                        if (sUserStatsInteract[subject_id]) {
+                            count_num_interact = sUserStatsInteract[subject_id].count_num;
+                        }
+                        var count_num_view = 0;
+                        if (sUserStatsView[subject_id]) {
+                            count_num_view = sUserStatsView[subject_id].count_num;
+                        }
+                        var gain = count_num_view > 0 ? count_num_interact/count_num_view : 0;
+                        gain = gain*100;
+                        var gainStr = ''+count_num_interact+' / '+count_num_view+' = '+(gain.toFixed(1))+'%';
+                        $('#user_stats_'+subject_id).html(gainStr);
+                    }
+                } else {
+                    _alert(backData.error);
+                }
+            },
+            error: function () {
+                _alert('网络错误');
+            }
+        });
+    }
+
+    $('.check_all').click(function(){
+        if(this.checked){
+            $('.item').each(function(){
+                this.checked = true;
+            })
+        }
+        else{
+            $('.item').each(function(){
+                this.checked = false;
+            })
+        }
+    });
+
+    $('#offline').click(function(){
+        var ids = "";
+        var n = 0;
+        $('.item').each(function() {
+            if(this.checked){
+                ids += $(this).val() + ',';
+                n += 1;
+            }
+        })
+
+        if(ids == ''){
+            art.dialog.alert('您还未选择任何项！');
+            return false;
+        }
+        else{
+            art.dialog.confirm("确认批量下线"+n+"条话题？", function(){
+                ids = ids.substring(0, ids.length - 1);
+                $.get('/subject/batch_subject_offline', {ids: ids}, function(result){
+                    _alert(result.msg, result.code);
+                    if (result.code) {
+                        setTimeout(function () {
+                            location.reload();
+                        }, 1500);
+                    }
+                }, 'json')
+            })
+        }
+    });
+
+</script>
+
+
+
+</div></div><div style="display: none; position: fixed; left: 0px; top: 0px; width: 100%; height: 100%; cursor: move; opacity: 0; background: rgb(255, 255, 255);"></div></body></html>

@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="820" viewBox="0 0 1280 820">
+  <defs>
+    <style>
+      .bg { fill: #ffffff; }
+      .title { font: 700 28px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #111111; }
+      .subtitle { font: 400 15px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #444444; }
+      .entity { fill: #ffffff; stroke: #111111; stroke-width: 2.2; rx: 14; ry: 14; }
+      .head { fill: #f5f5f5; stroke: #111111; stroke-width: 2.2; rx: 14; ry: 14; }
+      .name { font: 700 18px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #111111; }
+      .field { font: 14px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #222222; }
+      .hint { font: 13px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #555555; }
+      .line { stroke: #111111; stroke-width: 2.2; fill: none; }
+      .card { fill: #ffffff; stroke: #111111; stroke-width: 1.5; rx: 10; ry: 10; }
+      .tag { font: 13px 'Microsoft YaHei', 'PingFang SC', sans-serif; fill: #111111; }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#111111" />
+    </marker>
+  </defs>
+
+  <rect class="bg" width="1280" height="820" />
+  <text x="56" y="58" class="title">品牌广告 CPM 曝光量预估 · E-R 图</text>
+  <text x="56" y="86" class="subtitle">黑白高对比版本，便于文档粘贴、打印和 TAPD 预览</text>
+
+  <g transform="translate(70,150)">
+    <rect class="entity" width="280" height="320" />
+    <rect class="head" width="280" height="58" />
+    <text x="28" y="37" class="name">预估表单</text>
+    <text x="22" y="92" class="field">• 预估标题</text>
+    <text x="22" y="124" class="field">• 应用 / 页面 / 广告位 / 样式</text>
+    <text x="22" y="156" class="field">• 子位 / 手机平台</text>
+    <text x="22" y="188" class="field">• 售卖方式</text>
+    <text x="22" y="220" class="field">• 投放起止时间</text>
+    <text x="22" y="252" class="field">• 库存曝光转化率</text>
+    <text x="22" y="292" class="hint">说明：用户填写的预估条件输入实体</text>
+  </g>
+
+  <g transform="translate(500,150)">
+    <rect class="entity" width="300" height="320" />
+    <rect class="head" width="300" height="58" />
+    <text x="28" y="37" class="name">预估结果</text>
+    <text x="22" y="92" class="field">• 结果摘要</text>
+    <text x="22" y="124" class="field">• 剩余曝光总量</text>
+    <text x="22" y="156" class="field">• 初始库存</text>
+    <text x="22" y="188" class="field">• 预估细节行</text>
+    <text x="22" y="220" class="field">• 优先占量计划 / 预定计划</text>
+    <text x="22" y="252" class="field">• 分天剩余结果</text>
+    <text x="22" y="292" class="hint">说明：一次预估动作的聚合输出实体</text>
+  </g>
+
+  <g transform="translate(920,80)">
+    <rect class="entity" width="280" height="180" />
+    <rect class="head" width="280" height="54" />
+    <text x="26" y="35" class="name">优先占量计划</text>
+    <text x="20" y="92" class="field">• 计划ID / 广告主</text>
+    <text x="20" y="124" class="field">• 投放类型 / 计划来源</text>
+    <text x="20" y="156" class="field">• 库存交叉占量 / 曝光交叉占量</text>
+  </g>
+
+  <g transform="translate(920,310)">
+    <rect class="entity" width="280" height="180" />
+    <rect class="head" width="280" height="54" />
+    <text x="26" y="35" class="name">预定计划</text>
+    <text x="20" y="92" class="field">• 计划ID / 广告主</text>
+    <text x="20" y="124" class="field">• 投放类型 / 库存交叉占量</text>
+    <text x="20" y="156" class="field">• 曝光交叉占量 / 投放时间</text>
+  </g>
+
+  <g transform="translate(920,540)">
+    <rect class="entity" width="280" height="180" />
+    <rect class="head" width="280" height="54" />
+    <text x="26" y="35" class="name">分天剩余库存</text>
+    <text x="20" y="92" class="field">• 日期</text>
+    <text x="20" y="124" class="field">• 剩余库存 / 剩余库存（非CPM）</text>
+    <text x="20" y="156" class="field">• 剩余曝光</text>
+  </g>
+
+  <path class="line" marker-end="url(#arrow)" d="M350 310 C410 310, 440 310, 500 310" />
+  <rect x="375" y="268" width="100" height="30" class="card" />
+  <text x="390" y="288" class="tag">1 对 1 生成</text>
+
+  <path class="line" marker-end="url(#arrow)" d="M800 200 L880 200 L880 130 L920 130" />
+  <rect x="822" y="178" width="84" height="24" class="card" />
+  <text x="836" y="194" class="tag">1 对多</text>
+
+  <path class="line" marker-end="url(#arrow)" d="M800 400 L920 400" />
+  <rect x="830" y="380" width="84" height="24" class="card" />
+  <text x="844" y="396" class="tag">1 对多</text>
+
+  <path class="line" marker-end="url(#arrow)" d="M800 440 L880 440 L880 630 L920 630" />
+  <rect x="822" y="420" width="84" height="24" class="card" />
+  <text x="836" y="436" class="tag">1 对多</text>
+</svg>
