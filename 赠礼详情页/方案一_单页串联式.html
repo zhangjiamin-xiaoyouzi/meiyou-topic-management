@@ -1,0 +1,1094 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>美柚会员福利领取页</title>
+  <style>
+    :root {
+      --pink: #ff3f8a;
+      --pink-dark: #f92f78;
+      --green: #4dc922;
+      --green-deep: #2fab12;
+      --text: #33343a;
+      --muted: #6e7178;
+      --soft: #f5f5f8;
+      --white: #fff;
+      --danger: #e60012;
+      --card-radius: 18px;
+      --shadow: 0 10px 26px rgba(31, 43, 28, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: #ececf1;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+      letter-spacing: 0;
+    }
+
+    body { display: flex; justify-content: center; }
+
+    .page {
+      position: relative;
+      width: min(100vw, 430px);
+      min-height: 100vh;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 82% 3%, rgba(191, 239, 66, 0.36), transparent 27%),
+        radial-gradient(circle at 10% 3%, rgba(246, 241, 205, 0.96), transparent 35%),
+        linear-gradient(180deg, #fbfae6 0%, #f8fbef 28%, #f3f3f8 44%, #f4f4f8 100%);
+    }
+
+    .status-bar {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      height: 58px;
+      padding: 8px 24px 0;
+      font-weight: 800;
+      color: #0f1014;
+    }
+
+    .time { font-size: 18px; line-height: 1; }
+
+    .app-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      min-width: 78px;
+      height: 29px;
+      padding: 3px 9px 3px 4px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.88);
+      box-shadow: 0 2px 10px rgba(255, 123, 167, 0.12);
+    }
+
+    .app-icon {
+      display: grid;
+      place-items: center;
+      width: 22px; height: 22px;
+      border-radius: 7px;
+      background: linear-gradient(135deg, #ff2b83, #ff8fb4);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .app-name { color: #ff4f95; font-size: 17px; font-weight: 900; }
+
+    .system-icons {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .signal {
+      display: inline-flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 18px;
+    }
+    .signal span { display: block; width: 4px; border-radius: 4px; background: #0b0b0d; }
+    .signal span:nth-child(1) { height: 6px; }
+    .signal span:nth-child(2) { height: 9px; }
+    .signal span:nth-child(3) { height: 13px; }
+    .signal span:nth-child(4) { height: 17px; }
+
+    .wifi {
+      position: relative;
+      width: 22px; height: 17px;
+    }
+    .wifi::before, .wifi::after, .wifi span {
+      position: absolute;
+      left: 50%;
+      border: 3px solid #0b0b0d;
+      border-bottom: 0;
+      border-left-color: transparent;
+      border-right-color: transparent;
+      border-radius: 22px 22px 0 0;
+      transform: translateX(-50%);
+      content: "";
+    }
+    .wifi::before { top: 0; width: 22px; height: 12px; }
+    .wifi::after { top: 5px; width: 14px; height: 8px; }
+    .wifi span { top: 11px; width: 5px; height: 5px; border: 0; border-radius: 50%; background: #0b0b0d; }
+
+    .battery {
+      min-width: 31px; height: 21px;
+      padding: 2px 4px;
+      border-radius: 5px;
+      background: #0b0b0d;
+      color: #f7f5d7;
+      font-size: 14px;
+      font-weight: 900;
+      line-height: 17px;
+      text-align: center;
+    }
+
+    .nav {
+      position: relative;
+      display: grid;
+      grid-template-columns: 42px 1fr 42px;
+      align-items: center;
+      height: 62px;
+      padding: 0 18px;
+    }
+
+    .back {
+      width: 28px; height: 28px;
+      border: 0;
+      background: transparent;
+      position: relative;
+    }
+    .back::before {
+      position: absolute;
+      inset: 4px 0 0 6px;
+      width: 18px; height: 18px;
+      border-left: 4px solid #555861;
+      border-bottom: 4px solid #555861;
+      border-radius: 2px;
+      transform: rotate(45deg);
+      content: "";
+    }
+
+    .brand-line {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      font-size: 18px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .member-mark {
+      display: inline-grid;
+      place-items: center;
+      width: 17px; height: 17px;
+      border-radius: 50% 50% 50% 4px;
+      transform: rotate(-45deg);
+      background: linear-gradient(135deg, #ff277e, #ff7bc4);
+      color: #fff;
+      font-size: 12px;
+      line-height: 1;
+    }
+    .member-mark span { transform: rotate(45deg); margin-top: -1px; }
+
+    .heart-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      color: #4a3428;
+      font-size: 16px;
+      font-weight: 900;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+    .heart-logo::before {
+      display: inline-block;
+      color: #e3262e;
+      font-size: 21px;
+      transform: translateY(1px);
+      content: "♡";
+    }
+
+    .hero-wrap {
+      position: relative;
+      height: 258px;
+      padding: 36px 20px 0;
+    }
+
+    .hand {
+      position: absolute;
+      left: -24px; bottom: 8px;
+      width: 100px; height: 136px;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .palm {
+      position: absolute;
+      left: 4px; bottom: 0;
+      width: 66px; height: 86px;
+      border-radius: 46px 34px 36px 34px;
+      background: linear-gradient(145deg, #ffd0c0 0%, #f0a18c 84%);
+      transform: rotate(-9deg);
+      box-shadow: 12px -12px 30px rgba(189, 80, 61, 0.15) inset;
+    }
+    .finger {
+      position: absolute;
+      width: 28px; height: 88px;
+      border-radius: 22px;
+      background: linear-gradient(180deg, #ffd9cf 0%, #f4ab99 88%);
+      box-shadow: 5px -8px 16px rgba(161, 80, 67, 0.12) inset;
+      transform-origin: bottom center;
+    }
+    .finger.one { left: 52px; top: 10px; transform: rotate(-2deg); }
+    .finger.two { left: 28px; top: 28px; height: 78px; transform: rotate(-12deg); }
+
+    .coupon {
+      position: relative;
+      z-index: 2;
+      height: 176px;
+      border-radius: 18px 18px 13px 13px;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse at 68% 68%, rgba(248, 255, 205, 0.38), transparent 30%),
+        linear-gradient(107deg, #7ddd3c 0%, #45c91c 45%, #31b510 100%);
+      box-shadow: 0 16px 26px rgba(67, 156, 13, 0.2);
+      transform: rotate(-2.7deg);
+    }
+    .coupon::before {
+      position: absolute;
+      right: -62px; bottom: -54px;
+      width: 360px; height: 125px;
+      border-radius: 50%;
+      background:
+        linear-gradient(180deg, rgba(250, 255, 197, 0.52), rgba(67, 190, 29, 0.16)),
+        repeating-linear-gradient(160deg, rgba(255, 255, 255, 0.22) 0 1px, transparent 1px 8px);
+      transform: rotate(-7deg);
+      content: "";
+    }
+    .coupon::after {
+      position: absolute;
+      left: 22px; right: 120px; bottom: 35px;
+      height: 38px;
+      border-radius: 100%;
+      border-top: 2px solid rgba(255, 255, 255, 0.2);
+      transform: rotate(-5deg);
+      content: "";
+    }
+
+    .daily-tag {
+      position: absolute; top: 0; right: 0;
+      z-index: 4;
+      padding: 8px 17px 9px;
+      border-radius: 0 16px 0 16px;
+      background: rgba(45, 51, 39, 0.86);
+      color: #f4f6d2;
+      font-size: 17px;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+
+    .coupon-content {
+      position: relative;
+      z-index: 3;
+      height: 100%;
+      padding: 40px 24px 20px;
+      color: #fff;
+    }
+    .coupon-kicker {
+      margin: 0 0 14px;
+      color: rgba(27, 120, 19, 0.72);
+      font-size: 19px;
+      font-weight: 900;
+    }
+    .coupon-title {
+      margin: 0;
+      font-size: clamp(30px, 8.4vw, 38px);
+      font-weight: 950;
+      line-height: 1;
+      text-shadow: 0 2px 0 rgba(46, 164, 23, 0.12);
+      white-space: nowrap;
+    }
+    .coupon-subtitle {
+      margin-top: 16px;
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .coupon-value {
+      position: absolute;
+      right: 24px; bottom: 17px;
+      z-index: 5;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 18px;
+      font-weight: 850;
+    }
+
+    .tissue-stack {
+      position: absolute;
+      top: 44px; right: 16px;
+      z-index: 4;
+      width: 124px; height: 92px;
+      transform: rotate(1.7deg);
+    }
+    .tissue-box {
+      position: absolute;
+      width: 76px; height: 44px;
+      border: 1px solid rgba(45, 137, 27, 0.18);
+      border-radius: 3px;
+      background:
+        linear-gradient(178deg, rgba(255, 255, 255, 0.82) 0 28%, transparent 29%),
+        linear-gradient(14deg, #e8ffe4 0 38%, #83e83f 39% 70%, #f9ffe6 71% 100%);
+      box-shadow: 0 4px 10px rgba(33, 99, 18, 0.16);
+    }
+    .tissue-box::before {
+      position: absolute;
+      top: -8px; left: 28px;
+      width: 38px; height: 18px;
+      border-radius: 18px 18px 4px 4px;
+      background: linear-gradient(180deg, #fff, #edf2ef);
+      box-shadow: 0 1px 5px rgba(54, 87, 39, 0.14);
+      content: "";
+    }
+    .tissue-box::after {
+      position: absolute;
+      top: 19px; left: 23px;
+      color: #4a3428;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 8px;
+      font-weight: 900;
+      content: "心相印";
+    }
+    .tissue-box.b1 { left: 10px; top: 0; }
+    .tissue-box.b2 { left: 44px; top: 5px; transform: scale(0.95); }
+    .tissue-box.b3 { left: 4px; top: 42px; transform: scale(0.92); }
+    .tissue-box.b4 { left: 42px; top: 47px; transform: scale(0.88); }
+
+    .claim-card, .detail-card {
+      position: relative;
+      z-index: 3;
+      margin: 0 14px;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: var(--shadow);
+    }
+
+    .claim-card {
+      min-height: 106px;
+      padding: 17px 14px 19px;
+      border-radius: var(--card-radius);
+      transform: translateY(-28px);
+    }
+
+    .claim-title {
+      margin: 0 0 20px;
+      font-size: 20px;
+      font-weight: 900;
+      line-height: 1.2;
+      color: #33343a;
+    }
+
+    /* 按钮区域：始终保持106px高度，避免布局抖动 */
+    .claim-button-area {
+      min-height: 106px;
+      transition: opacity 300ms ease;
+    }
+
+    .claim-button {
+      display: block;
+      width: min(190px, 70%);
+      height: 38px;
+      margin: 0 auto;
+      border: 0;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #ff4b91 0%, #fb3d82 100%);
+      color: #fff;
+      font-size: 17px;
+      font-weight: 900;
+      line-height: 38px;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(255, 63, 138, 0.22);
+      transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease;
+    }
+    .claim-button:hover {
+      filter: brightness(1.02);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 20px rgba(255, 63, 138, 0.28);
+    }
+    .claim-button:focus-visible {
+      outline: 3px solid rgba(255, 63, 138, 0.28);
+      outline-offset: 3px;
+    }
+    .claim-button:active {
+      transform: translateY(1px);
+      box-shadow: 0 4px 10px rgba(255, 63, 138, 0.2);
+    }
+
+    /* ── 已领取行内状态 ── */
+    .claimed-inline {
+      animation: fadeSlideIn 350ms ease forwards;
+    }
+
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .claimed-btn-grey {
+      display: block;
+      width: min(190px, 70%);
+      height: 38px;
+      margin: 0 auto;
+      border: 0;
+      border-radius: 999px;
+      background: #d9dae0;
+      color: #9ca0a8;
+      font-size: 17px;
+      font-weight: 900;
+      line-height: 38px;
+      text-align: center;
+      cursor: default;
+    }
+
+    .claimed-status-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 12px;
+      font-size: 15px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .claimed-view-addr {
+      border: 0;
+      background: transparent;
+      color: var(--pink);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 0;
+      text-decoration: underline;
+    }
+    .claimed-view-addr:hover { color: #e62e72; }
+
+    /* ── 折叠信息卡片 ── */
+    .info-collapse {
+      margin-top: 14px;
+      border-radius: 12px;
+      background: #f6f6f8;
+      overflow: hidden;
+      transition: all 350ms ease;
+    }
+
+    .info-collapse-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 14px;
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .info-collapse-header:active { background: rgba(0,0,0,0.03); }
+
+    .info-collapse-header-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #3d7eb3;
+    }
+    .info-collapse-header-left::before { content: "📦"; font-size: 16px; }
+
+    .info-collapse-arrow {
+      display: inline-block;
+      width: 20px; height: 20px;
+      transition: transform 300ms ease;
+      color: #9ca0a8;
+    }
+    .info-collapse-arrow svg { display: block; }
+    .info-collapse.open .info-collapse-arrow { transform: rotate(180deg); }
+
+    .info-collapse-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 400ms ease, padding 400ms ease;
+      padding: 0 14px;
+    }
+    .info-collapse.open .info-collapse-body {
+      max-height: 300px;
+      padding: 0 14px 14px;
+    }
+
+    .info-addr-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px;
+      border-radius: 10px;
+      background: var(--white);
+      margin-bottom: 10px;
+    }
+    .info-addr-card .addr-info { flex: 1; min-width: 0; }
+    .info-addr-card .addr-person {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 4px;
+      font-size: 15px;
+      font-weight: 900;
+      color: #1f2126;
+    }
+    .info-addr-card .addr-detail {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.4;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .info-logistics-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: var(--white);
+    }
+    .info-logistics-left { flex: 1; min-width: 0; }
+    .info-logistics-company {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+    .info-logistics-number {
+      font-size: 15px;
+      font-weight: 800;
+      color: #1f2126;
+      letter-spacing: 0.5px;
+      user-select: all;
+    }
+
+    .logistics-copy-btn {
+      flex: 0 0 auto;
+      height: 32px;
+      padding: 0 14px;
+      border: 1.5px solid var(--pink);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--pink);
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 150ms ease, color 150ms ease;
+    }
+    .logistics-copy-btn:hover { background: var(--pink); color: #fff; }
+    .logistics-copy-btn:active { opacity: 0.8; }
+    .logistics-copy-btn.copied { background: var(--green); border-color: var(--green); color: #fff; }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 80px;
+      z-index: 999;
+      transform: translateX(-50%) translateY(20px);
+      padding: 10px 24px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.78);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      opacity: 0;
+      transition: opacity 280ms ease, transform 280ms ease;
+      pointer-events: none;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .detail-card {
+      margin-top: -16px;
+      padding: 13px 14px 40px;
+      border-radius: 14px 14px 0 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.72;
+    }
+
+    .section-title {
+      margin: 0;
+      color: #6d7077;
+      font-size: 17px;
+      font-weight: 500;
+      line-height: 1.8;
+    }
+
+    .paragraph { margin: 0 0 30px; }
+    .paragraph.tight { margin-bottom: 28px; }
+    .red { color: var(--danger); }
+    .strong { color: #5e626a; font-weight: 850; }
+
+    .home-indicator {
+      position: fixed;
+      left: 50%;
+      bottom: 8px;
+      z-index: 10;
+      width: 112px;
+      height: 5px;
+      border-radius: 999px;
+      background: #050507;
+      transform: translateX(-50%);
+    }
+
+    /* ── 确认浮层 ── */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 280ms ease, visibility 280ms ease;
+    }
+    .overlay.show { opacity: 1; visibility: visible; }
+    .overlay-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.42);
+    }
+    .overlay-panel {
+      position: relative;
+      z-index: 1;
+      width: min(100vw, 450px);
+      max-height: 90vh;
+      overflow-y: auto;
+      border-radius: 22px 22px 0 0;
+      background: #fff;
+      padding: 32px 24px 42px;
+      transform: translateY(100%);
+      transition: transform 320ms cubic-bezier(0.22, 0.98, 0.32, 1);
+    }
+    .overlay.show .overlay-panel { transform: translateY(0); }
+    .overlay-handle {
+      width: 48px; height: 5px;
+      margin: 0 auto 20px;
+      border-radius: 999px;
+      background: #d9dae0;
+    }
+    .overlay-title {
+      margin: 0 0 6px;
+      font-size: 20px;
+      font-weight: 900;
+      color: #1f2126;
+      text-align: center;
+    }
+    .overlay-days {
+      margin: 0 0 28px;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--muted);
+      text-align: center;
+    }
+    .overlay-addr-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 16px 14px;
+      border-radius: 12px;
+      background: #f6f6f8;
+      margin-bottom: 12px;
+    }
+    .overlay-addr-info { flex: 1; min-width: 0; }
+    .overlay-addr-person {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 6px;
+      font-size: 17px;
+      font-weight: 900;
+      color: #1f2126;
+    }
+    .overlay-addr-detail {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.4;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .overlay-modify {
+      flex: 0 0 auto;
+      border: 0;
+      background: transparent;
+      color: var(--pink);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 4px 0;
+      white-space: nowrap;
+    }
+    .overlay-hint {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: #fff3e8;
+      color: #cd5e20;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 28px;
+    }
+    .overlay-hint::before { content: "⚠"; font-size: 16px; flex: 0 0 auto; }
+    .overlay-confirm {
+      display: block;
+      width: 100%;
+      height: 48px;
+      border: 0;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #ff4b91 0%, #fb3d82 100%);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 900;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(255, 63, 138, 0.24);
+      transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease;
+    }
+    .overlay-confirm:hover {
+      filter: brightness(1.02);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(255, 63, 138, 0.3);
+    }
+    .overlay-confirm:active { transform: translateY(1px); box-shadow: 0 4px 10px rgba(255, 63, 138, 0.2); }
+
+    @media (min-width: 431px) {
+      body { padding: 24px 0; }
+      .page { border-radius: 28px; box-shadow: 0 24px 70px rgba(24,27,33,0.18); }
+      .home-indicator { position: absolute; }
+    }
+    @media (max-width: 360px) {
+      .status-bar { padding-inline: 18px; }
+      .brand-line { font-size: 16px; }
+      .hero-wrap { padding-inline: 16px; }
+      .coupon-title { font-size: 28px; }
+      .tissue-stack { right: 8px; transform: scale(0.84) rotate(1.7deg); transform-origin: top right; }
+      .detail-card { font-size: 15px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page" aria-label="美柚会员福利领取页">
+    <header class="status-bar" aria-label="手机状态栏">
+      <div class="time">17:36</div>
+      <div class="app-pill" aria-label="美柚">
+        <span class="app-icon">柚</span>
+        <span class="app-name">美柚</span>
+      </div>
+      <div class="system-icons" aria-hidden="true">
+        <span class="signal"><span></span><span></span><span></span><span></span></span>
+        <span class="wifi"><span></span></span>
+        <span class="battery">100</span>
+      </div>
+    </header>
+
+    <nav class="nav" aria-label="页面导航">
+      <button class="back" type="button" aria-label="返回"></button>
+      <div class="brand-line">
+        <span class="member-mark" aria-hidden="true"><span>✓</span></span>
+        <span>美柚会员</span>
+        <span aria-hidden="true">|</span>
+        <span class="heart-logo">相印</span>
+      </div>
+      <span aria-hidden="true"></span>
+    </nav>
+
+    <section class="hero-wrap" aria-label="茶语抽纸优惠券">
+      <div class="hand" aria-hidden="true">
+        <span class="palm"></span>
+        <span class="finger one"></span>
+        <span class="finger two"></span>
+      </div>
+      <article class="coupon">
+        <div class="daily-tag">每日可领一次</div>
+        <div class="coupon-content">
+          <p class="coupon-kicker">美柚会员专享</p>
+          <h1 class="coupon-title">茶语抽纸10元券</h1>
+          <div class="coupon-subtitle">5包到手8.8元</div>
+        </div>
+        <div class="tissue-stack" aria-hidden="true">
+          <span class="tissue-box b1"></span>
+          <span class="tissue-box b2"></span>
+          <span class="tissue-box b3"></span>
+          <span class="tissue-box b4"></span>
+        </div>
+        <div class="coupon-value">价值￥10</div>
+      </article>
+    </section>
+
+    <section class="claim-card" aria-label="领取美柚专享福利">
+      <h2 class="claim-title">领取美柚专享福利</h2>
+
+      <!-- 按钮区域：固定高度避免抖动 -->
+      <div class="claim-button-area" id="buttonArea">
+        <button class="claim-button" id="claimBtn" type="button">免费领取</button>
+      </div>
+
+      <!-- 已领取状态（行内展示） -->
+      <div class="claimed-inline" id="claimedInline" style="display:none;">
+        <div class="claimed-btn-grey">已领取</div>
+        <div class="claimed-status-row">
+          <span id="claimedDays">预计 3 个工作日内寄出</span>
+          <button class="claimed-view-addr" id="viewAddrBtn" type="button">查看收货地址</button>
+        </div>
+
+        <!-- 折叠信息卡片 -->
+        <div class="info-collapse" id="infoCollapse">
+          <div class="info-collapse-header" id="collapseHeader">
+            <span class="info-collapse-header-left">物流信息</span>
+            <span class="info-collapse-arrow">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M6 8l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </div>
+          <div class="info-collapse-body">
+            <div class="info-addr-card">
+              <div class="addr-info">
+                <div class="addr-person">
+                  <span id="infoName">测试2</span>
+                  <span id="infoPhone">132****5555</span>
+                </div>
+                <div class="addr-detail" id="infoAddr">广西壮族自治区桂林市荔浦县85号</div>
+              </div>
+            </div>
+            <div class="info-logistics-row">
+              <div class="info-logistics-left">
+                <div class="info-logistics-company" id="logisticsCompany">顺丰速运</div>
+                <div class="info-logistics-number" id="logisticsNumber">SF1234567890</div>
+              </div>
+              <button class="logistics-copy-btn" id="logisticsCopyBtn" type="button">复制</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="detail-card" aria-label="福利详情">
+      <h2 class="section-title">福利详情：</h2>
+      <p class="paragraph tight">
+        心相印10元抽纸券，适用于心相印茶语丝享抽纸100抽*5包，
+        <span class="red">到手8.8元</span>
+      </p>
+      <h2 class="section-title">领取流程：</h2>
+      <p class="paragraph">
+        1、点击上方"立即领取"按钮，获得兑换码，复制兑换码。
+        <span class="strong">福利每日可领1次</span><br>
+        2、兑换路径：恒安官方会员商城小程序-我的-兑换中心-输入兑换码即可
+      </p>
+      <h2 class="section-title">使用说明：</h2>
+      <p class="paragraph">
+        1、兑换码有效期：截止2026年12月31日，请在有效期内完成兑换，逾期作废<br>
+        2、本优惠券新老用户均可使用，每个订单限用1张，不与其他优惠叠加<br>
+        3、兑换后路径查询：可在"恒安官方会员商城"微信小程序底部导航栏【我的】-【全部订单】中查看<br>
+        4、本优惠券仅原价购买商品时可用<br>
+        5、本优惠券不可二次销售，不可兑现
+      </p>
+    </section>
+
+    <span class="home-indicator" aria-hidden="true"></span>
+
+    <!-- ── 确认地址浮层 ── -->
+    <div class="overlay" id="confirmOverlay" role="dialog" aria-modal="true" aria-label="确认收货地址">
+      <div class="overlay-backdrop" id="overlayBackdrop"></div>
+      <div class="overlay-panel" id="overlayPanel">
+        <div class="overlay-handle" aria-hidden="true"></div>
+        <h2 class="overlay-title">请确认收货地址</h2>
+        <p class="overlay-days" id="overlayDays">预计 3 个工作日内寄出</p>
+        <div class="overlay-addr-card">
+          <div class="overlay-addr-info">
+            <div class="overlay-addr-person">
+              <span id="overlayName"></span>
+              <span id="overlayPhone"></span>
+            </div>
+            <div class="overlay-addr-detail" id="overlayAddr"></div>
+          </div>
+          <button class="overlay-modify" id="overlayModify" type="button">修改</button>
+        </div>
+        <div class="overlay-hint">确认地址以后不可修改</div>
+        <button class="overlay-confirm" id="overlayConfirm" type="button">确认</button>
+      </div>
+    </div>
+
+    <!-- ── 只读地址浮层 ── -->
+    <div class="overlay" id="readonlyOverlay" role="dialog" aria-modal="true" aria-label="查看收货地址">
+      <div class="overlay-backdrop" id="readonlyBackdrop"></div>
+      <div class="overlay-panel">
+        <div class="overlay-handle" aria-hidden="true"></div>
+        <h2 class="overlay-title">收货地址</h2>
+        <div class="overlay-addr-card" style="margin-bottom:0;">
+          <div class="overlay-addr-info">
+            <div class="overlay-addr-person">
+              <span id="readonlyName"></span>
+              <span id="readonlyPhone"></span>
+            </div>
+            <div class="overlay-addr-detail" id="readonlyAddr"></div>
+          </div>
+        </div>
+        <button class="overlay-confirm" id="readonlyClose" type="button" style="margin-top:28px;background:#d9dae0;box-shadow:none;color:#33343a;">关闭</button>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+  </main>
+
+  <script>
+    const claimBtn = document.getElementById("claimBtn");
+    const buttonArea = document.getElementById("buttonArea");
+    const claimedInline = document.getElementById("claimedInline");
+    const claimedDays = document.getElementById("claimedDays");
+    const viewAddrBtn = document.getElementById("viewAddrBtn");
+    const infoCollapse = document.getElementById("infoCollapse");
+    const collapseHeader = document.getElementById("collapseHeader");
+    const infoName = document.getElementById("infoName");
+    const infoPhone = document.getElementById("infoPhone");
+    const infoAddr = document.getElementById("infoAddr");
+    const logisticsCompany = document.getElementById("logisticsCompany");
+    const logisticsNumber = document.getElementById("logisticsNumber");
+    const logisticsCopyBtn = document.getElementById("logisticsCopyBtn");
+    const toast = document.getElementById("toast");
+
+    const confirmOverlay = document.getElementById("confirmOverlay");
+    const overlayBackdrop = document.getElementById("overlayBackdrop");
+    const overlayName = document.getElementById("overlayName");
+    const overlayPhone = document.getElementById("overlayPhone");
+    const overlayAddr = document.getElementById("overlayAddr");
+    const overlayDays = document.getElementById("overlayDays");
+    const overlayModify = document.getElementById("overlayModify");
+    const overlayConfirm = document.getElementById("overlayConfirm");
+    const readonlyOverlay = document.getElementById("readonlyOverlay");
+    const readonlyBackdrop = document.getElementById("readonlyBackdrop");
+    const readonlyName = document.getElementById("readonlyName");
+    const readonlyPhone = document.getElementById("readonlyPhone");
+    const readonlyAddr = document.getElementById("readonlyAddr");
+    const readonlyClose = document.getElementById("readonlyClose");
+
+    let currentName = "", currentPhone = "", currentAddr = "";
+    let currentShipDaysText = "";
+
+    const ADDRESS_PAGE = "./方案一_地址页.html";
+
+    function randomShipDays() { return Math.floor(Math.random() * 5) + 2; }
+
+    // ── Toast ──
+    let toastTimer = null;
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 1800);
+    }
+
+    // ── 从 URL 读取地址 ──
+    function parseAddressFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      const name = params.get("name");
+      const phone = params.get("phone");
+      const addr = params.get("addr");
+      if (name && phone && addr) {
+        currentName = decodeURIComponent(name);
+        currentPhone = decodeURIComponent(phone);
+        currentAddr = decodeURIComponent(addr);
+        currentShipDaysText = `预计 ${randomShipDays()} 个工作日内寄出`;
+        showConfirmOverlay();
+      }
+    }
+
+    function showConfirmOverlay() {
+      overlayName.textContent = currentName;
+      overlayPhone.textContent = currentPhone;
+      overlayAddr.textContent = currentAddr;
+      overlayDays.textContent = currentShipDaysText;
+      confirmOverlay.classList.add("show");
+    }
+
+    function hideConfirmOverlay() { confirmOverlay.classList.remove("show"); }
+
+    function showReadonlyOverlay() {
+      readonlyName.textContent = currentName;
+      readonlyPhone.textContent = currentPhone;
+      readonlyAddr.textContent = currentAddr;
+      readonlyOverlay.classList.add("show");
+    }
+
+    function hideReadonlyOverlay() { readonlyOverlay.classList.remove("show"); }
+
+    // ── 同步已领取状态到行内区 ──
+    function syncClaimedState() {
+      claimedDays.textContent = currentShipDaysText;
+      infoName.textContent = currentName;
+      infoPhone.textContent = currentPhone;
+      infoAddr.textContent = currentAddr;
+      logisticsCompany.textContent = "顺丰速运";
+      logisticsNumber.textContent = "SF" + String(Math.floor(Math.random() * 10000000000)).padStart(10, "0");
+    }
+
+    // ── 点击免费领取 ──
+    claimBtn.addEventListener("click", () => {
+      window.location.href = ADDRESS_PAGE;
+    });
+
+    overlayBackdrop.addEventListener("click", hideConfirmOverlay);
+
+    overlayModify.addEventListener("click", (e) => {
+      e.stopPropagation();
+      hideConfirmOverlay();
+      window.location.href = ADDRESS_PAGE;
+    });
+
+    // ── 确认领取 ──
+    overlayConfirm.addEventListener("click", () => {
+      hideConfirmOverlay();
+      buttonArea.style.display = "none";
+      claimedInline.style.display = "block";
+      syncClaimedState();
+      // 自动展开物流卡片
+      infoCollapse.classList.add("open");
+    });
+
+    // ── 查看收货地址 ──
+    viewAddrBtn.addEventListener("click", showReadonlyOverlay);
+
+    // ── 折叠信息卡片 ──
+    collapseHeader.addEventListener("click", () => {
+      infoCollapse.classList.toggle("open");
+    });
+
+    // ── 复制物流单号 ──
+    logisticsCopyBtn.addEventListener("click", async () => {
+      const number = logisticsNumber.textContent;
+      try {
+        await navigator.clipboard.writeText(number);
+      } catch {
+        const ta = document.createElement("textarea");
+        ta.value = number;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+      }
+      logisticsCopyBtn.textContent = "已复制";
+      logisticsCopyBtn.classList.add("copied");
+      showToast("已复制");
+      setTimeout(() => {
+        logisticsCopyBtn.textContent = "复制";
+        logisticsCopyBtn.classList.remove("copied");
+      }, 2000);
+    });
+
+    // ── 只读浮层关闭 ──
+    readonlyBackdrop.addEventListener("click", hideReadonlyOverlay);
+    readonlyClose.addEventListener("click", hideReadonlyOverlay);
+
+    parseAddressFromURL();
+  </script>
+</body>
+</html>

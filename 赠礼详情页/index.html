@@ -1,0 +1,1165 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>美柚会员福利领取页</title>
+  <style>
+    :root {
+      --pink: #ff3f8a;
+      --pink-dark: #f92f78;
+      --green: #4dc922;
+      --green-deep: #2fab12;
+      --text: #33343a;
+      --muted: #6e7178;
+      --soft: #f5f5f8;
+      --white: #fff;
+      --danger: #e60012;
+      --card-radius: 18px;
+      --shadow: 0 10px 26px rgba(31, 43, 28, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: #ececf1;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+      letter-spacing: 0;
+    }
+
+    body { display: flex; justify-content: center; }
+
+    .page {
+      position: relative;
+      width: min(100vw, 430px);
+      min-height: 100vh;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 82% 3%, rgba(191, 239, 66, 0.36), transparent 27%),
+        radial-gradient(circle at 10% 3%, rgba(246, 241, 205, 0.96), transparent 35%),
+        linear-gradient(180deg, #fbfae6 0%, #f8fbef 28%, #f3f3f8 44%, #f4f4f8 100%);
+    }
+
+    .status-bar {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      height: 58px;
+      padding: 8px 24px 0;
+      font-weight: 800;
+      color: #0f1014;
+    }
+
+    .time { font-size: 18px; line-height: 1; }
+
+    .app-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      min-width: 78px;
+      height: 29px;
+      padding: 3px 9px 3px 4px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.88);
+      box-shadow: 0 2px 10px rgba(255, 123, 167, 0.12);
+    }
+
+    .app-icon {
+      display: grid;
+      place-items: center;
+      width: 22px; height: 22px;
+      border-radius: 7px;
+      background: linear-gradient(135deg, #ff2b83, #ff8fb4);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .app-name { color: #ff4f95; font-size: 17px; font-weight: 900; }
+
+    .system-icons {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .signal {
+      display: inline-flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 18px;
+    }
+    .signal span { display: block; width: 4px; border-radius: 4px; background: #0b0b0d; }
+    .signal span:nth-child(1) { height: 6px; }
+    .signal span:nth-child(2) { height: 9px; }
+    .signal span:nth-child(3) { height: 13px; }
+    .signal span:nth-child(4) { height: 17px; }
+
+    .wifi {
+      position: relative;
+      width: 22px; height: 17px;
+    }
+    .wifi::before, .wifi::after, .wifi span {
+      position: absolute;
+      left: 50%;
+      border: 3px solid #0b0b0d;
+      border-bottom: 0;
+      border-left-color: transparent;
+      border-right-color: transparent;
+      border-radius: 22px 22px 0 0;
+      transform: translateX(-50%);
+      content: "";
+    }
+    .wifi::before { top: 0; width: 22px; height: 12px; }
+    .wifi::after { top: 5px; width: 14px; height: 8px; }
+    .wifi span { top: 11px; width: 5px; height: 5px; border: 0; border-radius: 50%; background: #0b0b0d; }
+
+    .battery {
+      min-width: 31px; height: 21px;
+      padding: 2px 4px;
+      border-radius: 5px;
+      background: #0b0b0d;
+      color: #f7f5d7;
+      font-size: 14px;
+      font-weight: 900;
+      line-height: 17px;
+      text-align: center;
+    }
+
+    .nav {
+      position: relative;
+      display: grid;
+      grid-template-columns: 42px 1fr 42px;
+      align-items: center;
+      height: 62px;
+      padding: 0 18px;
+    }
+
+    .back {
+      width: 28px; height: 28px;
+      border: 0;
+      background: transparent;
+      position: relative;
+    }
+    .back::before {
+      position: absolute;
+      inset: 4px 0 0 6px;
+      width: 18px; height: 18px;
+      border-left: 4px solid #555861;
+      border-bottom: 4px solid #555861;
+      border-radius: 2px;
+      transform: rotate(45deg);
+      content: "";
+    }
+
+    .brand-line {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      font-size: 18px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .member-mark {
+      display: inline-grid;
+      place-items: center;
+      width: 17px; height: 17px;
+      border-radius: 50% 50% 50% 4px;
+      transform: rotate(-45deg);
+      background: linear-gradient(135deg, #ff277e, #ff7bc4);
+      color: #fff;
+      font-size: 12px;
+      line-height: 1;
+    }
+    .member-mark span { transform: rotate(45deg); margin-top: -1px; }
+
+    .heart-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      color: #4a3428;
+      font-size: 16px;
+      font-weight: 900;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+    .heart-logo::before {
+      display: inline-block;
+      color: #e3262e;
+      font-size: 21px;
+      transform: translateY(1px);
+      content: "♡";
+    }
+
+    .hero-wrap {
+      position: relative;
+      height: 274px;
+      padding: 10px 14px 0;
+    }
+
+    .hand {
+      position: absolute;
+      left: -24px; bottom: 8px;
+      width: 100px; height: 136px;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .palm {
+      position: absolute;
+      left: 4px; bottom: 0;
+      width: 66px; height: 86px;
+      border-radius: 46px 34px 36px 34px;
+      background: linear-gradient(145deg, #ffd0c0 0%, #f0a18c 84%);
+      transform: rotate(-9deg);
+      box-shadow: 12px -12px 30px rgba(189, 80, 61, 0.15) inset;
+    }
+    .finger {
+      position: absolute;
+      width: 28px; height: 88px;
+      border-radius: 22px;
+      background: linear-gradient(180deg, #ffd9cf 0%, #f4ab99 88%);
+      box-shadow: 5px -8px 16px rgba(161, 80, 67, 0.12) inset;
+      transform-origin: bottom center;
+    }
+    .finger.one { left: 52px; top: 10px; transform: rotate(-2deg); }
+    .finger.two { left: 28px; top: 28px; height: 78px; transform: rotate(-12deg); }
+
+    .coupon-img-wrap {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+      padding: 10px;
+      transform: rotate(-2.7deg);
+    }
+    .coupon-img-wrap img {
+      width: 100%;
+      height: 100%;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+      object-fit: cover;
+      display: block;
+    }
+
+    .claim-card, .detail-card {
+      position: relative;
+      z-index: 3;
+      margin: 0 14px;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: var(--shadow);
+    }
+
+    .claim-card {
+      padding: 17px 14px 19px;
+      border-radius: var(--card-radius);
+      margin-top: 0;
+    }
+
+    .claim-title {
+      margin: 0 0 20px;
+      font-size: 20px;
+      font-weight: 900;
+      line-height: 1.2;
+      color: #33343a;
+      word-break: break-all;
+    }
+
+    /* 按钮区域 */
+    .claim-button-area {
+      min-height: 38px;
+      transition: opacity 300ms ease;
+    }
+
+    .claim-button {
+      display: block;
+      width: min(190px, 70%);
+      height: 38px;
+      margin: 0 auto;
+      border: 0;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #ff4b91 0%, #fb3d82 100%);
+      color: #fff;
+      font-size: 17px;
+      font-weight: 900;
+      line-height: 38px;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(255, 63, 138, 0.22);
+      transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease;
+    }
+    .claim-button:hover {
+      filter: brightness(1.02);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 20px rgba(255, 63, 138, 0.28);
+    }
+    .claim-button:focus-visible {
+      outline: 3px solid rgba(255, 63, 138, 0.28);
+      outline-offset: 3px;
+    }
+    .claim-button:active {
+      transform: translateY(1px);
+      box-shadow: 0 4px 10px rgba(255, 63, 138, 0.2);
+    }
+
+    /* ── 已领取行内状态 ── */
+    .claimed-inline {
+      animation: fadeSlideIn 350ms ease forwards;
+    }
+
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .claimed-btn-grey {
+      display: block;
+      width: min(190px, 70%);
+      height: 38px;
+      margin: 0 auto;
+      border: 0;
+      border-radius: 999px;
+      background: #d9dae0;
+      color: #9ca0a8;
+      font-size: 17px;
+      font-weight: 900;
+      line-height: 38px;
+      text-align: center;
+      cursor: default;
+    }
+
+    .claimed-status-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 12px;
+      font-size: 15px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    /* ── 收货地址常驻 ── */
+    .claimed-addr {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: #f6f6f8;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .claimed-addr-person {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 4px;
+      font-size: 15px;
+      font-weight: 900;
+      color: #1f2126;
+    }
+    .claimed-addr-detail {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.4;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* ── 物流行 ── */
+    .claimed-logistics {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 10px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: #f6f6f8;
+      font-size: 14px;
+    }
+    .claimed-logistics-label {
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .claimed-logistics-number {
+      font-size: 15px;
+      font-weight: 800;
+      color: #1f2126;
+      letter-spacing: 0.5px;
+      user-select: all;
+    }
+
+    .logistics-copy-btn {
+      flex: 0 0 auto;
+      height: 32px;
+      padding: 0 14px;
+      border: 1.5px solid var(--pink);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--pink);
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 150ms ease, color 150ms ease;
+    }
+    .logistics-copy-btn:hover { background: var(--pink); color: #fff; }
+    .logistics-copy-btn:active { opacity: 0.8; }
+    .logistics-copy-btn.copied { background: var(--green); border-color: var(--green); color: #fff; }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 80px;
+      z-index: 999;
+      transform: translateX(-50%) translateY(20px);
+      padding: 10px 24px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.78);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      opacity: 0;
+      transition: opacity 280ms ease, transform 280ms ease;
+      pointer-events: none;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .detail-card {
+      margin-top: -16px;
+      padding: 13px 14px 40px;
+      border-radius: 14px 14px 0 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.72;
+    }
+
+    .section-title {
+      margin: 0;
+      color: #6d7077;
+      font-size: 17px;
+      font-weight: 500;
+      line-height: 1.8;
+    }
+
+    .paragraph { margin: 0 0 30px; }
+    .paragraph.tight { margin-bottom: 28px; }
+    .red { color: var(--danger); }
+    .strong { color: #5e626a; font-weight: 850; }
+
+    /* ── 使用须知 ── */
+    .usage-notes {
+      margin: 24px 14px 40px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .usage-notes-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 18px 16px 12px;
+      border-bottom: 1px solid #f0f0f2;
+    }
+
+    .usage-notes-icon { font-size: 18px; line-height: 1; }
+
+    .usage-notes-title {
+      font-size: 17px;
+      font-weight: 850;
+      color: #33343a;
+    }
+
+    .usage-notes-body {
+      padding: 14px 16px 20px;
+    }
+
+    .usage-notes-body p {
+      margin: 0 0 8px;
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .usage-notes-body p:last-child {
+      margin-bottom: 0;
+    }
+
+    .home-indicator {
+      position: fixed;
+      left: 50%;
+      bottom: 8px;
+      z-index: 10;
+      width: 112px;
+      height: 5px;
+      border-radius: 999px;
+      background: #050507;
+      transform: translateX(-50%);
+    }
+
+    /* ── 确认浮层 ── */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 280ms ease, visibility 280ms ease;
+    }
+    .overlay.show { opacity: 1; visibility: visible; }
+    .overlay-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.42);
+    }
+    .overlay-panel {
+      position: relative;
+      z-index: 1;
+      width: min(100vw, 450px);
+      max-height: 90vh;
+      overflow-y: auto;
+      border-radius: 22px 22px 0 0;
+      background: #fff;
+      padding: 32px 24px 42px;
+      transform: translateY(100%);
+      transition: transform 320ms cubic-bezier(0.22, 0.98, 0.32, 1);
+    }
+    .overlay.show .overlay-panel { transform: translateY(0); }
+    .overlay-handle {
+      width: 48px; height: 5px;
+      margin: 0 auto 20px;
+      border-radius: 999px;
+      background: #d9dae0;
+    }
+    .overlay-title {
+      margin: 0 0 6px;
+      font-size: 20px;
+      font-weight: 900;
+      color: #1f2126;
+      text-align: center;
+    }
+    .overlay-days {
+      margin: 0 0 28px;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--muted);
+      text-align: center;
+    }
+    .overlay-addr-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 16px 14px;
+      border-radius: 12px;
+      background: #f6f6f8;
+      margin-bottom: 12px;
+    }
+    .overlay-addr-info { flex: 1; min-width: 0; }
+    .overlay-addr-person {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 6px;
+      font-size: 17px;
+      font-weight: 900;
+      color: #1f2126;
+    }
+    .overlay-addr-detail {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.4;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .overlay-modify {
+      flex: 0 0 auto;
+      border: 0;
+      background: transparent;
+      color: var(--pink);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 4px 0;
+      white-space: nowrap;
+    }
+    .overlay-hint {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: #fff3e8;
+      color: #cd5e20;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 28px;
+    }
+    .overlay-hint::before { content: "⚠"; font-size: 16px; flex: 0 0 auto; }
+    .overlay-confirm {
+      display: block;
+      width: 100%;
+      height: 48px;
+      border: 0;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #ff4b91 0%, #fb3d82 100%);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 900;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(255, 63, 138, 0.24);
+      transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease;
+    }
+    .overlay-confirm:hover {
+      filter: brightness(1.02);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(255, 63, 138, 0.3);
+    }
+    .overlay-confirm:active { transform: translateY(1px); box-shadow: 0 4px 10px rgba(255, 63, 138, 0.2); }
+
+    /* ── 二次确认弹窗 ── */
+    .confirm2 {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 220ms ease, visibility 220ms ease;
+    }
+    .confirm2.show { opacity: 1; visibility: visible; }
+    .confirm2-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.36);
+    }
+    .confirm2-box {
+      position: relative;
+      z-index: 1;
+      width: min(calc(100vw - 48px), 340px);
+      background: #fff;
+      border-radius: 18px;
+      padding: 32px 24px 20px;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.18);
+      text-align: center;
+      transform: scale(0.92);
+      transition: transform 260ms cubic-bezier(0.22, 0.98, 0.32, 1);
+    }
+    .confirm2.show .confirm2-box { transform: scale(1); }
+    .confirm2-icon {
+      display: grid;
+      place-items: center;
+      width: 52px; height: 52px;
+      margin: 0 auto 16px;
+      border-radius: 50%;
+      background: #fff3e8;
+      font-size: 26px;
+    }
+    .confirm2-title {
+      margin: 0 0 8px;
+      font-size: 18px;
+      font-weight: 900;
+      color: #1f2126;
+    }
+    .confirm2-desc {
+      margin: 0 0 28px;
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .confirm2-btns {
+      display: flex;
+      gap: 12px;
+    }
+    .confirm2-btns button {
+      flex: 1;
+      height: 44px;
+      border: 0;
+      border-radius: 999px;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 120ms ease, filter 120ms ease;
+    }
+    .confirm2-btns button:active { transform: translateY(1px); }
+    .confirm2-cancel {
+      background: #f0f0f2;
+      color: #6e7178;
+    }
+    .confirm2-cancel:hover { filter: brightness(0.97); }
+    .confirm2-ok {
+      background: linear-gradient(180deg, #ff4b91 0%, #fb3d82 100%);
+      color: #fff;
+      box-shadow: 0 6px 16px rgba(255, 63, 138, 0.22);
+    }
+    .confirm2-ok:hover { filter: brightness(1.04); }
+
+    @media (min-width: 431px) {
+      body { padding: 24px 0; }
+      .page { border-radius: 28px; box-shadow: 0 24px 70px rgba(24,27,33,0.18); }
+      .home-indicator { position: absolute; }
+    }
+    @media (max-width: 360px) {
+      .status-bar { padding-inline: 18px; }
+      .brand-line { font-size: 16px; }
+      .hero-wrap { padding-inline: 16px; }
+      .coupon-title { font-size: 28px; }
+      .tissue-stack { right: 8px; transform: scale(0.84) rotate(1.7deg); transform-origin: top right; }
+      .detail-card { font-size: 15px; }
+    }
+  </style>
+<style id="__req_tip_style2__">
+.req-anno-btn{display:inline-block;background:#e67e00;color:#fff;border:none;border-radius:3px;
+  padding:1px 7px;font-size:11px;line-height:18px;cursor:pointer;margin-right:8px;
+  vertical-align:middle;font-weight:600;opacity:.9}
+.req-anno-btn:hover{background:#cf6c00;opacity:1}
+.req-anno-box{display:none}
+#__req_modal__ *{box-sizing:border-box}
+</style>
+<script>
+function toggleReqAnno(btn) {
+  var box = btn.parentElement.querySelector('.req-anno-box');
+  if (!box) return;
+  if (document.getElementById('__req_modal__')) return;
+  var ov = document.createElement('div');
+  ov.id = '__req_modal__';
+  ov.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);'
+    + 'z-index:999998;display:flex;align-items:center;justify-content:center';
+  var card = document.createElement('div');
+  card.style.cssText = 'background:#fff;border-radius:8px;padding:24px 28px 20px;max-width:420px;'
+    + 'width:92%;box-shadow:0 8px 32px rgba(0,0,0,.22);position:relative;border-top:4px solid #e67e00';
+  var cls = document.createElement('button');
+  cls.innerHTML = '&times;';
+  cls.style.cssText = 'position:absolute;top:10px;right:14px;background:none;border:none;'
+    + 'font-size:22px;line-height:1;cursor:pointer;color:#aaa;padding:0';
+  cls.onclick = function () { ov.remove(); };
+  var ttl = document.createElement('div');
+  ttl.style.cssText = 'font-size:13px;font-weight:700;color:#e67e00;margin-bottom:12px;letter-spacing:.5px';
+  ttl.textContent = '📋 需求说明';
+  var body = document.createElement('div');
+  body.style.cssText = 'font-size:12px;color:#5a4000;line-height:1.9;'
+    + 'background:#fffbe6;padding:12px 14px;border-radius:6px;border-left:3px solid #e67e00;'
+    + 'max-height:60vh;overflow-y:auto';
+  var raw = box.innerHTML;
+  // 检查是否包含 HTML 标签（含 HTML 实体编码的标签）
+  var decoded = raw.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"');
+  if (/<[a-zA-Z]/.test(decoded)) {
+    body.innerHTML = decoded;
+  } else {
+    body.style.whiteSpace = 'pre-line';
+    body.textContent = box.textContent.trim();
+  }
+  card.appendChild(cls); card.appendChild(ttl); card.appendChild(body);
+  ov.appendChild(card);
+  ov.onclick = function (e) { if (e.target === ov) ov.remove(); };
+  document.body.appendChild(ov);
+}
+</script>
+</head>
+<body>
+  <main class="page" aria-label="美柚会员福利领取页">
+    <header class="status-bar" aria-label="手机状态栏">
+      <div class="time">17:36</div>
+      <div class="app-pill" aria-label="美柚">
+        <span class="app-icon">柚</span>
+        <span class="app-name">美柚</span>
+      </div>
+      <div class="system-icons" aria-hidden="true">
+        <span class="signal"><span></span><span></span><span></span><span></span></span>
+        <span class="wifi"><span></span></span>
+        <span class="battery">100</span>
+      </div>
+    </header>
+
+    <nav class="nav" aria-label="页面导航">
+      <button class="back" type="button" aria-label="返回"></button>
+      <div class="brand-line">
+        <span class="member-mark" aria-hidden="true"><span>✓</span></span>
+        <span>美柚会员</span>
+        <span aria-hidden="true">|</span>
+        <span class="heart-logo">相印</span>
+      </div>
+      <span aria-hidden="true"></span>
+    </nav>
+
+    <section class="hero-wrap" aria-label="茶语抽纸优惠券" style="position:relative;">
+      <button class="req-anno-btn" onclick="toggleReqAnno(this)" style="position:absolute;top:10px;right:10px;z-index:20">需求说明</button>
+      <div class="req-anno-box">【优惠券卡片模块】
+此模块为一张品牌优惠券图片，由区赠礼后台配置并上传。
+
+业务背景：
+• 美柚与第三方品牌（如心相印）联名推广，用户通过领券享受品牌折扣
+• 券面内容（品牌名、券名、面值、促销文案）统一由运营在后台配置
+• 前端不做文案编辑，仅渲染后台下发的图片/数据
+
+用户侧：点击优惠券区域的行为待定（跳转品牌页 or 无交互），当前版本为纯展示。</div>
+      <div class="coupon-img-wrap">
+        <img src="美柚纸巾.jpg" alt="茶语抽纸优惠券" />
+      </div>
+    </section>
+
+    <section class="claim-card" aria-label="领取美柚专享福利" style="position:relative;">
+      <button class="req-anno-btn" onclick="toggleReqAnno(this)" style="position:absolute;top:10px;right:10px;z-index:20">需求说明</button>
+      <div class="req-anno-box">【领取卡片模块】
+用户领取赠礼的核心操作区，承载"免费领取→已领取"的完整流程。
+
+用户场景：
+• 领取前：用户浏览商品信息 → 点击"免费领取" → 跳转地址选择页填写收货信息
+• 领取后：用户确认地址后回到本页，按钮变为灰色"已领取"，不可再次点击
+
+业务规则：
+• 每个用户仅可领取一次，状态切换后不可逆
+• 已领取用户再次访问本页，直接展示"已领取"状态（需后端返回领取记录）
+• 未领取用户可多次进出地址页，但一旦在确认浮层点击"确认"即锁定
+
+展示顺序：预计寄出时间 → 收货地址（常驻） → 物流信息（按发货状态动态切换）
+
+异常场景：
+• 商品库存不足时，"免费领取"按钮置灰并提示"已领完"
+• 用户未登录/非会员时，点击按钮应引导登录或提示无权限</div>
+      <h2 class="claim-title">美柚一心婴儿柔纸巾云柔巾新生儿宝宝手口专用超柔纸巾保湿乳霜纸</h2>
+
+      <!-- 按钮区域：固定高度避免抖动 -->
+      <div class="claim-button-area" id="buttonArea">
+        <button class="claim-button" id="claimBtn" type="button">免费领取</button>
+      </div>
+
+      <!-- 已领取状态（行内展示） -->
+      <div class="claimed-inline" id="claimedInline" style="display:none;">
+        <div class="claimed-btn-grey">已领取</div>
+        <div class="claimed-status-row">
+          <span id="claimedDays">预计 7 个工作日内寄出</span>
+        </div>
+
+        <!-- 收货地址常驻 -->
+        <div class="claimed-addr" id="claimedAddr" style="position:relative;">
+          <button class="req-anno-btn" onclick="toggleReqAnno(this)" style="position:absolute;top:6px;right:6px;z-index:20">需求说明</button>
+          <div class="req-anno-box">【收货地址展示】
+确认领取后常驻展示用户的收货信息，数据来源于地址选择页用户提交的内容。
+
+展示规则：
+• 收件人姓名：完整展示（如"张三"），不做脱敏——用户需核对是否为自己
+• 手机号：中间 4 位脱敏（如 132****5555），保护隐私
+• 详细地址：完整展示省/市/区 + 街道门牌号
+
+业务约束：
+• 地址在用户点击"确认"后即锁定，前端不可编辑
+• 若用户发现地址有误，唯一路径为联系客服人工修改（第 5 条使用须知留有客服电话）
+• 设计上：浅灰底色（#f6f6f8）与白色卡片区分，视觉上弱于主操作区，暗示"只读"</div>
+          <div class="claimed-addr-person">
+            <span id="infoName">测试2</span>
+            <span id="infoPhone">132****5555</span>
+          </div>
+          <div class="claimed-addr-detail" id="infoAddr">广西壮族自治区桂林市荔浦县85号</div>
+        </div>
+
+        <!-- 物流行：未发货 / 已发货 -->
+        <div class="claimed-logistics" id="claimedLogistics" style="position:relative;">
+          <button class="req-anno-btn" onclick="toggleReqAnno(this)" style="position:absolute;top:6px;right:6px;z-index:20">需求说明</button>
+          <div class="req-anno-box">
+&lt;div style="background:#f6f6f8;border-radius:8px;padding:12px 14px;font-family:sans-serif;"&gt;
+
+&lt;div style="margin-bottom:14px;"&gt;
+&lt;span style="font-weight:700;color:#555;"&gt;── 无物流单号（未发货）──&lt;/span&gt;&lt;br&gt;
+&lt;span style="color:#6e7178;font-size:14px;"&gt;🚚 等待发货&lt;/span&gt;
+&lt;/div&gt;
+
+&lt;div style="display:flex;align-items:center;justify-content:space-between;"&gt;
+&lt;div&gt;
+&lt;span style="font-weight:700;color:#555;"&gt;── 有物流单号（已发货）──&lt;/span&gt;&lt;br&gt;
+&lt;span style="font-size:13px;color:#6e7178;"&gt;顺丰速运&lt;/span&gt;&lt;br&gt;
+&lt;span style="font-size:15px;font-weight:800;color:#1f2126;"&gt;SF1234567890&lt;/span&gt;
+&lt;/div&gt;
+&lt;span style="border:1.5px solid #ff3f8a;border-radius:999px;padding:4px 14px;color:#ff3f8a;font-size:13px;font-weight:800;"&gt;复制&lt;/span&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+【物流信息展示】
+后台运营录入物流单号后，此处从未发货切换为已发货状态（两种形态见上图对比）。
+
+状态切换逻辑：
+• 未发货：灰色文字"🚚 等待发货"，纯文本，无可操作按钮
+• 已发货：快递公司名称 + 物流单号 + 粉色"复制"按钮
+
+交互细节：
+• 复制按钮：点击一键复制单号到剪贴板，成功后按钮变绿色"已复制"（2秒恢复）
+• 单号文本支持长按选中（方便用户手动复制或去快递官网查询）
+
+触发条件：
+• 后台运营在赠礼订单管理系统中录入快递公司和单号后，前端刷新即展示
+• 如录入后用户端未更新，检查：① 订单状态是否已同步 ② 物流信息接口是否正常返回
+
+用户价值：让用户在本页即可追踪物流，无需跳转到快递官网或客服咨询。</div>
+          <div class="claimed-logistics-inner" id="claimedLogisticsInner">
+            <span class="claimed-logistics-label">🚚 等待发货</span>
+          </div>
+        </div>
+    </section>
+
+    <!-- ── 使用须知 ── -->
+    <div class="usage-notes" style="position:relative;">
+      <button class="req-anno-btn" onclick="toggleReqAnno(this)" style="position:absolute;top:10px;right:10px;z-index:20">需求说明</button>
+      <div class="req-anno-box">【使用须知模块】
+面向用户的规则说明区，帮助用户了解领取条件、发货时效、售后渠道。
+
+内容管理：
+• 文案由后台运营统一配置，支持多条规则自由增删改
+• 当前展示 5 条为默认模板，各条含义如下：
+
+各条业务含义：
+• 第 1 条（仅限会员）：需与会员系统联动——非会员进入本页应看到领取按钮置灰或引导开通会员
+• 第 2 条（地址不可修改）：告知用户确认前仔细核对，降低客服改址工单量
+• 第 3 条（发货时效）：X 为占位符，具体工作日数由运营确认后填入，用户预期管理的关键信息
+• 第 4 条（缺货延期）：兜底条款，避免因供应链问题引发用户投诉
+• 第 5 条（客服电话）：需配置为实际运营号码，正常展示而非占位符</div>
+      <div class="usage-notes-header">
+        <span class="usage-notes-icon">📋</span>
+        <span class="usage-notes-title">使用须知</span>
+      </div>
+      <div class="usage-notes-body" id="usageNotesBody">
+        <p>1、本福利为美柚会员专属赠礼，仅限会员领取使用。</p>
+        <p>2、请确保收货地址准确无误，提交后将无法修改。</p>
+        <p>3、赠礼将在确认领取后 7 个工作日内寄出，物流信息可在本页查看。</p>
+        <p>4、如遇缺货等特殊情况，发货时间可能延长，敬请谅解。</p>
+        <p>5、如有疑问请联系美柚客服：400-xxx-xxxx。</p>
+      </div>
+    </div>
+
+    <span class="home-indicator" aria-hidden="true"></span>
+
+    <!-- ── 确认地址浮层 ── -->
+    <div class="overlay" id="confirmOverlay" role="dialog" aria-modal="true" aria-label="确认收货地址">
+      <div class="overlay-backdrop" id="overlayBackdrop"></div>
+      <div class="overlay-panel" id="overlayPanel" style="position:relative;">
+        <button class="req-anno-btn" onclick="toggleReqAnno(this)" style="position:absolute;top:10px;right:10px;z-index:20">需求说明</button>
+        <div class="req-anno-box">【确认地址浮层】
+用户在地址选择页提交后，返回本页自动弹出此浮层，完成最终确认即进入"已领取"状态。
+
+为什么需要这一步：
+• 地址选择页（address.html）是外部页面，用户可能误操作或中途退出
+• 回到本页再次确认，给用户最后一次核对机会，降低错发率
+
+交互设计：
+• 底部半屏面板弹出，带拖拽手柄（暗示可下滑关闭），同时支持点击遮罩关闭
+• 展示内容：收件人姓名 + 脱敏手机号 + 完整地址
+• 寄出时间提示："预计 7 个工作日内寄出"
+
+两个操作按钮：
+• "修改"：关闭弹窗 → 跳回地址选择页，用户可重新选择/编辑地址
+• "确认领取"：弹出二次确认弹窗，防止误操作
+
+【二次确认弹窗】
+点击"确认领取"后弹出居中模态框，文案为"确认领取赠礼？领取后收货地址将不可修改"。
+• "取消"：关闭二次弹窗，回到确认地址弹窗
+• "确认领取"：领取生效 → 页面切换为"已领取"状态 → 地址锁定
+
+关键逻辑：
+• URL 传参触发：address.html 通过 ?name=&phone=&addr= 传回地址参数，页面检测到参数即弹窗
+• 防重复弹窗：确认后立即清除 URL 参数（history.replaceState），用户刷新页面不会再次弹窗
+• 若用户关闭弹窗但不点"确认"，下次进入仍会弹出（参数未清除）
+
+边界情况：
+• 用户直接带参数访问（如分享链接）：同样触发弹窗，保证流程完整性
+• 已领取用户带参数访问：不应弹窗，直接展示"已领取"状态</div>
+        <div class="overlay-handle" aria-hidden="true"></div>
+        <h2 class="overlay-title">请确认收货地址</h2>
+        <p class="overlay-days" id="overlayDays">预计 7 个工作日内寄出</p>
+        <div class="overlay-addr-card">
+          <div class="overlay-addr-info">
+            <div class="overlay-addr-person">
+              <span id="overlayName"></span>
+              <span id="overlayPhone"></span>
+            </div>
+            <div class="overlay-addr-detail" id="overlayAddr"></div>
+          </div>
+          <button class="overlay-modify" id="overlayModify" type="button">修改</button>
+        </div>
+        <div class="overlay-hint">确认地址以后不可修改</div>
+        <button class="overlay-confirm" id="overlayConfirm" type="button">确认领取</button>
+      </div>
+    </div>
+
+    <!-- ── 二次确认弹窗 ── -->
+    <div class="confirm2" id="confirm2" role="dialog" aria-modal="true" aria-label="二次确认领取">
+      <div class="confirm2-backdrop" id="confirm2Backdrop"></div>
+      <div class="confirm2-box">
+        <div class="confirm2-icon">⚠️</div>
+        <h3 class="confirm2-title">确认领取赠礼？</h3>
+        <p class="confirm2-desc">领取后收货地址将不可修改，请确认信息无误</p>
+        <div class="confirm2-btns">
+          <button class="confirm2-cancel" id="confirm2Cancel" type="button">取消</button>
+          <button class="confirm2-ok" id="confirm2Ok" type="button">确认领取</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+  </main>
+
+  <script>
+    const claimBtn = document.getElementById("claimBtn");
+    const buttonArea = document.getElementById("buttonArea");
+    const claimedInline = document.getElementById("claimedInline");
+    const claimedDays = document.getElementById("claimedDays");
+    const infoName = document.getElementById("infoName");
+    const infoPhone = document.getElementById("infoPhone");
+    const infoAddr = document.getElementById("infoAddr");
+    const claimedLogistics = document.getElementById("claimedLogistics");
+    const claimedLogisticsInner = document.getElementById("claimedLogisticsInner");
+    const toast = document.getElementById("toast");
+
+    const confirmOverlay = document.getElementById("confirmOverlay");
+    const overlayBackdrop = document.getElementById("overlayBackdrop");
+    const overlayName = document.getElementById("overlayName");
+    const overlayPhone = document.getElementById("overlayPhone");
+    const overlayAddr = document.getElementById("overlayAddr");
+    const overlayDays = document.getElementById("overlayDays");
+    const overlayModify = document.getElementById("overlayModify");
+    const overlayConfirm = document.getElementById("overlayConfirm");
+
+    const confirm2 = document.getElementById("confirm2");
+    const confirm2Backdrop = document.getElementById("confirm2Backdrop");
+    const confirm2Cancel = document.getElementById("confirm2Cancel");
+    const confirm2Ok = document.getElementById("confirm2Ok");
+
+    let currentName = "测试2", currentPhone = "132****5555", currentAddr = "广西壮族自治区桂林市荔浦县85号";
+    let currentShipDaysText = `预计 ${getShipDaysText()} 个工作日内寄出`;
+
+    const ADDRESS_PAGE = "./address.html";
+
+    function getShipDaysText() { return "7"; }
+
+    // ── Toast ──
+    let toastTimer = null;
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 1800);
+    }
+
+    // ── 从 URL 读取地址 ──
+    function parseAddressFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      const name = params.get("name");
+      const phone = params.get("phone");
+      const addr = params.get("addr");
+      if (name && phone && addr) {
+        currentName = decodeURIComponent(name);
+        currentPhone = decodeURIComponent(phone);
+        currentAddr = decodeURIComponent(addr);
+        currentShipDaysText = `预计 ${getShipDaysText()} 个工作日内寄出`;
+        // 清除 URL 参数，避免刷新重复弹窗
+        history.replaceState(null, "", window.location.pathname);
+        showConfirmOverlay();
+      }
+    }
+
+    function showConfirmOverlay() {
+      overlayName.textContent = currentName;
+      overlayPhone.textContent = currentPhone;
+      overlayAddr.textContent = currentAddr;
+      overlayDays.textContent = currentShipDaysText;
+      confirmOverlay.classList.add("show");
+    }
+
+    function hideConfirmOverlay() { confirmOverlay.classList.remove("show"); }
+
+    // ── 同步已领取状态到行内区 ──
+    function syncClaimedState() {
+      claimedDays.textContent = currentShipDaysText;
+      infoName.textContent = currentName;
+      infoPhone.textContent = currentPhone;
+      infoAddr.textContent = currentAddr;
+      // 初始：等待发货
+      claimedLogisticsInner.innerHTML = '<span class="claimed-logistics-label">🚚 等待发货</span>';
+    }
+
+    // ── 模拟后台发货（调用此函数切换为已发货） ──
+    function setShipped(company, number) {
+      claimedLogisticsInner.innerHTML = `
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;font-weight:600;color:var(--muted);margin-bottom:3px;">${company}</div>
+          <span class="claimed-logistics-number">${number}</span>
+        </div>
+        <button class="logistics-copy-btn" id="logisticsCopyBtn" type="button">复制</button>
+      `;
+      // 绑定复制事件
+      const copyBtn = document.getElementById("logisticsCopyBtn");
+      if (copyBtn) {
+        copyBtn.addEventListener("click", async () => {
+          const num = number;
+          try {
+            await navigator.clipboard.writeText(num);
+          } catch {
+            const ta = document.createElement("textarea");
+            ta.value = num;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand("copy");
+            document.body.removeChild(ta);
+          }
+          copyBtn.textContent = "已复制";
+          copyBtn.classList.add("copied");
+          showToast("已复制");
+          setTimeout(() => {
+            copyBtn.textContent = "复制";
+            copyBtn.classList.remove("copied");
+          }, 2000);
+        });
+      }
+    }
+
+    // ── 点击免费领取 ──
+    claimBtn.addEventListener("click", () => {
+      showConfirmOverlay();
+    });
+
+    overlayBackdrop.addEventListener("click", hideConfirmOverlay);
+
+    overlayModify.addEventListener("click", (e) => {
+      e.stopPropagation();
+      hideConfirmOverlay();
+      window.location.href = ADDRESS_PAGE;
+    });
+
+    // ── 确认领取（弹出二次确认） ──
+    overlayConfirm.addEventListener("click", () => {
+      confirm2.classList.add("show");
+    });
+
+    confirm2Backdrop.addEventListener("click", () => {
+      confirm2.classList.remove("show");
+    });
+    confirm2Cancel.addEventListener("click", () => {
+      confirm2.classList.remove("show");
+    });
+    confirm2Ok.addEventListener("click", () => {
+      confirm2.classList.remove("show");
+      hideConfirmOverlay();
+      buttonArea.style.display = "none";
+      claimedInline.style.display = "block";
+      syncClaimedState();
+    });
+
+    parseAddressFromURL();
+  </script>
+</body>
+</html>

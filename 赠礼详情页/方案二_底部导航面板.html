@@ -1,0 +1,914 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>美柚会员福利领取页</title>
+  <style>
+    :root {
+      --pink: #ff3f8a;
+      --pink-dark: #f92f78;
+      --green: #4dc922;
+      --text: #33343a;
+      --muted: #6e7178;
+      --soft: #f5f5f8;
+      --white: #fff;
+      --danger: #e60012;
+      --card-radius: 18px;
+      --shadow: 0 10px 26px rgba(31, 43, 28, 0.08);
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; min-height: 100%;
+      background: #ececf1;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+    }
+    body { display: flex; justify-content: center; }
+
+    .page {
+      position: relative;
+      width: min(100vw, 430px);
+      min-height: 100vh;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 82% 3%, rgba(191, 239, 66, 0.36), transparent 27%),
+        radial-gradient(circle at 10% 3%, rgba(246, 241, 205, 0.96), transparent 35%),
+        linear-gradient(180deg, #fbfae6 0%, #f8fbef 28%, #f3f3f8 44%, #f4f4f8 100%);
+    }
+
+    /* ── Status Bar, Nav, Hero (unchanged from original) ── */
+    .status-bar {
+      display: grid; grid-template-columns: 1fr auto 1fr;
+      align-items: center; height: 58px; padding: 8px 24px 0;
+      font-weight: 800; color: #0f1014;
+    }
+    .time { font-size: 18px; }
+    .app-pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      min-width: 78px; height: 29px; padding: 3px 9px 3px 4px;
+      border-radius: 999px; background: rgba(255,255,255,0.88);
+      box-shadow: 0 2px 10px rgba(255,123,167,0.12);
+    }
+    .app-icon {
+      display: grid; place-items: center;
+      width: 22px; height: 22px; border-radius: 7px;
+      background: linear-gradient(135deg, #ff2b83, #ff8fb4);
+      color: #fff; font-size: 13px; font-weight: 900;
+    }
+    .app-name { color: #ff4f95; font-size: 17px; font-weight: 900; }
+    .system-icons { display: flex; justify-content: flex-end; align-items: center; gap: 8px; }
+    .signal { display: inline-flex; align-items: flex-end; gap: 3px; height: 18px; }
+    .signal span { display: block; width: 4px; border-radius: 4px; background: #0b0b0d; }
+    .signal span:nth-child(1) { height: 6px; }
+    .signal span:nth-child(2) { height: 9px; }
+    .signal span:nth-child(3) { height: 13px; }
+    .signal span:nth-child(4) { height: 17px; }
+    .wifi { position: relative; width: 22px; height: 17px; }
+    .wifi::before, .wifi::after, .wifi span {
+      position: absolute; left: 50%;
+      border: 3px solid #0b0b0d; border-bottom: 0;
+      border-left-color: transparent; border-right-color: transparent;
+      border-radius: 22px 22px 0 0; transform: translateX(-50%); content: "";
+    }
+    .wifi::before { top: 0; width: 22px; height: 12px; }
+    .wifi::after { top: 5px; width: 14px; height: 8px; }
+    .wifi span { top: 11px; width: 5px; height: 5px; border: 0; border-radius: 50%; background: #0b0b0d; }
+    .battery { min-width: 31px; height: 21px; padding: 2px 4px; border-radius: 5px; background: #0b0b0d; color: #f7f5d7; font-size: 14px; font-weight: 900; line-height: 17px; text-align: center; }
+
+    .nav {
+      display: grid; grid-template-columns: 42px 1fr 42px;
+      align-items: center; height: 62px; padding: 0 18px;
+    }
+    .back { width: 28px; height: 28px; border: 0; background: transparent; position: relative; }
+    .back::before {
+      position: absolute; inset: 4px 0 0 6px; width: 18px; height: 18px;
+      border-left: 4px solid #555861; border-bottom: 4px solid #555861;
+      border-radius: 2px; transform: rotate(45deg); content: "";
+    }
+    .brand-line { display: flex; justify-content: center; align-items: center; gap: 8px; font-size: 18px; font-weight: 850; white-space: nowrap; }
+    .member-mark { display: inline-grid; place-items: center; width: 17px; height: 17px; border-radius: 50% 50% 50% 4px; transform: rotate(-45deg); background: linear-gradient(135deg, #ff277e, #ff7bc4); color: #fff; font-size: 12px; }
+    .member-mark span { transform: rotate(45deg); margin-top: -1px; }
+    .heart-logo { display: inline-flex; align-items: center; gap: 2px; color: #4a3428; font-size: 16px; font-weight: 900; font-family: Georgia, "Times New Roman", serif; }
+    .heart-logo::before { display: inline-block; color: #e3262e; font-size: 21px; transform: translateY(1px); content: "♡"; }
+
+    .hero-wrap { position: relative; height: 258px; padding: 36px 20px 0; }
+    .hand { position: absolute; left: -24px; bottom: 8px; width: 100px; height: 136px; pointer-events: none; z-index: 1; }
+    .palm { position: absolute; left: 4px; bottom: 0; width: 66px; height: 86px; border-radius: 46px 34px 36px 34px; background: linear-gradient(145deg, #ffd0c0 0%, #f0a18c 84%); transform: rotate(-9deg); box-shadow: 12px -12px 30px rgba(189,80,61,0.15) inset; }
+    .finger { position: absolute; width: 28px; height: 88px; border-radius: 22px; background: linear-gradient(180deg, #ffd9cf 0%, #f4ab99 88%); box-shadow: 5px -8px 16px rgba(161,80,67,0.12) inset; transform-origin: bottom center; }
+    .finger.one { left: 52px; top: 10px; transform: rotate(-2deg); }
+    .finger.two { left: 28px; top: 28px; height: 78px; transform: rotate(-12deg); }
+
+    .coupon { position: relative; z-index: 2; height: 176px; border-radius: 18px 18px 13px 13px; overflow: hidden; background: radial-gradient(ellipse at 68% 68%, rgba(248,255,205,0.38), transparent 30%), linear-gradient(107deg, #7ddd3c 0%, #45c91c 45%, #31b510 100%); box-shadow: 0 16px 26px rgba(67,156,13,0.2); transform: rotate(-2.7deg); }
+    .coupon::before { position: absolute; right: -62px; bottom: -54px; width: 360px; height: 125px; border-radius: 50%; background: linear-gradient(180deg, rgba(250,255,197,0.52), rgba(67,190,29,0.16)), repeating-linear-gradient(160deg, rgba(255,255,255,0.22) 0 1px, transparent 1px 8px); transform: rotate(-7deg); content: ""; }
+    .coupon::after { position: absolute; left: 22px; right: 120px; bottom: 35px; height: 38px; border-radius: 100%; border-top: 2px solid rgba(255,255,255,0.2); transform: rotate(-5deg); content: ""; }
+    .daily-tag { position: absolute; top: 0; right: 0; z-index: 4; padding: 8px 17px 9px; border-radius: 0 16px 0 16px; background: rgba(45,51,39,0.86); color: #f4f6d2; font-size: 17px; font-weight: 750; white-space: nowrap; }
+    .coupon-content { position: relative; z-index: 3; height: 100%; padding: 40px 24px 20px; color: #fff; }
+    .coupon-kicker { margin: 0 0 14px; color: rgba(27,120,19,0.72); font-size: 19px; font-weight: 900; }
+    .coupon-title { margin: 0; font-size: clamp(30px,8.4vw,38px); font-weight: 950; line-height: 1; text-shadow: 0 2px 0 rgba(46,164,23,0.12); white-space: nowrap; }
+    .coupon-subtitle { margin-top: 16px; font-size: 22px; font-weight: 900; line-height: 1; }
+    .coupon-value { position: absolute; right: 24px; bottom: 17px; z-index: 5; color: rgba(255,255,255,0.78); font-size: 18px; font-weight: 850; }
+
+    .tissue-stack { position: absolute; top: 44px; right: 16px; z-index: 4; width: 124px; height: 92px; transform: rotate(1.7deg); }
+    .tissue-box { position: absolute; width: 76px; height: 44px; border: 1px solid rgba(45,137,27,0.18); border-radius: 3px; background: linear-gradient(178deg, rgba(255,255,255,0.82) 0 28%, transparent 29%), linear-gradient(14deg, #e8ffe4 0 38%, #83e83f 39% 70%, #f9ffe6 71% 100%); box-shadow: 0 4px 10px rgba(33,99,18,0.16); }
+    .tissue-box::before { position: absolute; top: -8px; left: 28px; width: 38px; height: 18px; border-radius: 18px 18px 4px 4px; background: linear-gradient(180deg, #fff, #edf2ef); box-shadow: 0 1px 5px rgba(54,87,39,0.14); content: ""; }
+    .tissue-box::after { position: absolute; top: 19px; left: 23px; color: #4a3428; font-family: Georgia, "Times New Roman", serif; font-size: 8px; font-weight: 900; content: "心相印"; }
+    .tissue-box.b1 { left: 10px; top: 0; }
+    .tissue-box.b2 { left: 44px; top: 5px; transform: scale(0.95); }
+    .tissue-box.b3 { left: 4px; top: 42px; transform: scale(0.92); }
+    .tissue-box.b4 { left: 42px; top: 47px; transform: scale(0.88); }
+
+    /* ── 领取卡片 ── */
+    .claim-card {
+      position: relative; z-index: 3;
+      margin: 0 14px;
+      background: rgba(255,255,255,0.96); box-shadow: var(--shadow);
+      min-height: 106px; padding: 17px 14px 19px;
+      border-radius: var(--card-radius); transform: translateY(-28px);
+    }
+    .claim-title { margin: 0 0 20px; font-size: 20px; font-weight: 900; color: #33343a; }
+
+    .claim-button {
+      display: block; width: min(190px,70%); height: 38px;
+      margin: 0 auto; border: 0; border-radius: 999px;
+      background: linear-gradient(180deg, #ff4b91 0%, #fb3d82 100%);
+      color: #fff; font-size: 17px; font-weight: 900; line-height: 38px; text-align: center;
+      cursor: pointer; box-shadow: 0 8px 18px rgba(255,63,138,0.22);
+      transition: transform 160ms ease, box-shadow 160ms ease;
+    }
+    .claim-button:hover { filter: brightness(1.02); transform: translateY(-1px); box-shadow: 0 10px 20px rgba(255,63,138,0.28); }
+    .claim-button:active { transform: translateY(1px); box-shadow: 0 4px 10px rgba(255,63,138,0.2); }
+
+    /* ── Detail Card ── */
+    .detail-card {
+      margin-top: -16px; padding: 13px 14px 100px;
+      border-radius: 14px 14px 0 0;
+      background: rgba(255,255,255,0.96); box-shadow: var(--shadow);
+      color: var(--muted); font-size: 16px; line-height: 1.72;
+    }
+    .section-title { margin: 0; color: #6d7077; font-size: 17px; font-weight: 500; line-height: 1.8; }
+    .paragraph { margin: 0 0 30px; }
+    .paragraph.tight { margin-bottom: 28px; }
+    .red { color: var(--danger); }
+    .strong { color: #5e626a; font-weight: 850; }
+
+    .home-indicator {
+      position: fixed; left: 50%; bottom: 8px; z-index: 10;
+      width: 112px; height: 5px; border-radius: 999px;
+      background: #050507; transform: translateX(-50%);
+    }
+
+    /* ══════════════════════════════════════
+       底部面板 (Bottom Panel)
+       ══════════════════════════════════════ */
+    .panel-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      opacity: 0; visibility: hidden;
+      transition: opacity 300ms ease, visibility 300ms ease;
+    }
+    .panel-overlay.show { opacity: 1; visibility: visible; }
+
+    .panel-backdrop {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.45);
+    }
+
+    .panel-sheet {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      max-height: 88vh;
+      background: #fff;
+      border-radius: 24px 24px 0 0;
+      transform: translateY(100%);
+      transition: transform 380ms cubic-bezier(0.22, 0.98, 0.32, 1);
+      display: flex;
+      flex-direction: column;
+    }
+    .panel-overlay.show .panel-sheet { transform: translateY(0); }
+
+    .panel-sheet-inner {
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 12px 24px 42px;
+    }
+
+    /* Handle */
+    .panel-handle {
+      width: 48px; height: 5px;
+      margin: 0 auto 16px;
+      border-radius: 999px;
+      background: #d9dae0;
+    }
+
+    /* ── 步骤指示器 ── */
+    .step-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 20px;
+    }
+    .step-dot {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #c4c6cc;
+      transition: color 300ms ease;
+    }
+    .step-dot::before {
+      content: "";
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #d9dae0;
+      transition: background 300ms ease;
+    }
+    .step-dot.active { color: var(--pink); }
+    .step-dot.active::before { background: var(--pink); }
+    .step-dot.done { color: var(--green); }
+    .step-dot.done::before { background: var(--green); }
+
+    .step-connector {
+      width: 28px; height: 1px;
+      background: #d9dae0;
+      flex: 0 0 auto;
+    }
+    .step-connector.done { background: var(--green); }
+
+    /* ── 步骤标题 ── */
+    .step-title {
+      margin: 0 0 6px;
+      font-size: 20px;
+      font-weight: 900;
+      color: #1f2126;
+      text-align: center;
+    }
+    .step-subtitle {
+      margin: 0 0 24px;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    /* ── 步骤容器（切换动画） ── */
+    .step-content {
+      position: relative;
+    }
+    .step-pane {
+      display: none;
+      animation: stepFadeIn 350ms ease;
+    }
+    .step-pane.active { display: block; }
+
+    @keyframes stepFadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ═══ Step 1: 地址选择 ═══ */
+    .addr-select-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 14px 12px;
+      margin-bottom: 8px;
+      border: 2px solid #eaeaee;
+      border-radius: 14px;
+      background: var(--white);
+      cursor: pointer;
+      transition: border-color 200ms ease, background 200ms ease;
+      text-align: left;
+      font: inherit;
+    }
+    .addr-select-item:hover { border-color: #d0d0d8; }
+    .addr-select-item.selected {
+      border-color: var(--pink);
+      background: #fff5f9;
+    }
+
+    .addr-select-radio {
+      flex: 0 0 auto;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      border: 2px solid #d0d1d8;
+      display: grid;
+      place-items: center;
+      transition: border-color 200ms ease, background 200ms ease;
+    }
+    .addr-select-radio::after {
+      content: "";
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: transparent;
+      transition: background 200ms ease;
+    }
+    .addr-select-item.selected .addr-select-radio {
+      border-color: var(--pink);
+      background: var(--pink);
+    }
+    .addr-select-item.selected .addr-select-radio::after {
+      background: #fff;
+    }
+
+    .addr-select-info { flex: 1; min-width: 0; }
+    .addr-select-person {
+      font-size: 17px; font-weight: 900; color: #1f2126;
+      margin-bottom: 4px;
+      display: flex; align-items: baseline; gap: 8px;
+    }
+    .addr-select-addr {
+      font-size: 14px; color: var(--muted);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .addr-select-badge {
+      flex: 0 0 auto;
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 2px;
+      background: #f0f0f1;
+      color: #9ca0a8;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .addr-add-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      padding: 12px;
+      margin-top: 4px;
+      border: 1.5px dashed #d0d1d8;
+      border-radius: 12px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font: inherit;
+      transition: border-color 200ms ease, color 200ms ease;
+    }
+    .addr-add-btn:hover { border-color: var(--pink); color: var(--pink); }
+
+    /* ═══ Step 2: 确认地址 ═══ */
+    .confirm-card {
+      padding: 16px 14px;
+      border-radius: 12px;
+      background: #f6f6f8;
+      margin-bottom: 12px;
+    }
+    .confirm-person {
+      font-size: 17px; font-weight: 900; color: #1f2126;
+      display: flex; align-items: baseline; gap: 10px;
+      margin-bottom: 6px;
+    }
+    .confirm-addr {
+      font-size: 15px; color: var(--muted); line-height: 1.4;
+    }
+    .confirm-modify-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 6px;
+    }
+    .confirm-modify {
+      border: 0; background: transparent;
+      color: var(--pink); font-size: 14px; font-weight: 700;
+      cursor: pointer; padding: 4px 0;
+    }
+
+    .confirm-hint {
+      display: flex; align-items: center; gap: 6px;
+      padding: 12px 14px; border-radius: 10px;
+      background: #fff3e8; color: #cd5e20;
+      font-size: 14px; font-weight: 600;
+      margin-bottom: 28px;
+    }
+    .confirm-hint::before { content: "⚠"; font-size: 16px; flex: 0 0 auto; }
+
+    /* ═══ Step 3: 结果 ═══ */
+    .result-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .result-check {
+      display: grid; place-items: center;
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7ddd3c, #45c91c);
+      color: #fff;
+      font-size: 28px;
+      font-weight: 900;
+      box-shadow: 0 6px 16px rgba(69,201,28,0.28);
+    }
+    .result-text {
+      font-size: 22px; font-weight: 900;
+      color: #1f2126;
+    }
+
+    .result-days {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 15px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .result-card {
+      padding: 14px;
+      border-radius: 12px;
+      background: #f0f8ff;
+      border: 1px solid #d4e8f7;
+      margin-bottom: 20px;
+    }
+    .result-card-header {
+      display: flex; align-items: center; gap: 6px;
+      margin-bottom: 10px;
+      font-size: 14px; font-weight: 700; color: #3d7eb3;
+    }
+    .result-card-header::before { content: "📦"; font-size: 16px; }
+
+    .result-addr-line {
+      display: flex; align-items: flex-start; gap: 6px;
+      padding: 10px 12px; border-radius: 8px;
+      background: var(--white);
+      margin-bottom: 8px;
+      font-size: 14px; color: #3d7eb3;
+    }
+    .result-addr-line::before { content: "📍"; flex: 0 0 auto; }
+    .result-addr-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .result-logistics-row {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 10px; padding: 10px 12px; border-radius: 8px;
+      background: var(--white);
+    }
+    .result-logistics-left { flex: 1; min-width: 0; }
+    .result-logistics-company { font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 3px; }
+    .result-logistics-number { font-size: 16px; font-weight: 800; color: #1f2126; letter-spacing: 0.5px; user-select: all; }
+
+    .result-btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* ── 通用按钮 ── */
+    .btn-primary {
+      display: block; width: 100%; height: 48px;
+      border: 0; border-radius: 999px;
+      background: linear-gradient(180deg, #ff4b91 0%, #fb3d82 100%);
+      color: #fff; font-size: 18px; font-weight: 900;
+      text-align: center; cursor: pointer;
+      box-shadow: 0 8px 20px rgba(255,63,138,0.24);
+      transition: transform 160ms ease, box-shadow 160ms ease;
+      font: inherit;
+    }
+    .btn-primary:hover { filter: brightness(1.02); transform: translateY(-1px); box-shadow: 0 10px 24px rgba(255,63,138,0.3); }
+    .btn-primary:active { transform: translateY(1px); box-shadow: 0 4px 10px rgba(255,63,138,0.2); }
+    .btn-primary:disabled {
+      opacity: 0.5; cursor: not-allowed; box-shadow: none;
+      transform: none !important; filter: none !important;
+    }
+
+    .btn-secondary {
+      display: block; width: 100%; height: 48px;
+      border: 2px solid #d9dae0; border-radius: 999px;
+      background: var(--white);
+      color: #33343a; font-size: 17px; font-weight: 800;
+      text-align: center; cursor: pointer;
+      transition: background 150ms ease;
+      font: inherit;
+    }
+    .btn-secondary:hover { background: #f6f6f8; }
+
+    .btn-copy {
+      flex: 0 0 auto; height: 32px;
+      padding: 0 14px;
+      border: 1.5px solid var(--pink); border-radius: 999px;
+      background: transparent; color: var(--pink);
+      font-size: 13px; font-weight: 800;
+      cursor: pointer; white-space: nowrap;
+      transition: background 150ms ease, color 150ms ease;
+    }
+    .btn-copy:hover { background: var(--pink); color: #fff; }
+    .btn-copy:active { opacity: 0.8; }
+    .btn-copy.copied { background: var(--green); border-color: var(--green); color: #fff; }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed; left: 50%; bottom: 100px; z-index: 999;
+      transform: translateX(-50%) translateY(20px);
+      padding: 10px 24px; border-radius: 999px;
+      background: rgba(0,0,0,0.78); color: #fff;
+      font-size: 14px; font-weight: 600;
+      opacity: 0; transition: opacity 280ms ease, transform 280ms ease;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── 已领取行内状态 ── */
+    .claimed-inline {
+      display: none;
+      animation: fadeSlideIn 350ms ease forwards;
+    }
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .claimed-btn-grey {
+      display: block; width: min(190px,70%); height: 38px;
+      margin: 0 auto; border: 0; border-radius: 999px;
+      background: #d9dae0; color: #9ca0a8;
+      font-size: 17px; font-weight: 900; line-height: 38px; text-align: center;
+      cursor: default;
+    }
+    .claimed-status-row {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      margin-top: 12px; font-size: 15px; color: var(--muted); font-weight: 500;
+    }
+
+    @media (min-width: 431px) {
+      body { padding: 24px 0; }
+      .page { border-radius: 28px; box-shadow: 0 24px 70px rgba(24,27,33,0.18); }
+      .home-indicator { position: absolute; }
+    }
+    @media (max-width: 360px) {
+      .status-bar { padding-inline: 18px; }
+      .brand-line { font-size: 16px; }
+      .hero-wrap { padding-inline: 16px; }
+      .coupon-title { font-size: 28px; }
+      .tissue-stack { right: 8px; transform: scale(0.84) rotate(1.7deg); transform-origin: top right; }
+      .detail-card { font-size: 15px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page" aria-label="美柚会员福利领取页">
+    <!-- Status Bar -->
+    <header class="status-bar" aria-label="手机状态栏">
+      <div class="time">17:36</div>
+      <div class="app-pill" aria-label="美柚">
+        <span class="app-icon">柚</span>
+        <span class="app-name">美柚</span>
+      </div>
+      <div class="system-icons" aria-hidden="true">
+        <span class="signal"><span></span><span></span><span></span><span></span></span>
+        <span class="wifi"><span></span></span>
+        <span class="battery">100</span>
+      </div>
+    </header>
+
+    <!-- Nav -->
+    <nav class="nav" aria-label="页面导航">
+      <button class="back" type="button" aria-label="返回"></button>
+      <div class="brand-line">
+        <span class="member-mark" aria-hidden="true"><span>✓</span></span>
+        <span>美柚会员</span>
+        <span aria-hidden="true">|</span>
+        <span class="heart-logo">相印</span>
+      </div>
+      <span aria-hidden="true"></span>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero-wrap" aria-label="茶语抽纸优惠券">
+      <div class="hand" aria-hidden="true">
+        <span class="palm"></span>
+        <span class="finger one"></span>
+        <span class="finger two"></span>
+      </div>
+      <article class="coupon">
+        <div class="daily-tag">每日可领一次</div>
+        <div class="coupon-content">
+          <p class="coupon-kicker">美柚会员专享</p>
+          <h1 class="coupon-title">茶语抽纸10元券</h1>
+          <div class="coupon-subtitle">5包到手8.8元</div>
+        </div>
+        <div class="tissue-stack" aria-hidden="true">
+          <span class="tissue-box b1"></span>
+          <span class="tissue-box b2"></span>
+          <span class="tissue-box b3"></span>
+          <span class="tissue-box b4"></span>
+        </div>
+        <div class="coupon-value">价值￥10</div>
+      </article>
+    </section>
+
+    <!-- Claim Card -->
+    <section class="claim-card" aria-label="领取美柚专享福利">
+      <h2 class="claim-title">领取美柚专享福利</h2>
+      <button class="claim-button" id="claimBtn" type="button">免费领取</button>
+
+      <!-- 已领取行内状态 -->
+      <div class="claimed-inline" id="claimedInline">
+        <div class="claimed-btn-grey">已领取</div>
+        <div class="claimed-status-row">
+          <span id="claimedDays">预计 3 个工作日内寄出</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Detail -->
+    <section class="detail-card" aria-label="福利详情">
+      <h2 class="section-title">福利详情：</h2>
+      <p class="paragraph tight">
+        心相印10元抽纸券，适用于心相印茶语丝享抽纸100抽*5包，
+        <span class="red">到手8.8元</span>
+      </p>
+      <h2 class="section-title">领取流程：</h2>
+      <p class="paragraph">
+        1、点击上方"免费领取"按钮，选择收货地址并确认<br>
+        2、兑换路径：恒安官方会员商城小程序-我的-兑换中心-输入兑换码即可
+      </p>
+      <h2 class="section-title">使用说明：</h2>
+      <p class="paragraph">
+        1、兑换码有效期：截止2026年12月31日，请在有效期内完成兑换，逾期作废<br>
+        2、本优惠券新老用户均可使用，每个订单限用1张，不与其他优惠叠加<br>
+        3、兑换后路径查询：可在"恒安官方会员商城"微信小程序底部导航栏【我的】-【全部订单】中查看<br>
+        4、本优惠券仅原价购买商品时可用<br>
+        5、本优惠券不可二次销售，不可兑现
+      </p>
+    </section>
+
+    <span class="home-indicator" aria-hidden="true"></span>
+  </main>
+
+  <!-- ══════════════════════════════════════
+       底部面板 (Bottom Panel)
+       ══════════════════════════════════════ -->
+  <div class="panel-overlay" id="panelOverlay" role="dialog" aria-modal="true" aria-label="领取流程">
+    <div class="panel-backdrop" id="panelBackdrop"></div>
+    <div class="panel-sheet">
+      <div class="panel-sheet-inner">
+        <div class="panel-handle" aria-hidden="true"></div>
+
+        <!-- 步骤指示器 -->
+        <div class="step-indicator" id="stepIndicator">
+          <span class="step-dot active" data-step="1">选择地址</span>
+          <span class="step-connector" data-step="1"></span>
+          <span class="step-dot" data-step="2">确认</span>
+          <span class="step-connector" data-step="2"></span>
+          <span class="step-dot" data-step="3">完成</span>
+        </div>
+
+        <!-- 步骤容器 -->
+        <div class="step-content">
+
+          <!-- ═══ Step 1: 选择地址 ═══ -->
+          <div class="step-pane active" id="step1">
+            <h2 class="step-title">选择收货地址</h2>
+            <p class="step-subtitle">请选择奖品寄送地址</p>
+
+            <button class="addr-select-item selected" data-idx="0" type="button">
+              <span class="addr-select-radio"></span>
+              <span class="addr-select-info">
+                <span class="addr-select-person">
+                  <span>测试2</span>
+                  <span>132****5555</span>
+                  <span class="addr-select-badge">默认</span>
+                </span>
+                <span class="addr-select-addr">广西壮族自治区桂林市荔浦县85号</span>
+              </span>
+            </button>
+
+            <button class="addr-select-item" data-idx="1" type="button">
+              <span class="addr-select-radio"></span>
+              <span class="addr-select-info">
+                <span class="addr-select-person">
+                  <span>测试1</span>
+                  <span>132****6666</span>
+                </span>
+                <span class="addr-select-addr">福建省宁德市寿宁县平溪镇52号</span>
+              </span>
+            </button>
+
+            <button class="addr-add-btn" type="button">+ 添加新地址</button>
+
+            <div style="margin-top: 24px;">
+              <button class="btn-primary" id="step1Next" type="button">下一步</button>
+            </div>
+          </div>
+
+          <!-- ═══ Step 2: 确认地址 ═══ -->
+          <div class="step-pane" id="step2">
+            <h2 class="step-title">确认收货地址</h2>
+            <p class="step-subtitle" id="step2Days">预计 3 个工作日内寄出</p>
+
+            <div class="confirm-card">
+              <div class="confirm-person">
+                <span id="confirmName">测试2</span>
+                <span id="confirmPhone">132****5555</span>
+              </div>
+              <div class="confirm-addr" id="confirmAddr">广西壮族自治区桂林市荔浦县85号</div>
+              <div class="confirm-modify-row">
+                <button class="confirm-modify" id="step2Modify" type="button">修改地址</button>
+              </div>
+            </div>
+
+            <div class="confirm-hint">确认地址以后不可修改</div>
+
+            <button class="btn-primary" id="step2Confirm" type="button">确认领取</button>
+          </div>
+
+          <!-- ═══ Step 3: 完成 ═══ -->
+          <div class="step-pane" id="step3">
+            <div class="result-badge">
+              <span class="result-check">✓</span>
+              <span class="result-text">已领取</span>
+            </div>
+            <p class="result-days" id="resultDays">预计 3 个工作日内寄出</p>
+
+            <div class="result-card">
+              <div class="result-card-header">物流信息</div>
+              <div class="result-addr-line">
+                <span class="result-addr-text" id="resultAddr">测试2 132****5555 · 广西桂林市荔浦县85号</span>
+              </div>
+              <div class="result-logistics-row">
+                <div class="result-logistics-left">
+                  <div class="result-logistics-company" id="resultCompany">顺丰速运</div>
+                  <div class="result-logistics-number" id="resultNumber">SF1234567890</div>
+                </div>
+                <button class="btn-copy" id="resultCopy" type="button">复制</button>
+              </div>
+            </div>
+
+            <div class="result-btn-group">
+              <button class="btn-primary" id="step3Done" type="button">完成</button>
+            </div>
+          </div>
+
+        </div><!-- /step-content -->
+      </div><!-- /panel-sheet-inner -->
+    </div><!-- /panel-sheet -->
+  </div><!-- /panel-overlay -->
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ── DOM refs ──
+    const claimBtn = document.getElementById("claimBtn");
+    const claimedInline = document.getElementById("claimedInline");
+    const claimedDays = document.getElementById("claimedDays");
+    const panelOverlay = document.getElementById("panelOverlay");
+    const panelBackdrop = document.getElementById("panelBackdrop");
+    const step1 = document.getElementById("step1");
+    const step2 = document.getElementById("step2");
+    const step3 = document.getElementById("step3");
+    const step1Next = document.getElementById("step1Next");
+    const step2Modify = document.getElementById("step2Modify");
+    const step2Confirm = document.getElementById("step2Confirm");
+    const step2Days = document.getElementById("step2Days");
+    const step3Done = document.getElementById("step3Done");
+    const confirmName = document.getElementById("confirmName");
+    const confirmPhone = document.getElementById("confirmPhone");
+    const confirmAddr = document.getElementById("confirmAddr");
+    const resultDays = document.getElementById("resultDays");
+    const resultAddr = document.getElementById("resultAddr");
+    const resultCompany = document.getElementById("resultCompany");
+    const resultNumber = document.getElementById("resultNumber");
+    const resultCopy = document.getElementById("resultCopy");
+    const toast = document.getElementById("toast");
+
+    const addrItems = document.querySelectorAll(".addr-select-item");
+    const stepDots = document.querySelectorAll(".step-dot");
+    const stepConnectors = document.querySelectorAll(".step-connector");
+    const stepPanes = { 1: step1, 2: step2, 3: step3 };
+
+    // ── 地址数据 ──
+    const addressData = [
+      { name: "测试2", phone: "132****5555", addr: "广西壮族自治区桂林市荔浦县85号", badge: "默认" },
+      { name: "测试1", phone: "132****6666", addr: "福建省宁德市寿宁县平溪镇52号", badge: "" },
+    ];
+
+    let selectedIdx = 0;   // 当前选中地址索引
+    let currentStep = 1;
+    let shipDays = 3;
+    let isClaimed = false;
+
+    function randomShipDays() { return Math.floor(Math.random() * 5) + 2; }
+
+    // ── Toast ──
+    let toastTimer = null;
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 1800);
+    }
+
+    // ── 地址选择 ──
+    addrItems.forEach((item) => {
+      item.addEventListener("click", () => {
+        addrItems.forEach((el) => el.classList.remove("selected"));
+        item.classList.add("selected");
+        selectedIdx = parseInt(item.dataset.idx);
+      });
+    });
+
+    // ── 底部面板 ──
+    function openPanel() { panelOverlay.classList.add("show"); }
+    function closePanel() { panelOverlay.classList.remove("show"); }
+
+    panelBackdrop.addEventListener("click", closePanel);
+
+    // ── 切换步骤 ──
+    function goToStep(step) {
+      currentStep = step;
+      // 切换 pane
+      Object.values(stepPanes).forEach((p) => p.classList.remove("active"));
+      stepPanes[step].classList.add("active");
+      // 更新 dot
+      stepDots.forEach((dot) => {
+        const s = parseInt(dot.dataset.step);
+        dot.classList.remove("active", "done");
+        if (s === step) dot.classList.add("active");
+        else if (s < step) dot.classList.add("done");
+      });
+      stepConnectors.forEach((conn) => {
+        const s = parseInt(conn.dataset.step);
+        conn.classList.toggle("done", s < step);
+      });
+    }
+
+    // ── Step 1 → Step 2 ──
+    step1Next.addEventListener("click", () => {
+      const addr = addressData[selectedIdx];
+      confirmName.textContent = addr.name;
+      confirmPhone.textContent = addr.phone;
+      confirmAddr.textContent = addr.addr;
+      shipDays = randomShipDays();
+      const daysText = `预计 ${shipDays} 个工作日内寄出`;
+      step2Days.textContent = daysText;
+      goToStep(2);
+    });
+
+    // ── Step 2 → 返回 Step 1 ──
+    step2Modify.addEventListener("click", () => {
+      goToStep(1);
+    });
+
+    // ── Step 2 → Step 3 (确认领取) ──
+    step2Confirm.addEventListener("click", () => {
+      const addr = addressData[selectedIdx];
+      const daysText = `预计 ${shipDays} 个工作日内寄出`;
+      resultDays.textContent = daysText;
+      resultAddr.textContent = `${addr.name} ${addr.phone} · ${addr.addr}`;
+      resultCompany.textContent = "顺丰速运";
+      resultNumber.textContent = "SF" + String(Math.floor(Math.random() * 10000000000)).padStart(10, "0");
+      goToStep(3);
+    });
+
+    // ── Step 3: 完成 ──
+    step3Done.addEventListener("click", () => {
+      closePanel();
+      isClaimed = true;
+      // 更新行内状态
+      const daysText = `预计 ${shipDays} 个工作日内寄出`;
+      claimedDays.textContent = daysText;
+      claimBtn.style.display = "none";
+      claimedInline.style.display = "block";
+    });
+
+    // ── 复制物流单号 ──
+    resultCopy.addEventListener("click", async () => {
+      const number = resultNumber.textContent;
+      try {
+        await navigator.clipboard.writeText(number);
+      } catch {
+        const ta = document.createElement("textarea");
+        ta.value = number;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+      }
+      resultCopy.textContent = "已复制";
+      resultCopy.classList.add("copied");
+      showToast("已复制");
+      setTimeout(() => {
+        resultCopy.textContent = "复制";
+        resultCopy.classList.remove("copied");
+      }, 2000);
+    });
+
+    // ── 点击免费领取 ──
+    claimBtn.addEventListener("click", () => {
+      // 重置步骤
+      goToStep(1);
+      selectedIdx = 0;
+      addrItems.forEach((el, i) => {
+        el.classList.toggle("selected", i === 0);
+      });
+      openPanel();
+    });
+  </script>
+</body>
+</html>

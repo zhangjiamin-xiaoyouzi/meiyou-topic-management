@@ -1,0 +1,115 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script><script>mermaid.initialize({startOnLoad:true,theme:"default",securityLevel:"loose"});window.mermaidReady=false;window.addEventListener("load",function(){setTimeout(function(){window.mermaidReady=true;},3000);});</script><style>body{font-family:sans-serif;margin:20px;background:#fff}.diagram{margin:20px 0;padding:16px;border:1px solid #e0e0e0;border-radius:8px;background:#fafafa}h2{color:#333;font-size:16px;margin:24px 0 8px 0}.mermaid svg{max-width:100%}</style></head><body><h2>1. E-R 图</h2>
+<div class="diagram" id="diagram-0"><div class="mermaid">
+erDiagram
+    USER ||--o{ CLAIM_RECORD : "领取"
+    USER ||--o{ ADDRESS : "拥有"
+    CLAIM_RECORD ||--|| ADDRESS : "使用"
+    CLAIM_RECORD ||--o| LOGISTICS : "关联"
+    GIFT_CONFIG ||--o{ CLAIM_RECORD : "配置"
+
+    USER {
+        string user_id PK
+        string member_status "会员状态"
+        string phone "手机号"
+    }
+
+    ADDRESS {
+        string address_id PK
+        string user_id FK
+        string name "收件人"
+        string phone "手机号"
+        string province "省"
+        string city "市"
+        string district "区"
+        string detail "详细地址"
+        boolean is_default "默认地址"
+    }
+
+    GIFT_CONFIG {
+        string gift_id PK
+        string coupon_image "优惠券图片URL"
+        string product_title "商品标题"
+        string usage_notes "使用须知JSON"
+        int ship_days "预计发货天数"
+        int stock "库存数量"
+    }
+
+    CLAIM_RECORD {
+        string claim_id PK
+        string user_id FK
+        string gift_id FK
+        string address_id FK
+        string status "claimed/shipped"
+        datetime created_at "领取时间"
+    }
+
+    LOGISTICS {
+        string logistics_id PK
+        string claim_id FK
+        string company "快递公司"
+        string tracking_number "物流单号"
+        string status "运输中/已签收"
+        datetime shipped_at "发货时间"
+    }
+</div></div>
+<h2>2. 产品结构图</h2>
+<div class="diagram" id="diagram-1"><div class="mermaid">
+mindmap
+  root((赠礼详情页))
+    手机状态栏
+    页面导航
+      返回按钮
+      美柚会员 | 品牌标识
+    优惠券卡片
+      品牌优惠券图片
+    领取卡片
+      商品标题
+      免费领取按钮
+      已领取状态
+        已领取按钮（置灰）
+        预计寄出时间
+        收货地址信息
+        物流信息
+    使用须知
+      规则列表
+    确认地址浮层
+      收货地址卡片
+      修改按钮
+      确认领取按钮
+    二次确认弹窗
+      取消按钮
+      确认领取按钮
+    Toast 提示
+    地址选择页
+      地址列表
+      默认地址标识
+      返回/添加新地址
+</div></div>
+<h2>3. 产品流程图</h2>
+<div class="diagram" id="diagram-2"><div class="mermaid">
+flowchart TD
+    A[用户进入赠礼详情页] --> B{是否已领取?}
+    B -->|否| C[展示优惠券 + 商品 + 免费领取按钮]
+    B -->|是| D[展示已领取状态:<br/>收货地址 + 物流信息]
+
+    C --> E{用户点击免费领取}
+    E --> F[弹出确认地址浮层<br/>展示默认收货地址]
+    F --> G{用户操作}
+
+    G -->|点击修改| H[跳转地址选择页]
+    H --> I[用户选择地址]
+    I --> J[返回详情页, 携带地址参数]
+    J --> F
+
+    G -->|点击确认领取| K[弹出二次确认弹窗]
+    K --> L{用户操作}
+    L -->|取消| K --关闭--> F
+    L -->|确认领取| M[领取生效:<br/>按钮变灰为已领取]
+
+    M --> N[展示收货地址]
+    N --> O[展示物流信息]
+
+    D --> P{是否有物流单号?}
+    P -->|否| Q[🚚 等待发货]
+    P -->|是| R[显示快递公司 + 单号<br/>一键复制按钮]
+</div></div></body></html>

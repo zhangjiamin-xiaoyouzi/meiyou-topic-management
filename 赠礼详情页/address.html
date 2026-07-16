@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>收货地址</title>
+  <style>
+    :root {
+      --page-bg: #f3f3f4;
+      --bar-bg: #f8f8fa;
+      --white: #fff;
+      --text: #34363b;
+      --muted: #a4a6ad;
+      --line: #f0f0f2;
+      --pink: #ff4b91;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: #ececf1;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+    }
+    body { display: flex; justify-content: center; }
+    button, a { color: inherit; font: inherit; }
+    .page {
+      position: relative;
+      width: min(100vw, 450px);
+      min-height: 100vh;
+      overflow: hidden;
+      background: var(--page-bg);
+    }
+    .top {
+      position: relative;
+      z-index: 2;
+      background: var(--bar-bg);
+      border-bottom: 1px solid rgba(229, 229, 233, 0.72);
+    }
+    .status-bar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      height: 40px;
+      padding: 7px 18px 0 27px;
+      font-weight: 800;
+      color: #090a0c;
+    }
+    .time { font-size: 18px; line-height: 1; }
+    .system-icons { display: flex; align-items: center; gap: 6px; }
+    .signal { display: inline-flex; align-items: flex-end; gap: 2px; height: 15px; }
+    .signal span { display: block; width: 4px; border-radius: 4px; background: #0a0b0e; }
+    .signal span:nth-child(1) { height: 5px; }
+    .signal span:nth-child(2) { height: 8px; }
+    .signal span:nth-child(3) { height: 11px; }
+    .signal span:nth-child(4) { height: 14px; }
+    .wifi { position: relative; width: 19px; height: 15px; }
+    .wifi::before, .wifi::after, .wifi span {
+      position: absolute; left: 50%;
+      border: 2.5px solid #0a0b0e; border-bottom: 0;
+      border-left-color: transparent; border-right-color: transparent;
+      border-radius: 20px 20px 0 0; transform: translateX(-50%); content: "";
+    }
+    .wifi::before { top: 1px; width: 19px; height: 10px; }
+    .wifi::after { top: 6px; width: 12px; height: 6px; }
+    .wifi span { top: 11px; width: 4px; height: 4px; border: 0; border-radius: 50%; background: #0a0b0e; }
+    .battery { min-width: 28px; height: 18px; padding: 1px 4px; border-radius: 5px; background: #4e5259; color: #fff; font-size: 12px; font-weight: 850; line-height: 16px; text-align: center; }
+    .nav {
+      display: grid;
+      grid-template-columns: 64px 1fr 112px;
+      align-items: center;
+      height: 54px;
+      padding: 0 13px 0 8px;
+    }
+    .back {
+      display: block; width: 34px; height: 34px; border: 0; background: transparent; position: relative; text-decoration: none;
+    }
+    .back::before {
+      position: absolute; top: 8px; left: 10px; width: 14px; height: 14px;
+      border-left: 2px solid #40434a; border-bottom: 2px solid #40434a;
+      transform: rotate(45deg); content: "";
+    }
+    .title { margin: 0; color: #33343a; font-size: 18px; font-weight: 850; text-align: center; }
+    .add-address { justify-self: end; border: 0; background: transparent; color: #33343a; font-size: 16px; font-weight: 600; text-decoration: none; white-space: nowrap; }
+    }
+
+    .address-list { position: relative; z-index: 1; background: var(--white); }
+    .address-item {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 42px;
+      align-items: center;
+      min-height: 92px;
+      padding: 15px 10px 14px;
+      border: 0;
+      border-bottom: 1px solid rgba(243, 243, 245, 0.95);
+      background: transparent;
+      text-align: left;
+      cursor: pointer;
+      transition: background 150ms ease;
+      width: 100%;
+    }
+    .address-item:hover { background: #fcfcfd; }
+    .address-item:active { background: #f8f8fa; }
+    .person {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 13px;
+      color: #32343a;
+      font-size: 19px;
+      font-weight: 900;
+    }
+    .phone { font-weight: 900; }
+    .address {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.25;
+    }
+    .badge {
+      flex: 0 0 auto;
+      display: inline-block;
+      min-width: 31px;
+      height: 19px;
+      padding: 1px 5px;
+      border-radius: 2px;
+      background: #f0f0f1;
+      color: #9ca0a8;
+      font-size: 12px;
+      line-height: 17px;
+      text-align: center;
+    }
+    .address-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .edit {
+      justify-self: end;
+      display: grid;
+      place-items: center;
+      width: 36px; height: 36px;
+      border: 0; border-radius: 50%;
+      background: transparent;
+      color: var(--pink);
+      cursor: pointer;
+    }
+    .edit-icon { position: relative; width: 21px; height: 21px; display: block; }
+    .edit-icon::before {
+      position: absolute; left: 3px; top: 8px; width: 17px; height: 6px;
+      border: 2px solid currentColor; border-left: 0; border-radius: 1px 4px 4px 1px;
+      transform: rotate(-45deg); content: "";
+    }
+    .edit-icon::after {
+      position: absolute; left: 2px; bottom: 3px; width: 10px; height: 2px;
+      border-radius: 2px; background: currentColor; transform: rotate(-1deg); content: "";
+    }
+    .empty-space { height: calc(100vh - 278px); background: var(--page-bg); }
+
+    @media (min-width: 451px) {
+      body { padding: 24px 0; }
+      .page { border-radius: 28px; box-shadow: 0 24px 70px rgba(24,27,33,0.18); }
+    }
+    @media (max-width: 360px) {
+      .nav { grid-template-columns: 52px 1fr 96px; }
+      .add-address, .address { font-size: 14px; }
+      .person { font-size: 17px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page" aria-label="收货地址选择页">
+    <header class="top">
+      <div class="status-bar" aria-label="手机状态栏">
+        <div class="time">18:12</div>
+        <div class="system-icons" aria-hidden="true">
+          <span class="signal"><span></span><span></span><span></span><span></span></span>
+          <span class="wifi"><span></span></span>
+          <span class="battery">68</span>
+        </div>
+      </div>
+      <nav class="nav" aria-label="页面导航">
+        <a class="back" href="./index.html" aria-label="返回福利详情页"></a>
+        <h1 class="title">收货地址</h1>
+        <a class="add-address" href="#" aria-label="添加新地址">添加新地址</a>
+      </nav>
+    </header>
+
+    <!-- 顶部提示条 -->
+
+    <section class="address-list" aria-label="地址列表">
+      <article class="address-item" tabindex="0" role="button" aria-label="选择测试2地址">
+        <span>
+          <span class="person">
+            <span>测试2</span>
+            <span class="phone">132****5555</span>
+          </span>
+          <span class="address">
+            <span class="badge">默认</span>
+            <span class="address-text">广西壮族自治区桂林市荔浦县85号</span>
+          </span>
+        </span>
+        <button class="edit" type="button" aria-label="编辑测试2地址">
+          <span class="edit-icon" aria-hidden="true"></span>
+        </button>
+      </article>
+
+      <article class="address-item" tabindex="0" role="button" aria-label="选择测试1地址">
+        <span>
+          <span class="person">
+            <span>测试1</span>
+            <span class="phone">132****6666</span>
+          </span>
+          <span class="address">
+            <span class="address-text">福建省宁德市寿宁县平溪镇52号</span>
+          </span>
+        </span>
+        <button class="edit" type="button" aria-label="编辑测试1地址">
+          <span class="edit-icon" aria-hidden="true"></span>
+        </button>
+      </article>
+    </section>
+
+    <div class="empty-space" aria-hidden="true"></div>
+  </main>
+
+  <script>
+    // 保留来源参数（from=panel 表示从面板进入，回传后重新打开面板）
+    const urlParams = new URLSearchParams(window.location.search);
+    const fromParam = urlParams.get("from") || "";
+    const fromQuery = fromParam ? `&from=${encodeURIComponent(fromParam)}` : "";
+
+    const addressItems = document.querySelectorAll(".address-item");
+    addressItems.forEach((item) => {
+      item.addEventListener("click", () => {
+        const personEl = item.querySelector(".person");
+        const phoneEl = item.querySelector(".phone");
+        const addressTextEl = item.querySelector(".address-text");
+        const name = encodeURIComponent(personEl ? personEl.children[0].textContent.trim() : "");
+        const phone = encodeURIComponent(phoneEl ? phoneEl.textContent.trim() : "");
+        const addr = encodeURIComponent(addressTextEl ? addressTextEl.textContent.trim() : "");
+        window.location.href = `./index.html?name=${name}&phone=${phone}&addr=${addr}${fromQuery}`;
+      });
+      item.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          item.click();
+        }
+      });
+    });
+    document.querySelectorAll(".edit").forEach((button) => {
+      button.addEventListener("click", (event) => { event.stopPropagation(); });
+    });
+  </script>
+</body>
+</html>
