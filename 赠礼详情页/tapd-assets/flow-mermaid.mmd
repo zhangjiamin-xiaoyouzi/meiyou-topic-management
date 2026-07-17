@@ -1,0 +1,17 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#ff6b9d', 'primaryTextColor': '#fff', 'primaryBorderColor': '#e91e63', 'lineColor': '#666', 'secondaryColor': '#fff3e0', 'tertiaryColor': '#e8f5e9'}}}%%
+graph TD
+    subgraph 用户操作流程
+        A[📱 初始页面<br/>赠礼卡片 + 商品标题 + 免费领取按钮] -->|点击「免费领取」| B[📋 确认地址浮层<br/>展示收货人/地址/手机号]
+        
+        B -->|点击「修改」| C[🏠 地址选择页<br/>独立页面，选择地址]
+        C -->|选择地址后返回| B
+        
+        B -->|点击「确认领取」| D[⚠️ 二次确认弹窗<br/>提示：确认后地址不可修改]
+        D -->|点击「确认」| E[✅ 已领取状态<br/>按钮变灰 + 展示物流信息]
+    end
+    
+    style A fill:#e91e63,stroke:#c2185b,color:#fff
+    style B fill:#ff6b9d,stroke:#e91e63,color:#fff
+    style C fill:#ff9800,stroke:#f57c00,color:#fff
+    style D fill:#ffc107,stroke:#ff8f00,color:#333
+    style E fill:#4caf50,stroke:#388e3c,color:#fff
